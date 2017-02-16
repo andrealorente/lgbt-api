@@ -147,6 +147,12 @@ app.use('/graphql', graphqlHTTP({
 
 app.use(cors());
 
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 app.get('/posts', function(req, res) {
     // This is just an internal test
     var query = 'query { allPosts { id, title, content, author, tags } }'; 
