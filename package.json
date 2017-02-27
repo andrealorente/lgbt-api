@@ -2,6 +2,7 @@
   "name": "lgbt-api",
   "version": "0.0.0",
   "private": true,
+  "main": "graphql-server.js",
   "scripts": {
     "start": "node graphql-server.js"
   },

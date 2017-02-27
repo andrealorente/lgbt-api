@@ -8,8 +8,8 @@ var bodyParser = require('body-parser');
 var cors = require('cors');
 
 //Models
-var User = require('./Models/userModel');
-var Post = require('./Models/postModel');
+var User = require('./models/userModel');
+var Post = require('./models/postModel');
 
 //Conectar con la bd
 mongoose.connect('mongodb://admin:admin@ds145868.mlab.com:45868/lgbt-app');
