@@ -172,7 +172,11 @@ app.get('/users/:id', function(req, res){ //para pasarle un parámetro
 
 //app.listen(4000);
 //console.log('Running a GraphQL API server at localhost:4000/graphql');
-
+// Initialize the app.
+  var server = app.listen(process.env.PORT || 8080, function () {
+    var port = server.address().port;
+    console.log("App now running on port", port);
+  });
 
 /*
     Atajos de teclado:
