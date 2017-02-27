@@ -153,8 +153,6 @@ app.get('/posts', function(req, res) {
     var query = 'query { allPosts { id, title, content, author, tags } }'; 
     graphql.graphql(schema, query).then( function(result) {  
         //console.log(JSON.stringify(result,null," "));
-		res.header("Access-Control-Allow-Origin", "*");
-		res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         res.json(result);
     });
  
@@ -172,8 +170,8 @@ app.get('/users/:id', function(req, res){ //para pasarle un parámetro
 
 });
 
-app.listen(4000);
-console.log('Running a GraphQL API server at localhost:4000/graphql');
+//app.listen(4000);
+//console.log('Running a GraphQL API server at localhost:4000/graphql');
 
 
 /*
