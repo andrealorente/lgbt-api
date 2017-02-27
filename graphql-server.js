@@ -140,7 +140,7 @@ app.post('/user', function(req, res) {
     res.json({ name: u.name, email: u.email });
 });
 
-app.use('/graphql', graphqlHTTP({
+app.use('/', graphqlHTTP({
     schema: schema,
     graphiql: true, //Para usar la herramienta GraphiQL
 }));
