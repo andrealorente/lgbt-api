@@ -133,6 +133,7 @@ app.use(bodyParser.urlencoded({
 
 app.use(bodyParser.json());
 /*********************************/
+app.use(cors());
 
 app.post('/user', function(req, res) {
     //Recibe los datos del formulario
@@ -140,12 +141,10 @@ app.post('/user', function(req, res) {
     res.json({ name: u.name, email: u.email });
 });
 
-app.use('/', graphqlHTTP({
+app.use('/graphql', graphqlHTTP({
     schema: schema,
     graphiql: true, //Para usar la herramienta GraphiQL
 }));
-
-app.use(cors());
 
 
 app.get('/posts', function(req, res) {
