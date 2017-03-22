@@ -11,6 +11,7 @@ var cors = require('cors');
 var User = require('./models/userModel');
 var Post = require('./models/postModel');
 var Channel = require('./models/channelModel');
+var Event = require('./models/eventModel');
 
 //Conectar con la bd
 mongoose.connect('mongodb://admin:admin@ds145868.mlab.com:45868/lgbt-app');
@@ -56,7 +57,7 @@ var postType = new graphql.GraphQLObjectType({
     }
 });
 
-//Post type
+//Channel type
 var channelType = new graphql.GraphQLObjectType({
     name: 'channelType',
     fields: {
@@ -64,6 +65,18 @@ var channelType = new graphql.GraphQLObjectType({
         title: { type: graphql.GraphQLString },
         description: { type: graphql.GraphQLString },
         author: { type: graphql.GraphQLString },
+    }
+});
+
+//Event type
+var eventType = new graphql.GraphQLObjectType({
+    name: 'eventType',
+    fields: {
+        id: { type: graphql.GraphQLString },
+        title: { type: graphql.GraphQLString },
+        description: { type: graphql.GraphQLString },
+        place: { type: graphql.GraphQLString },
+		start_time: { type: graphql.GraphQLString },
     }
 });
 
@@ -141,6 +154,17 @@ var queryType = new graphql.GraphQLObjectType({
 				});
 			}
 		},
+		allEvents: { //En el futuro esto va por meses
+			type: new graphql.GraphQLList(eventType),
+			resolve: function(_) {
+				return new Promise((resolve, reject) => {
+					Event.find(function(err, res) {
+						if(err) reject(err);
+						else resolve(res);
+					}
+				});
+			}
+		}
     }
 });
 
@@ -183,6 +207,16 @@ app.get('/posts', function(req, res) {
 app.get('/channels', function(req, res) {
     // This is just an internal test
     var query = 'query { allChannels { id, title, description, author } }'; 
+    graphql.graphql(schema, query).then( function(result) {  
+        //console.log(JSON.stringify(result,null," "));
+        res.json(result);
+    });
+ 
+});
+
+app.get('/events', function(req, res) {
+    // This is just an internal test
+    var query = 'query { allEvents { id, title, description, place, start_time } }'; 
     graphql.graphql(schema, query).then( function(result) {  
         //console.log(JSON.stringify(result,null," "));
         res.json(result);
