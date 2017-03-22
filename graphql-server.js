@@ -137,7 +137,7 @@ var queryType = new graphql.GraphQLObjectType({
 					Channel.find(function(err, res){
 						if(err) reject(err);
 						else resolve(res);
-					}
+					});
 				});
 			}
 		},
