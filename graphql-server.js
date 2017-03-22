@@ -161,7 +161,7 @@ var queryType = new graphql.GraphQLObjectType({
 					Event.find(function(err, res) {
 						if(err) reject(err);
 						else resolve(res);
-					}
+					});
 				});
 			}
 		}
