@@ -10,6 +10,7 @@ var cors = require('cors');
 //Models
 var User = require('./models/userModel');
 var Post = require('./models/postModel');
+var Channel = require('./models/channelModel');
 
 //Conectar con la bd
 mongoose.connect('mongodb://admin:admin@ds145868.mlab.com:45868/lgbt-app');
@@ -52,6 +53,17 @@ var postType = new graphql.GraphQLObjectType({
         content: { type: graphql.GraphQLString },
         author: { type: graphql.GraphQLString },
         tags: { type: new graphql.GraphQLList(graphql.GraphQLString)}
+    }
+});
+
+//Post type
+var channelType = new graphql.GraphQLObjectType({
+    name: 'channelType',
+    fields: {
+        id: { type: graphql.GraphQLString },
+        title: { type: graphql.GraphQLString },
+        description: { type: graphql.GraphQLString },
+        author: { type: graphql.GraphQLString },
     }
 });
 
@@ -118,6 +130,17 @@ var queryType = new graphql.GraphQLObjectType({
                 });
             }
         },
+		allChannels: {
+			type: new graphql.GraphQLList(channelType),
+			resolve: function(_) {
+				return new Promise((resolve, reject) => {
+					Channel.find(function(err, res){
+						if(err) reject(err);
+						else resolve(res);
+					}
+				});
+			}
+		},
     }
 });
 
@@ -150,6 +173,16 @@ app.use('/graphql', graphqlHTTP({
 app.get('/posts', function(req, res) {
     // This is just an internal test
     var query = 'query { allPosts { id, title, content, author, tags } }'; 
+    graphql.graphql(schema, query).then( function(result) {  
+        //console.log(JSON.stringify(result,null," "));
+        res.json(result);
+    });
+ 
+});
+
+app.get('/channels', function(req, res) {
+    // This is just an internal test
+    var query = 'query { allChannels { id, title, description, author } }'; 
     graphql.graphql(schema, query).then( function(result) {  
         //console.log(JSON.stringify(result,null," "));
         res.json(result);
