@@ -83,7 +83,7 @@ var eventType = new graphql.GraphQLObjectType({
 //Definir mutation type
 var mutationType = new graphql.GraphQLObjectType({
     name: 'Mutation',
-    fields: {
+    fields: ()=> ({
         createUser: { //Entry point
             type: userType,
             description: 'Crear un nuevo usuario',
@@ -104,7 +104,7 @@ var mutationType = new graphql.GraphQLObjectType({
                 });
             }
         },
-    }
+    })
 });
 
 //Definir query type
@@ -182,10 +182,15 @@ app.use(bodyParser.json());
 /*********************************/
 app.use(cors());
 
-app.post('/user', function(req, res) {
+app.get('/user', function(req, res) {
     //Recibe los datos del formulario
-    var u = req.body;
-    res.json({ name: u.name, email: u.email });
+    //var u = req.body;
+	var query ='mutation { createUser( user: { name: "cons", email: "cons" }) { name }}';
+    //res.json({ name: u.name, email: u.email });
+	graphql.graphql(schema, query).then( function(result) {  
+        //console.log(JSON.stringify(result,null," "));
+        res.json(result);
+    });
 });
 
 app.use('/graphql', graphqlHTTP({
