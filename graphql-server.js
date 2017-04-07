@@ -83,7 +83,7 @@ var eventType = new graphql.GraphQLObjectType({
 //Definir mutation type
 var mutationType = new graphql.GraphQLObjectType({
     name: 'Mutation',
-    fields: ()=> ({
+    fields: {
         createUser: { //Entry point
             type: userType,
             description: 'Crear un nuevo usuario',
@@ -104,7 +104,7 @@ var mutationType = new graphql.GraphQLObjectType({
                 });
             }
         },
-    })
+    }
 });
 
 //Definir query type
