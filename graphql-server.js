@@ -105,6 +105,25 @@ var mutationType = new graphql.GraphQLObjectType({
                 });
             }
         },
+        createPost: {
+            type: postType,
+            description: 'Crear un nuevo post',
+            args: {
+                title: {type: graphql.GraphQLString}
+            },
+            resolve: function(root,args){
+                return new Promise((resolve, reject) => {
+                    Post.create({
+                        title: args.title
+                    },function(err, res){
+                        if(err) reject(err);
+                        else{ resolve(res); } 
+                        
+                        
+                    });
+                });
+            }
+        }
     })
 });
 
