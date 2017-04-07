@@ -94,7 +94,7 @@ var mutationType = new graphql.GraphQLObjectType({
             resolve: function(_, args) {
                 return new Promise((resolve,reject) => {
                     
-                    User.create({
+                    User.save({
                         'name' : args.name,
                         'email' : args.email
                     }, function(err, res){
