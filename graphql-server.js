@@ -91,12 +91,12 @@ var mutationType = new graphql.GraphQLObjectType({
                 name: { type: graphql.GraphQLString },
 				email: {type: graphql.GraphQLString }
             },
-            resolve: function(_, { name, email }) {
+            resolve: function(_, args) {
                 return new Promise((resolve,reject) => {
                     
                     User.create({
-                        'name' : name,
-                        'email' : email
+                        'name' : args.name,
+                        'email' : args.email
                     }, function(err, res){
                         if(err) reject(err);
                         else{ resolve(res); } 
