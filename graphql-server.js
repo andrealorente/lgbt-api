@@ -85,7 +85,7 @@ var mutationType = new graphql.GraphQLObjectType({
     name: 'Mutation',
     fields: ()=> ({
         createUser: { //Entry point
-            type: userType,
+            type: userInputType,
             description: 'Crear un nuevo usuario',
             args: {
                 user: { type: userInputType }
