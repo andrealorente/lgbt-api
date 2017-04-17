@@ -12,6 +12,7 @@ var User = require('./models/userModel');
 var Post = require('./models/postModel');
 var Channel = require('./models/channelModel');
 var Event = require('./models/eventModel');
+var Comment = require('./models/commentModel');
 
 //Conectar con la bd
 mongoose.connect('mongodb://admin:admin@ds145868.mlab.com:45868/lgbt-app');
@@ -77,7 +78,33 @@ var eventType = new graphql.GraphQLObjectType({
         description: { type: graphql.GraphQLString },
         place: { type: graphql.GraphQLString },
 		start_time: { type: graphql.GraphQLString },
+		comments: {
+			type: new graphql.GraphQLList(commentType),
+			args: {
+				targetID: { type: graphql.GraphQLString }
+			},
+			resolve: function(_, { targetID }) {
+				return new Promise((resolve,reject) => {
+                    Comment.find({ 'target_id': targetID }, function(err, res){
+                        if(err) reject(err);
+                        else resolve(res);
+                    });
+                });
+			}
+		}
     }
+});
+
+//Comment type
+var commentType = new graphql.GraphQLObjectType({
+	name: 'commentType',
+	fields: {
+		id: { type: graphql.GraphQLString },
+		target_id: { type: graphql.GraphQLString } //Id del post, evento o lo que sea
+		user: { type: graphql.GraphQLString }, //Esto sería todos los datos necesarios del usuario
+		content: { type: graphql.GraphQLString },
+		created_time: { type: graphql.GraphQLString }
+	}
 });
 
 //Definir mutation type
