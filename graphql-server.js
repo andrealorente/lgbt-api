@@ -84,12 +84,12 @@ var eventType = new graphql.GraphQLObjectType({
 				targetID: { type: graphql.GraphQLString }
 			},
 			resolve: function(_, { targetID }) {
-				return new Promise((resolve,reject) => {
+				/*return new Promise((resolve,reject) => {
                     Comment.find({ 'target_id': targetID }, function(err, res){
                         if(err) reject(err);
                         else resolve(res);
                     });
-                });
+                });*/
 			}
 		}
     }
