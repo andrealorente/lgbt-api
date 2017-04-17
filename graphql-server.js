@@ -190,7 +190,7 @@ var queryType = new graphql.GraphQLObjectType({
 			args: {
 				eventID: { type: graphql.GraphQLString }
 			},
-			resolve: function(_) {
+			resolve: function(_, { eventID }) {
 				return new Promise((resolve, reject) => {
 					//Aquí iría algo pa buscar por id
 					Event.findById(eventID, function(err, event){
