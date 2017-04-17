@@ -72,7 +72,7 @@ var channelType = new graphql.GraphQLObjectType({
 //Event type
 var eventType = new graphql.GraphQLObjectType({
     name: 'eventType',
-    fields: {
+    fields: ()=> {
         id: { type: graphql.GraphQLString },
         title: { type: graphql.GraphQLString },
         description: { type: graphql.GraphQLString },
