@@ -69,10 +69,22 @@ var channelType = new graphql.GraphQLObjectType({
     }
 });
 
+//Comment type
+var commentType = new graphql.GraphQLObjectType({
+	name: 'commentType',
+	fields: {
+		id: { type: graphql.GraphQLString },
+		target_id: { type: graphql.GraphQLString }, //Id del post, evento o lo que sea
+		user: { type: graphql.GraphQLString }, //Esto sería todos los datos necesarios del usuario
+		content: { type: graphql.GraphQLString },
+		created_time: { type: graphql.GraphQLString }
+	}
+});
+
 //Event type
 var eventType = new graphql.GraphQLObjectType({
     name: 'eventType',
-    fields: ()=> {
+    fields: {
         id: { type: graphql.GraphQLString },
         title: { type: graphql.GraphQLString },
         description: { type: graphql.GraphQLString },
@@ -84,27 +96,17 @@ var eventType = new graphql.GraphQLObjectType({
 				targetID: { type: graphql.GraphQLString }
 			},
 			resolve: function(_, { targetID }) {
-				/*return new Promise((resolve,reject) => {
+				return new Promise((resolve,reject) => {
                     Comment.find({ 'target_id': targetID }, function(err, res){
                         if(err) reject(err);
                         else resolve(res);
+						
+						console.log("Llego aquí");
                     });
-                });*/
+                });
 			}
 		}
     }
-});
-
-//Comment type
-var commentType = new graphql.GraphQLObjectType({
-	name: 'commentType',
-	fields: {
-		id: { type: graphql.GraphQLString },
-		target_id: { type: graphql.GraphQLString } //Id del post, evento o lo que sea
-		user: { type: graphql.GraphQLString }, //Esto sería todos los datos necesarios del usuario
-		content: { type: graphql.GraphQLString },
-		created_time: { type: graphql.GraphQLString }
-	}
 });
 
 //Definir mutation type
