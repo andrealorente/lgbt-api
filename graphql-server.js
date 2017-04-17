@@ -184,6 +184,21 @@ var queryType = new graphql.GraphQLObjectType({
 					});
 				});
 			}
+		},
+		oneEvent: {
+			type: eventType,
+			args: {
+				eventID: { type: graphql.GraphQLString }
+			},
+			resolve: function(_) {
+				return new Promise((resolve, reject) => {
+					//Aquí iría algo pa buscar por id
+					Event.findById(eventID, function(err, event){
+						if(err) reject(err);
+						else resolve(event);
+					});
+				});
+			}
 		}
     }
 });
