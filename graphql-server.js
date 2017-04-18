@@ -14,28 +14,15 @@ var Channel = require('./models/channelModel');
 var Event = require('./models/eventModel');
 var Comment = require('./models/commentModel');
 
+//Custom types
+var userType = require('./types/userType');
+var channelType = require('./types/channelType');
+var commentType = require('./types/commentType');
+var eventType = require('./types/eventType');
+var postType = require('./types/postType');
+
 //Conectar con la bd
 mongoose.connect('mongodb://admin:admin@ds145868.mlab.com:45868/lgbt-app');
-
-//Definir min User type
-var minuserType = new graphql.GraphQLObjectType({
-    name: 'MinUser',
-    fields: {
-        id: { type: graphql.GraphQLString },
-        name: { type: graphql.GraphQLString }
-    }
-});
-
-//Definir User type
-var userType = new graphql.GraphQLObjectType({
-    name: 'User',
-    fields: {
-        id: { type: graphql.GraphQLString }, //Cada campo puede tener un resolve
-        name: { type: graphql.GraphQLString },
-        email: { type: graphql.GraphQLString },
-        followers: { type: new graphql.GraphQLList(minuserType)}
-    }
-});
 
 //Input type para User
 var userInputType = new graphql.GraphQLInputObjectType({
@@ -46,73 +33,22 @@ var userInputType = new graphql.GraphQLInputObjectType({
   }
 });
 
-//Post type
-var postType = new graphql.GraphQLObjectType({
-    name: 'postType',
-    fields: {
-        id: { type: graphql.GraphQLString },
-        title: { type: graphql.GraphQLString },
-        content: { type: graphql.GraphQLString },
-        author: { type: graphql.GraphQLString },
-        tags: { type: new graphql.GraphQLList(graphql.GraphQLString)}
-    }
-});
-
-//Channel type
-var channelType = new graphql.GraphQLObjectType({
-    name: 'channelType',
-    fields: {
-        id: { type: graphql.GraphQLString },
-        title: { type: graphql.GraphQLString },
-        description: { type: graphql.GraphQLString },
-        author: { type: graphql.GraphQLString },
-    }
-});
-
-//Comment type
-var commentType = new graphql.GraphQLObjectType({
-	name: 'commentType',
-	fields: {
-		id: { type: graphql.GraphQLString },
-		target_id: { type: graphql.GraphQLString }, //Id del post, evento o lo que sea
-		user: { type: graphql.GraphQLString }, //Esto sería todos los datos necesarios del usuario
-		content: { type: graphql.GraphQLString },
-		created_time: { type: graphql.GraphQLString }
-	}
-});
-
-//Event type
-var eventType = new graphql.GraphQLObjectType({
-    name: 'eventType',
-    fields: {
-        id: { type: graphql.GraphQLString },
-        title: { type: graphql.GraphQLString },
-        description: { type: graphql.GraphQLString },
-        place: { type: graphql.GraphQLString },
-		start_time: { type: graphql.GraphQLString },
-		comments: {
-			type: new graphql.GraphQLList(commentType),
-			args: {
-				targetID: { type: graphql.GraphQLString }
-			},
-			resolve: function(_, { targetID }) {
-				return new Promise((resolve,reject) => {
-                    Comment.find({ 'target_id': targetID }, function(err, res){
-                        if(err) reject(err);
-                        else resolve(res);
-						
-						console.log("Llego aquí");
-                    });
-                });
-			}
-		}
-    }
-});
-
 //Definir mutation type
 var mutationType = new graphql.GraphQLObjectType({
     name: 'Mutation',
     fields: ()=> ({
+		createToken: {
+			type: graphql.GraphQLString,
+			description: 'Crear un token de usuario',
+			args: {
+				username: { type: graphql.GraphQLString },
+				password: { type: graphql.GraphQLString }
+			},
+			resolve: function(_, args) {
+				//No sé bien en qué consiste esto o cómo se crea un token
+			}
+		},
+		
         createUser: { //Entry point
             type: userType,
             description: 'Crear un nuevo usuario',
@@ -134,6 +70,27 @@ var mutationType = new graphql.GraphQLObjectType({
                 });
             }
         },
+		
+		editUser: {
+			type: userType,
+			description: 'Editar datos de un usuario existente',
+			args: {
+				name: { type: graphql.GraphQLString },
+				email: { type: graphql.GraphQLString },
+			},
+			resolve: function(_, args) {
+				/*
+				var query = { name: 'borne' };
+				Model.update(query, { name: 'jason borne' }, options, callback)
+
+				// is sent as
+
+				Model.update(query, { $set: { name: 'jason borne' }}, options, callback)
+				
+				*/
+			}
+		},
+		
         createPost: {
             type: postType,
             description: 'Crear un nuevo post',
@@ -156,7 +113,7 @@ var mutationType = new graphql.GraphQLObjectType({
     })
 });
 
-//Definir query type
+/** QUERIES **/
 var queryType = new graphql.GraphQLObjectType({
     name: 'Query',
     fields: {
@@ -192,7 +149,7 @@ var queryType = new graphql.GraphQLObjectType({
                 });
             }
         },
-		allChannels: {
+		allChannels: { //Esto sería más bien para la página de Explorar canales (que muestra todos)
 			type: new graphql.GraphQLList(channelType),
 			resolve: function(_) {
 				return new Promise((resolve, reject) => {
