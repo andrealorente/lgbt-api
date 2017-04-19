@@ -225,7 +225,10 @@ app.get('/posts', function(req, res) {
     var query = 'query { allPosts { id, title, content, author, tags } }'; 
     graphql.graphql(schema, query).then( function(result) {  
         //console.log(JSON.stringify(result,null," "));
-        res.json(result);
+        res.json({
+			success: true,
+			data: result.data
+		});
     });
  
 });
