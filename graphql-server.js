@@ -49,6 +49,29 @@ var mutationType = new graphql.GraphQLObjectType({
 			}
 		},
 		
+		loginUser: {
+			type: graphql.GraphQLObjectType,
+			description: 'Loguear usuario',
+			args: {
+				username: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) },
+				password: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) }
+			},
+			resolve: function(_, args) {
+				return new Promise((resolve,reject) => {
+					//Comprobar que existe el nombre de usuario o email en la bd
+					User.findOne({ name: args.name }, function(err, user){
+						if(err) reject(err);
+						
+					});
+					//Si existe, comprobar que coincide la contraseña
+					
+					//Si coincide crear y devolver un object con los campos: success, token, user
+					//El token que devuelva lo tendrá que usar el usuario en cada cabecera de la petición get/post al servidor
+					//Se almacena en el cliente, en localStorage y es el middleware el que se encarga de generar y descifrar el token
+				});
+			}
+		},
+		
         createUser: { //Entry point
             type: userType,
             description: 'Crear un nuevo usuario',
