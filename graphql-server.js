@@ -50,7 +50,7 @@ var mutationType = new graphql.GraphQLObjectType({
 		},
 		
 		loginUser: {
-			type: graphql.GraphQLObjectType,
+			type: userType,
 			description: 'Loguear usuario',
 			args: {
 				username: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) },
