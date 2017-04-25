@@ -275,10 +275,13 @@ app.get('/posts', function(req, res) {
 
 app.get('/channels', function(req, res) {
     // This is just an internal test
-    var query = 'query { allChannels { id, title, description, author } }'; 
+    var query = 'query { allChannels { id, title, description } }'; 
     graphql.graphql(schema, query).then( function(result) {  
         //console.log(JSON.stringify(result,null," "));
-        res.json(result);
+        res.json({
+			success: true,
+			data: result.data
+		});
     });
  
 });
