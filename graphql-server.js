@@ -141,21 +141,38 @@ var queryType = new graphql.GraphQLObjectType({
     name: 'Query',
     fields: {
         user: {
-            type: new graphql.GraphQLList(userType),
+            type: userType,
             //args son los argumentos que acepta la query User
             args: {
-                name: { type: graphql.GraphQLString }
+                userID: { type: graphql.GraphQLString }
             },
-            resolve: function( _, {name} ) {
+            resolve: function( _, {userID} ) {
 
                 return new Promise((resolve,reject) => {
                     //Aquí se recuperan los datos de la bd
-                    User.find({ name: name }, function(err, user) { 
-                        if (err) reject(err);
-                        else resolve(user);
-                        
+                    User.findOne({ _id: userID}, function(err, user) { 
+                        if (err) 
+							reject(err);
+                        else if(user==null) {
+							res.json({
+								success: false,
+								error: {
+									code: 3,
+									message: "No se ha encontrado a tu usuario en la base de datos."
+								}
+							});
+							
+							resolve(res);
+						}else{
+							res.json({
+								success: true,
+								user: user
+							});
+							
+							resolve(res);
+						}
+							
                         console.log(user);
-                        
                     });
                 }); //Fin Promise 
                 
@@ -271,20 +288,22 @@ app.get('/events', function(req, res) {
     var query = 'query { allEvents { id, title, description, place, start_time } }'; 
     graphql.graphql(schema, query).then( function(result) {  
         //console.log(JSON.stringify(result,null," "));
-        res.json(result);
+        res.json({
+			success: true,
+			data: result.data
+		});
     });
  
 });
 
 app.get('/users/:id', function(req, res){ //para pasarle un parámetro
 
-  User.findOne({ _id: req.params.id}, function(err, user) {
-    if (err) throw err;
-    
-    //res.json({_id: user[0]._id, name: user[0].name, email: user[0].email});
-    res.json({users: req.params.id});
-    
-  });
+	var query = ' query { user(userID:\"' + req.params.id + '\") { id, name } }';
+	console.log(query);
+	graphql.graphql(schema, query).then( function(result) {  
+		//console.log(JSON.stringify(result,null," "));
+		res.json(result);
+	});
 
 });
 
