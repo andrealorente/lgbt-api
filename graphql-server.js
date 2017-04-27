@@ -150,29 +150,10 @@ var queryType = new graphql.GraphQLObjectType({
 
                 return new Promise((resolve,reject) => {
                     //Aquí se recuperan los datos de la bd
-                    User.findOne({ _id: userID}, function(err, user) { 
+                    User.findOne({ _id: userID}, function(err, res) { 
                         if (err) 
 							reject(err);
-                        else if(user==null) {
-							res.json({
-								success: false,
-								error: {
-									code: 3,
-									message: "No se ha encontrado a tu usuario en la base de datos."
-								}
-							});
-							
-							resolve(res);
-						}else{
-							res.json({
-								success: true,
-								user: user
-							});
-							
-							resolve(res);
-						}
-							
-                        console.log(user);
+                        else resolve(res);
                     });
                 }); //Fin Promise 
                 
@@ -302,10 +283,13 @@ app.get('/events', function(req, res) {
 app.get('/users/:id', function(req, res){ //para pasarle un parámetro
 
 	var query = ' query { user(userID:\"' + req.params.id + '\") { id, name } }';
-	console.log(query);
+	
 	graphql.graphql(schema, query).then( function(result) {  
 		//console.log(JSON.stringify(result,null," "));
-		res.json(result);
+		res.json({
+			success: true,
+			data: result.data
+		});
 	});
 
 });
