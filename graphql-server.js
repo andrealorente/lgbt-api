@@ -98,10 +98,14 @@ var mutationType = new graphql.GraphQLObjectType({
 			type: userType,
 			description: 'Editar datos de un usuario existente',
 			args: {
+				userID: { type: graphql.GraphQLString },
 				name: { type: graphql.GraphQLString },
 				email: { type: graphql.GraphQLString },
 			},
 			resolve: function(_, args) {
+				
+				//Primero buscar al usuario a partir de la id
+				//Luego actualizar datos
 				/*
 				var query = { name: 'borne' };
 				Model.update(query, { name: 'jason borne' }, options, callback)
@@ -291,12 +295,40 @@ var queryType = new graphql.GraphQLObjectType({
                 });
             }
         },
+		onePost: {
+			type: postType,
+			args: {
+				postID: { type: graphql.GraphQLString }
+			},
+			resolve: function(_, {postID}) {
+				return new Promise((resolve,reject) => {
+					Post.findById(postID, function(err, res) {
+						if (err) reject(err);
+						else resolve(res);
+					});
+				});
+			}
+		},
 		allChannels: { //Esto sería más bien para la página de Explorar canales (que muestra todos)
 			type: new graphql.GraphQLList(channelType),
 			resolve: function(_) {
 				return new Promise((resolve, reject) => {
 					Channel.find(function(err, res){
 						if(err) reject(err);
+						else resolve(res);
+					});
+				});
+			}
+		},
+		oneChannel: {
+			type: channelType,
+			args: {
+				channelID: { type: graphql.GraphQLString }
+			},
+			resolve: function(_, {channelID}) {
+				return new Promise((resolve,reject) => {
+					Channel.findById(channelID, function(err, res) {
+						if (err) reject(err);
 						else resolve(res);
 					});
 				});
@@ -320,10 +352,13 @@ var queryType = new graphql.GraphQLObjectType({
 			},
 			resolve: function(_, { eventID }) {
 				return new Promise((resolve, reject) => {
-					//Aquí iría algo pa buscar por id
+					
 					Event.findById(eventID, function(err, event){
-						if(err) reject(err);
-						else resolve(event);
+						if(err){
+							reject(err);
+						}else{
+							resolve(event);
+						} 
 					});
 				});
 			}
@@ -345,6 +380,8 @@ app.use(bodyParser.json());
 /*********************************/
 app.use(cors());
 
+/*************************************************************************************/
+
 app.get('/user', function(req, res) {
     //Recibe los datos del formulario
     //var u = req.body;
@@ -361,6 +398,7 @@ app.use('/graphql', graphqlHTTP({
     graphiql: true, //Para usar la herramienta GraphiQL
 }));
 
+/******** RUTAS DE POSTS *******/
 
 app.get('/posts', function(req, res) {
     // This is just an internal test
@@ -375,8 +413,39 @@ app.get('/posts', function(req, res) {
  
 });
 
+//Obtener un post concreto
+app.get('/posts/:id', function(req,res) {
+	
+	var query = 'query { onePost(postID:\"' + req.params.id + '\") { title, author, content } }'; 
+	graphql.graphql(schema, query).then( function(result) {  
+        
+		console.log(result); // { data: oneEvent: null }
+		if(result.data.onePost == null){ //No sé si esto está bien así o habría que mandar el error desde graphql
+			res.json({
+				success: false,
+				error: "No se ha encontrado ningún post con esa ID"
+			});	
+		}else{
+			res.json({
+				success: true,
+				data: result.data
+			});	
+		}
+        
+    });
+});
+
+//Comentar en un post
+app.post('posts/:id/comments',function(req,res){});
+//Dar like a un post
+app.post('posts/:id/likes',function(req,res){});
+
+
+/******* RUTAS DE CANALES ******/
+
+//Obtener todos los canales
 app.get('/channels', function(req, res) {
-    // This is just an internal test
+	
     var query = 'query { allChannels { id, title, description } }'; 
     graphql.graphql(schema, query).then( function(result) {  
         //console.log(JSON.stringify(result,null," "));
@@ -388,8 +457,32 @@ app.get('/channels', function(req, res) {
  
 });
 
+//Obtener un canal concreto
+app.get('/channels/:id', function(req,res) {
+	
+	var query = 'query { oneChannel(channelID:\"' + req.params.id + '\") { title, description, place, start_time } }'; 
+	graphql.graphql(schema, query).then( function(result) {  
+        
+		console.log(result); // { data: oneEvent: null }
+		if(result.data.oneChannel == null){ //No sé si esto está bien así o habría que mandar el error desde graphql
+			res.json({
+				success: false,
+				error: "No se ha encontrado ningún canal con esa ID"
+			});	
+		}else{
+			res.json({
+				success: true,
+				data: result.data
+			});	
+		}
+        
+    });
+});
+
+/******* RUTAS DE EVENTOS ********/
+
 app.get('/events', function(req, res) {
-    // This is just an internal test
+
     var query = 'query { allEvents { id, title, description, place, start_time } }'; 
     graphql.graphql(schema, query).then( function(result) {  
         //console.log(JSON.stringify(result,null," "));
@@ -401,9 +494,41 @@ app.get('/events', function(req, res) {
  
 });
 
-app.get('/users/:id', function(req, res){ //para pasarle un parámetro
+app.get('/events/:id', function(req,res) {
+	
+	var query = 'query { oneEvent(eventID:\"' + req.params.id + '\") { title, description, place, start_time } }'; 
+    graphql.graphql(schema, query).then( function(result) {  
+        
+		console.log(result); // { data: oneEvent: null }
+		if(result.data.oneEvent == null){ //No sé si esto está bien así o habría que mandar el error desde graphql
+			res.json({
+				success: false,
+				error: "No se ha encontrado ningún evento con esa ID"
+			});	
+		}else{
+			res.json({
+				success: true,
+				data: result.data
+			});	
+		}
+        
+    });
+});
 
-	var query = ' query { user(userID:\"' + req.params.id + '\") { id, name } }';
+//Asistir a un evento
+app.post('/events/:id/assist',function(req,res){});
+//Me interesa un evento
+app.post('/events/:id/interested',function(req,res){});
+//Comentar un evento
+app.post('/events/:id/comments',function(req,res){});
+
+
+/******* RUTAS DE USUARIO *******/
+
+//Obtiene un usuario 
+app.get('/users/:id', function(req, res){ //para pasarle un parámetro
+	
+	var query = ' query { user(userID:\"' + req.params.id + '\") { id, name, bio, place } }';
 	
 	graphql.graphql(schema, query).then( function(result) {  
 		//console.log(JSON.stringify(result,null," "));
@@ -414,6 +539,31 @@ app.get('/users/:id', function(req, res){ //para pasarle un parámetro
 	});
 
 });
+
+//Crea un usuario
+app.post('/users', function(req,res) {
+	var user = new User();
+	user.name = req.body.name;
+	
+	user.save(function(err){
+		if(err)
+			res.send(err);
+		
+		res.json({ message: 'Usuario creado!'});
+	});
+});
+
+//Actualiza datos de un usuario
+app.put('/users/:user-id', function(req,res){
+	
+	var query = ' query { editUser(userID:\"' + ') }';
+	
+});
+
+//Seguir a un usuario
+app.post('/users/:id/follows',function(req,res){});
+
+/*********************************************************************************************/
 
 //app.listen(4000);
 //console.log('Running a GraphQL API server at localhost:4000/graphql');

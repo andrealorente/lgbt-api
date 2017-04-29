@@ -8,7 +8,9 @@ var MinUserSchema = new Schema({
 
 var UserSchema = new Schema({
   name: String,
+  bio: String,
   email: String,
+  place: String,
   followers: [MinUserSchema]
 });
 
