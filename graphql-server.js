@@ -143,13 +143,15 @@ var mutationType = new graphql.GraphQLObjectType({
             type: postType,
             description: 'Editar un post ya existente',
             args: {
-                title: {type: graphql.GraphQLString}
+                postID: {type: graphql.GraphQLString},
+                title: {type: graphql.GraphQLString},
+                content: {type: graphql.GraphQLString}
             },
             resolve: function(root,args){
                 return new Promise((resolve, reject) => {
                     Post.findOneAndUpdate(
-                        {_id: args.postid/*"58e7ca08a364171f3c3fe58d"*/},
-                        {$set:{title: args.title}}, 
+                        {_id: args.postID/*"58e7ca08a364171f3c3fe58d"*/},
+                        {$set:{title: args.title, content: args.content}}, 
                         {new: true}
                     ,function(err, res){
                         if(err) reject(err);
@@ -217,7 +219,7 @@ var mutationType = new graphql.GraphQLObjectType({
             resolve: function(root,args){
                 return new Promise((resolve, reject) => {
                     Channel.findOneAndUpdate(
-                        {_id: args.postid/*"58e7ca08a364171f3c3fe58d"*/},
+                        {_id: args.postID/*"58e7ca08a364171f3c3fe58d"*/},
                         {$set:{title: args.title}}, 
                         {new: true}
                     ,function(err, res){
