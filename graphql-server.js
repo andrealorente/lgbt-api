@@ -49,8 +49,13 @@ var mutationType = new graphql.GraphQLObjectType({
 			}
 		},
 		
+<<<<<<< HEAD
 		/*loginUser: {
 			type: graphql.GraphQLObjectType,
+=======
+		loginUser: {
+			type: userType,
+>>>>>>> 01a1ee8df72453908dfe790366b6cc2eff4c9424
 			description: 'Loguear usuario',
 			args: {
 				username: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) },
@@ -260,21 +265,19 @@ var queryType = new graphql.GraphQLObjectType({
     name: 'Query',
     fields: {
         user: {
-            type: new graphql.GraphQLList(userType),
+            type: userType,
             //args son los argumentos que acepta la query User
             args: {
-                name: { type: graphql.GraphQLString }
+                userID: { type: graphql.GraphQLString }
             },
-            resolve: function( _, {name} ) {
+            resolve: function( _, {userID} ) {
 
                 return new Promise((resolve,reject) => {
                     //Aquí se recuperan los datos de la bd
-                    User.find({ name: name }, function(err, user) { 
-                        if (err) reject(err);
-                        else resolve(user);
-                        
-                        console.log(user);
-                        
+                    User.findOne({ _id: userID}, function(err, res) { 
+                        if (err) 
+							reject(err);
+                        else resolve(res);
                     });
                 }); //Fin Promise 
                 
@@ -377,10 +380,13 @@ app.get('/posts', function(req, res) {
 
 app.get('/channels', function(req, res) {
     // This is just an internal test
-    var query = 'query { allChannels { id, title, description, author } }'; 
+    var query = 'query { allChannels { id, title, description } }'; 
     graphql.graphql(schema, query).then( function(result) {  
         //console.log(JSON.stringify(result,null," "));
-        res.json(result);
+        res.json({
+			success: true,
+			data: result.data
+		});
     });
  
 });
@@ -390,20 +396,25 @@ app.get('/events', function(req, res) {
     var query = 'query { allEvents { id, title, description, place, start_time } }'; 
     graphql.graphql(schema, query).then( function(result) {  
         //console.log(JSON.stringify(result,null," "));
-        res.json(result);
+        res.json({
+			success: true,
+			data: result.data
+		});
     });
  
 });
 
 app.get('/users/:id', function(req, res){ //para pasarle un parámetro
 
-  User.findOne({ _id: req.params.id}, function(err, user) {
-    if (err) throw err;
-    
-    //res.json({_id: user[0]._id, name: user[0].name, email: user[0].email});
-    res.json({users: req.params.id});
-    
-  });
+	var query = ' query { user(userID:\"' + req.params.id + '\") { id, name } }';
+	
+	graphql.graphql(schema, query).then( function(result) {  
+		//console.log(JSON.stringify(result,null," "));
+		res.json({
+			success: true,
+			data: result.data
+		});
+	});
 
 });
 

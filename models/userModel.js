@@ -7,7 +7,6 @@ var MinUserSchema = new Schema({
 });
 
 var UserSchema = new Schema({
-  _id: String,
   name: String,
   email: String,
   followers: [MinUserSchema]
