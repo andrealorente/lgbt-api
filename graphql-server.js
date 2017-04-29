@@ -122,12 +122,17 @@ var mutationType = new graphql.GraphQLObjectType({
             type: postType,
             description: 'Crear un nuevo post',
             args: {
-                title: {type: graphql.GraphQLString}
+                title: {type: graphql.GraphQLString},
+                content: {type: graphql.GraphQLString},
+                author: {type: graphql.GraphQLString},
+                
             },
             resolve: function(root,args){
                 return new Promise((resolve, reject) => {
                     Post.create({
-                        title: args.title
+                        title: args.title,
+                        content: args.content,
+                        author: args.userid
                     },function(err, res){
                         if(err) reject(err);
                         else{ resolve(res); } 
@@ -136,7 +141,121 @@ var mutationType = new graphql.GraphQLObjectType({
                     });
                 });
             }
-        }
+        },
+        
+        updatePost: {
+            type: postType,
+            description: 'Editar un post ya existente',
+            args: {
+                title: {type: graphql.GraphQLString}
+            },
+            resolve: function(root,args){
+                return new Promise((resolve, reject) => {
+                    Post.findOneAndUpdate(
+                        {_id: args.postid/*"58e7ca08a364171f3c3fe58d"*/},
+                        {$set:{title: args.title}}, 
+                        {new: true}
+                    ,function(err, res){
+                        if(err) reject(err);
+                        else{ 
+                            resolve(res); 
+                        }   
+                        
+                    });
+                });
+            }
+        },
+        
+        deletePost: {
+            type: postType,
+            description: 'Eliminar un post ya existente',
+            args: {
+                title: {type: graphql.GraphQLString}
+            },
+            resolve: function(root,args){
+                return new Promise((resolve, reject) => {
+                    Post.findOneAndDelete(
+                        {_id: args.postid}
+                    ,function(err, res){
+                        if(err) reject(err);
+                        else{ 
+                            resolve(res); 
+                        }   
+                        
+                    });
+                });
+            }
+        },
+        
+        createChannel: {
+            type: channelType,
+            description: 'Crear un nuevo canal',
+            args: {
+                title: {type: graphql.GraphQLString},
+                content: {type: graphql.GraphQLString},
+                author: {type: graphql.GraphQLString},
+                
+            },
+            resolve: function(root,args){
+                return new Promise((resolve, reject) => {
+                    Channel.create({
+                        title: args.title,
+                        content: args.content,
+                        author: args.userid
+                    },function(err, res){
+                        if(err) reject(err);
+                        else{ resolve(res); } 
+                        
+                        
+                    });
+                });
+            }
+        },
+        
+        updateChannel: {
+            type: channelType,
+            description: 'Editar un canal ya existente',
+            args: {
+                title: {type: graphql.GraphQLString}
+            },
+            resolve: function(root,args){
+                return new Promise((resolve, reject) => {
+                    Channel.findOneAndUpdate(
+                        {_id: args.postid/*"58e7ca08a364171f3c3fe58d"*/},
+                        {$set:{title: args.title}}, 
+                        {new: true}
+                    ,function(err, res){
+                        if(err) reject(err);
+                        else{ 
+                            resolve(res); 
+                        }   
+                        
+                    });
+                });
+            }
+        },
+        
+        deleteChannel: {
+            type: channelType,
+            description: 'Eliminar un canal ya existente',
+            args: {
+                title: {type: graphql.GraphQLString}
+            },
+            resolve: function(root,args){
+                return new Promise((resolve, reject) => {
+                    Channel.findOneAndDelete(
+                        {_id: args.postid}
+                    ,function(err, res){
+                        if(err) reject(err);
+                        else{ 
+                            resolve(res); 
+                        }   
+                        
+                    });
+                });
+            }
+        },
+        
     })
 });
 
