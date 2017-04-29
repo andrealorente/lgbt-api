@@ -49,13 +49,8 @@ var mutationType = new graphql.GraphQLObjectType({
 			}
 		},
 		
-<<<<<<< HEAD
-		/*loginUser: {
-			type: graphql.GraphQLObjectType,
-=======
 		loginUser: {
 			type: userType,
->>>>>>> 01a1ee8df72453908dfe790366b6cc2eff4c9424
 			description: 'Loguear usuario',
 			args: {
 				username: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) },
@@ -75,7 +70,7 @@ var mutationType = new graphql.GraphQLObjectType({
 					//Se almacena en el cliente, en localStorage y es el middleware el que se encarga de generar y descifrar el token
 				});
 			}
-		},*/
+		},
 		
         createUser: { //Entry point
             type: userType,
