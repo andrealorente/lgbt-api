@@ -6,7 +6,7 @@ const channelType = new graphql.GraphQLObjectType({
         id: { type: graphql.GraphQLString },
         title: { type: graphql.GraphQLString },
         description: { type: graphql.GraphQLString },
-        author: { type: graphql.GraphQLString },
+        author: { type: graphql.GraphQLString }
     }
 });
 
