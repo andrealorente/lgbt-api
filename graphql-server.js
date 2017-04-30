@@ -149,13 +149,14 @@ var mutationType = new graphql.GraphQLObjectType({
             args: {
                 postID: {type: graphql.GraphQLString},
                 title: {type: graphql.GraphQLString},
-                content: {type: graphql.GraphQLString}
+                content: {type: graphql.GraphQLString},
+                tags: {type: new graphql.GraphQLList(graphql.GraphQLString)}
             },
             resolve: function(root,args){
                 return new Promise((resolve, reject) => {
                     Post.findOneAndUpdate(
                         {_id: args.postID/*"58e7ca08a364171f3c3fe58d"*/},
-                        {$set:{title: args.title, content: args.content}}, 
+                        {$set:{title: args.title, content: args.content, tags: args.tags}}, 
                         {new: true}
                     ,function(err, res){
                         if(err) reject(err);
@@ -172,18 +173,15 @@ var mutationType = new graphql.GraphQLObjectType({
             type: postType,
             description: 'Eliminar un post ya existente',
             args: {
-                title: {type: graphql.GraphQLString}
+                postID: {type: graphql.GraphQLString}
             },
             resolve: function(root,args){
                 return new Promise((resolve, reject) => {
                     Post.findOneAndDelete(
-                        {_id: args.postid}
+                        {_id: args.postID}
                     ,function(err, res){
                         if(err) reject(err);
-                        else{ 
-                            resolve(res); 
-                        }   
-                        
+                        else{resolve(res);}   
                     });
                 });
             }
@@ -207,8 +205,6 @@ var mutationType = new graphql.GraphQLObjectType({
                     },function(err, res){
                         if(err) reject(err);
                         else{ resolve(res); } 
-                        
-                        
                     });
                 });
             }
@@ -218,20 +214,18 @@ var mutationType = new graphql.GraphQLObjectType({
             type: channelType,
             description: 'Editar un canal ya existente',
             args: {
+                channelID: {type: graphql.GraphQLString},
                 title: {type: graphql.GraphQLString}
             },
             resolve: function(root,args){
                 return new Promise((resolve, reject) => {
                     Channel.findOneAndUpdate(
-                        {_id: args.postID/*"58e7ca08a364171f3c3fe58d"*/},
+                        {_id: args.channelID},
                         {$set:{title: args.title}}, 
                         {new: true}
                     ,function(err, res){
                         if(err) reject(err);
-                        else{ 
-                            resolve(res); 
-                        }   
-                        
+                        else{resolve(res);}   
                     });
                 });
             }
@@ -241,18 +235,15 @@ var mutationType = new graphql.GraphQLObjectType({
             type: channelType,
             description: 'Eliminar un canal ya existente',
             args: {
-                title: {type: graphql.GraphQLString}
+                channelID: {type: graphql.GraphQLString}
             },
             resolve: function(root,args){
                 return new Promise((resolve, reject) => {
                     Channel.findOneAndDelete(
-                        {_id: args.postid}
+                        {_id: args.channelID}
                     ,function(err, res){
                         if(err) reject(err);
-                        else{ 
-                            resolve(res); 
-                        }   
-                        
+                        else{resolve(res);}    
                     });
                 });
             }
