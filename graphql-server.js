@@ -164,7 +164,7 @@ var mutationType = new graphql.GraphQLObjectType({
                     var form = new formidable.IncomingForm();
                     form.keepExtensions = true;
                     form.multiples = true;
-                    form.parse(req, function(err, fields, files){
+                    form.parse(reject, function(err, fields, files){
                         var temp_path;
                         console.log(args.image);
                         if (args.image) {
