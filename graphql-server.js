@@ -179,6 +179,17 @@ var mutationType = new graphql.GraphQLObjectType({
                                         //plan.images.push(result.public_id);
                                         console.log("Actualizado con 1 foto");
                                         //updatePlan();
+                                         Post.findOneAndUpdate(
+                                            {_id: fields.postID},//"58e7ca08a364171f3c3fe58d"},
+                                            {$set:{title: fields.title, content: fields.content, tags: fields.tags, image: fields.image.images.name}}, 
+                                            {new: true}
+                                        ,function(err, res){
+                                            if(err) reject(err);
+                                            else{ 
+                                                resolve(res); 
+                                            }   
+
+                                        });
                                     },
                                     {
                                         crop: 'limit',
@@ -196,9 +207,9 @@ var mutationType = new graphql.GraphQLObjectType({
                         }
                     }
                     });
-                    
-                    Post.findOneAndUpdate(
-                        {_id: args.postID/*"58e7ca08a364171f3c3fe58d"*/},
+                   
+                    /*Post.findOneAndUpdate(
+                        {_id: args.postID//"58e7ca08a364171f3c3fe58d"},
                         {$set:{title: args.title, content: args.content, tags: args.tags, image: args.image.images.name}}, 
                         {new: true}
                     ,function(err, res){
@@ -207,7 +218,7 @@ var mutationType = new graphql.GraphQLObjectType({
                             resolve(res); 
                         }   
                         
-                    });
+                    });*/
                 });
             }
         },
