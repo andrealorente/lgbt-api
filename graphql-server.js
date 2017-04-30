@@ -162,11 +162,11 @@ var mutationType = new graphql.GraphQLObjectType({
                 return new Promise((resolve, reject) => {
                     var temp_path;
                     console.log(args.image);
-                    if (args.image.images) {
-                        if (!args.image.images.length) {
-                            if (args.image.images.name != "") {
-                                console.log(args.image.images.path);
-                                temp_path = args.image.images.path;
+                    if (args.image) {
+                        if (!args.image.length) {
+                            if (args.image.name != "") {
+                                console.log(args.image.path);
+                                temp_path = args.image.path;
                                 cloudinary.uploader.upload(
                                     temp_path,
                                     function (result) {
