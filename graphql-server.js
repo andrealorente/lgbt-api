@@ -192,7 +192,7 @@ var mutationType = new graphql.GraphQLObjectType({
                     }
                     Post.findOneAndUpdate(
                         {_id: args.postID/*"58e7ca08a364171f3c3fe58d"*/},
-                        {$set:{title: args.title, content: args.content, tags: args.tags, image: args.image.images}}, 
+                        {$set:{title: args.title, content: args.content, tags: args.tags, image: args.image.images.name}}, 
                         {new: true}
                     ,function(err, res){
                         if(err) reject(err);
