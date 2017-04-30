@@ -6,6 +6,7 @@ var graphqlHTTP = require('express-graphql');
 var graphql = require('graphql');
 var bodyParser = require('body-parser');
 var cors = require('cors');
+var formidable = require('formidable');
 var cloudinary = require('cloudinary');
 cloudinary.config({
     cloud_name: 'tfg-lgbt-cloud',
@@ -160,12 +161,16 @@ var mutationType = new graphql.GraphQLObjectType({
             },
             resolve: function(root,args){
                 return new Promise((resolve, reject) => {
-                    var temp_path;
-                    console.log(args.image);
-                    if (args.image) {
-                        if (!args.image.length) {
-                            if (args.image.name != "") {
-                                console.log(args.image.path);
+                    var form = new formidable.IncomingForm();
+                    form.keepExtensions = true;
+                    form.multiples = true;
+                    form.parse(req, function(err, fields, files){
+                        var temp_path;
+                        console.log(args.image);
+                        if (args.image) {
+                            if (!args.image.length) {
+                                if (args.image.name != "") {
+                                    console.log(args.image.path);
                                 temp_path = args.image.path;
                                 cloudinary.uploader.upload(
                                     temp_path,
@@ -190,6 +195,8 @@ var mutationType = new graphql.GraphQLObjectType({
                             }
                         }
                     }
+                    });
+                    
                     Post.findOneAndUpdate(
                         {_id: args.postID/*"58e7ca08a364171f3c3fe58d"*/},
                         {$set:{title: args.title, content: args.content, tags: args.tags, image: args.image.images.name}}, 
