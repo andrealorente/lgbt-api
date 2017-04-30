@@ -6,7 +6,12 @@ var graphqlHTTP = require('express-graphql');
 var graphql = require('graphql');
 var bodyParser = require('body-parser');
 var cors = require('cors');
-
+var cloudinary = require('cloudinary');
+cloudinary.config({
+    cloud_name: 'tfg-lgbt-cloud',
+    api_key: '479641643612759',
+    api_secret: 'VAv1oL4JL36U8Fwe9Edix4wj4as'
+});
 //Models
 var User = require('./models/userModel');
 var Post = require('./models/postModel');
@@ -150,13 +155,44 @@ var mutationType = new graphql.GraphQLObjectType({
                 postID: {type: graphql.GraphQLString},
                 title: {type: graphql.GraphQLString},
                 content: {type: graphql.GraphQLString},
-                tags: {type: new graphql.GraphQLList(graphql.GraphQLString)}
+                tags: {type: new graphql.GraphQLList(graphql.GraphQLString)},
+                image: {type: graphql.GraphQLString}
             },
             resolve: function(root,args){
                 return new Promise((resolve, reject) => {
+                    var temp_path;
+                    console.log(args.image);
+                    if (args.image.images) {
+                        if (!args.image.images.length) {
+                            if (args.image.images.name != "") {
+                                console.log(args.image.images.path);
+                                temp_path = args.image.images.path;
+                                cloudinary.uploader.upload(
+                                    temp_path,
+                                    function (result) {
+                                        console.log(result);
+                                        //plan.images.push(result.public_id);
+                                        console.log("Actualizado con 1 foto");
+                                        //updatePlan();
+                                    },
+                                    {
+                                        crop: 'limit',
+                                        width: 300,
+                                        height: 300,
+                                        format: "png",
+                                        folder: "posts"/*,
+                                        tags: ['posts', Post._id, Post.name, user.account.user]*/
+                                    }
+                                );
+                            } else {
+                                //updatePlan();
+                                console.log("Actualizado sin 1 foto");
+                            }
+                        }
+                    }
                     Post.findOneAndUpdate(
                         {_id: args.postID/*"58e7ca08a364171f3c3fe58d"*/},
-                        {$set:{title: args.title, content: args.content, tags: args.tags}}, 
+                        {$set:{title: args.title, content: args.content, tags: args.tags, image: args.image.images}}, 
                         {new: true}
                     ,function(err, res){
                         if(err) reject(err);

@@ -7,7 +7,8 @@ var postType = new graphql.GraphQLObjectType({
         title: { type: graphql.GraphQLString },
         content: { type: graphql.GraphQLString },
         author: { type: graphql.GraphQLString },
-        tags: { type: new graphql.GraphQLList(graphql.GraphQLString)}
+        tags: { type: new graphql.GraphQLList(graphql.GraphQLString)},
+        image: { type: graphql.GraphQLString }
 		//El campo de comments sería como en eventType (copiar)
     }
 });
