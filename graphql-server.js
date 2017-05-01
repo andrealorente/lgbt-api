@@ -13,6 +13,7 @@ cloudinary.config({
     api_key: '479641643612759',
     api_secret: 'VAv1oL4JL36U8Fwe9Edix4wj4as'
 });
+var middleware = require('middleware');
 //Models
 var User = require('./models/userModel');
 var Post = require('./models/postModel');
@@ -438,7 +439,7 @@ app.post('posts/:id/comments',function(req,res){});
 //Dar like a un post
 app.post('posts/:id/likes',function(req,res){});
 
-app.post('posts/:id/update',function(req,res){
+app.post('posts/:id/update',middleware.ensureAuthorised,function(req,res){
     var form = new formidable.IncomingForm();
     form.keepExtensions = true;
     form.multiples = true;
