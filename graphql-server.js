@@ -6,7 +6,14 @@ var graphqlHTTP = require('express-graphql');
 var graphql = require('graphql');
 var bodyParser = require('body-parser');
 var cors = require('cors');
-
+var formidable = require('formidable');
+var cloudinary = require('cloudinary');
+cloudinary.config({
+    cloud_name: 'tfg-lgbt-cloud',
+    api_key: '479641643612759',
+    api_secret: 'VAv1oL4JL36U8Fwe9Edix4wj4as'
+});
+var middleware = require('./middleware');
 //Models
 var User = require('./models/userModel');
 var Post = require('./models/postModel');
@@ -147,13 +154,17 @@ var mutationType = new graphql.GraphQLObjectType({
             type: postType,
             description: 'Editar un post ya existente',
             args: {
-                title: {type: graphql.GraphQLString}
+                postID: {type: graphql.GraphQLString},
+                title: {type: graphql.GraphQLString},
+                content: {type: graphql.GraphQLString},
+                tags: {type: new graphql.GraphQLList(graphql.GraphQLString)},
+                image: {type: graphql.GraphQLString}
             },
             resolve: function(root,args){
                 return new Promise((resolve, reject) => {
                     Post.findOneAndUpdate(
-                        {_id: args.postid/*"58e7ca08a364171f3c3fe58d"*/},
-                        {$set:{title: args.title}}, 
+                        {_id: args.postID},//"58e7ca08a364171f3c3fe58d"},
+                        {$set:{title: args.title, content: args.content, tags: args.tags, image: args.image}}, 
                         {new: true}
                     ,function(err, res){
                         if(err) reject(err);
@@ -170,18 +181,15 @@ var mutationType = new graphql.GraphQLObjectType({
             type: postType,
             description: 'Eliminar un post ya existente',
             args: {
-                title: {type: graphql.GraphQLString}
+                postID: {type: graphql.GraphQLString}
             },
             resolve: function(root,args){
                 return new Promise((resolve, reject) => {
                     Post.findOneAndDelete(
-                        {_id: args.postid}
+                        {_id: args.postID}
                     ,function(err, res){
                         if(err) reject(err);
-                        else{ 
-                            resolve(res); 
-                        }   
-                        
+                        else{resolve(res);}   
                     });
                 });
             }
@@ -205,8 +213,6 @@ var mutationType = new graphql.GraphQLObjectType({
                     },function(err, res){
                         if(err) reject(err);
                         else{ resolve(res); } 
-                        
-                        
                     });
                 });
             }
@@ -216,20 +222,18 @@ var mutationType = new graphql.GraphQLObjectType({
             type: channelType,
             description: 'Editar un canal ya existente',
             args: {
+                channelID: {type: graphql.GraphQLString},
                 title: {type: graphql.GraphQLString}
             },
             resolve: function(root,args){
                 return new Promise((resolve, reject) => {
                     Channel.findOneAndUpdate(
-                        {_id: args.postid/*"58e7ca08a364171f3c3fe58d"*/},
+                        {_id: args.channelID},
                         {$set:{title: args.title}}, 
                         {new: true}
                     ,function(err, res){
                         if(err) reject(err);
-                        else{ 
-                            resolve(res); 
-                        }   
-                        
+                        else{resolve(res);}   
                     });
                 });
             }
@@ -239,18 +243,15 @@ var mutationType = new graphql.GraphQLObjectType({
             type: channelType,
             description: 'Eliminar un canal ya existente',
             args: {
-                title: {type: graphql.GraphQLString}
+                channelID: {type: graphql.GraphQLString}
             },
             resolve: function(root,args){
                 return new Promise((resolve, reject) => {
                     Channel.findOneAndDelete(
-                        {_id: args.postid}
+                        {_id: args.channelID}
                     ,function(err, res){
                         if(err) reject(err);
-                        else{ 
-                            resolve(res); 
-                        }   
-                        
+                        else{resolve(res);}    
                     });
                 });
             }
@@ -438,6 +439,59 @@ app.post('posts/:id/comments',function(req,res){});
 //Dar like a un post
 app.post('posts/:id/likes',function(req,res){});
 
+app.post('posts/:id/update',middleware.ensureAuthorised,function(req,res){
+    var form = new formidable.IncomingForm();
+    form.keepExtensions = true;
+    form.multiples = true;
+    form.parse(reject, function(err, fields, files){
+        var temp_path;
+        console.log(files.images);
+        if (files.images) {
+            if (!files.images.length) {
+                if (files.images.name != "") {
+                    console.log(files.images.path);
+                    temp_path = files.images.path;
+                    cloudinary.uploader.upload(
+                        temp_path,
+                        function (result) {
+                            console.log(result);
+                            //plan.images.push(result.public_id);
+                            console.log("Actualizado con 1 foto");
+                            var query = "mutation{updatePost(postID:\""+ fields.id +"\",title:\""+ fields.title +"\",content:\""+ fields.content +"\",tags:\""+ fields.tags +"\",image:\""+ files.image.name +"){id,title,content,tags,image}}";
+	                       graphql.graphql(schema, query).then( function(result) {  
+        
+		                      console.log(result); // { data: oneEvent: null }
+		                      if(result.data.onePost == null){ //No sé si esto está bien así o habría que mandar el error desde graphql
+			                     res.json({
+				                    success: false,
+				                    error: "No se ha encontrado ningún post con esa ID"
+			                     });	
+		                      }else{
+			                     res.json({
+				                    success: true,
+				                    data: result.data
+			                     });	
+		                      }
+        
+                            });            
+                        },
+                        {
+                            crop: 'limit',
+                            width: 300,
+                            height: 300,
+                            format: "png",
+                            folder: "posts"/*,
+                            tags: ['posts', Post._id, Post.name, user.account.user]*/
+                        }
+                    );
+                } else {
+                    //updatePlan();
+                    console.log("Actualizado sin 1 foto");
+                }
+            }
+        }
+    });
+});
 
 /******* RUTAS DE CANALES ******/
 
