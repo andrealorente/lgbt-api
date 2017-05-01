@@ -458,7 +458,7 @@ app.get('/channels', function(req, res) {
 //Obtener un canal concreto
 app.get('/channels/:id', function(req,res) {
 	
-	var query = 'query { oneChannel(channelID:\"' + req.params.id + '\") { title, description, place, start_time } }'; 
+	var query = 'query { oneChannel(channelID:\"' + req.params.id + '\") { title, description, start_time } }'; 
 	graphql.graphql(schema, query).then( function(result) {  
         
 		console.log(result); // { data: oneEvent: null }
@@ -522,6 +522,17 @@ app.post('/events/:id/comments',function(req,res){});
 
 
 /******* RUTAS DE USUARIO *******/
+
+//Loguear un usuario
+app.post('users/login', function(req,res) {
+	var user = req.body.user_name;
+	var pswd = req.body.user_pswd;
+	
+	res.json({
+		user: user,
+		pswd: pswd
+	});
+});
 
 //Obtiene un usuario 
 app.get('/users/:id', function(req, res){ //para pasarle un parámetro
