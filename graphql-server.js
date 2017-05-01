@@ -13,7 +13,7 @@ cloudinary.config({
     api_key: '479641643612759',
     api_secret: 'VAv1oL4JL36U8Fwe9Edix4wj4as'
 });
-var middleware = require('middleware');
+var middleware = require('./middleware');
 //Models
 var User = require('./models/userModel');
 var Post = require('./models/postModel');
