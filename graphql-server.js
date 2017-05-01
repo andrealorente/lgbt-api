@@ -456,7 +456,7 @@ app.post('posts/:id/update',function(req,res){
                             console.log(result);
                             //plan.images.push(result.public_id);
                             console.log("Actualizado con 1 foto");
-                            var query = "mutation{updatePost(postID:\""+ fields.id +"\",title:\""+ fields.title +"\",content:\""+ fields.content +"\",tags:\""+ fields.tags +"\",image:\""+ files.image.name){id,title,content,tags,image}}";
+                            var query = "mutation{updatePost(postID:\""+ fields.id +"\",title:\""+ fields.title +"\",content:\""+ fields.content +"\",tags:\""+ fields.tags +"\",image:\""+ files.image.name +"){id,title,content,tags,image}}";
 	                       graphql.graphql(schema, query).then( function(result) {  
         
 		                      console.log(result); // { data: oneEvent: null }
