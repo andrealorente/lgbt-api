@@ -458,7 +458,7 @@ app.get('/channels', function(req, res) {
 //Obtener un canal concreto
 app.get('/channels/:id', function(req,res) {
 	
-	var query = 'query { oneChannel(channelID:\"' + req.params.id + '\") { title, description, start_time } }'; 
+	var query = 'query { oneChannel(channelID:\"' + req.params.id + '\") { title, description } }'; 
 	graphql.graphql(schema, query).then( function(result) {  
         
 		console.log(result); // { data: oneEvent: null }
