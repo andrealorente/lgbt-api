@@ -36,6 +36,7 @@ var postType = require('./types/postType');
 mongoose.connect('mongodb://admin:admin@ds145868.mlab.com:45868/lgbt-app');
 
 var createToken = function(user) {
+	console.log(user);
 	var payload = {
 		sub: user._id,
 		iat: moment().unix(),
@@ -73,7 +74,7 @@ var mutationType = new graphql.GraphQLObjectType({
 						if(err) reject(err);
 						else{
 							//Comprobar que la contraseña coincide con la que es
-							user.token = createToken(user);
+							//user.token = createToken(user);
 							resolve(user);
 						}
 					});
@@ -589,14 +590,15 @@ app.post('/users/login', function(req,res) {
 	var user = req.body.user_name;
 	var pswd = req.body.user_pswd;
 	
-	var mutation = 'mutation { loginUser(username: \"' + user + '\", password: \"'+pswd +'\"){ id, name, bio, token }';
+	var mutation = 'mutation { loginUser(username: \"' + user + '\", password: \"'+pswd +'\"){ id, name, bio }}';
 	
 	graphql.graphql(schema, mutation).then( function(result) {  
-		//console.log(JSON.stringify(result,null," "));
+		//console.log(JSON.stringify(result));
 		console.log(result);
 		res.json({
 			success: true,
-			data: result.data
+			data: result.data,
+			token: createToken(result.data.loginUser)
 		});
 	});
 });
