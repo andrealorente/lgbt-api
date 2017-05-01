@@ -11,7 +11,7 @@ var UserSchema = new Schema({
   bio: String,
   email: String,
   place: String,
-  followers: [MinUserSchema]
+  followers: [MinUserSchema],
 });
 
 var User = mongoose.model('users', UserSchema); //nombre de la colección en la bd

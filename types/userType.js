@@ -18,7 +18,8 @@ var userType = new graphql.GraphQLObjectType({
 		bio: { type: graphql.GraphQLString },
         email: { type: graphql.GraphQLString },
 		place: { type: graphql.GraphQLString },
-        followers: { type: new graphql.GraphQLList(minuserType)}
+        followers: { type: new graphql.GraphQLList(minuserType)},
+		token: { type: graphql.GraphQLString }
     }
 });
 
