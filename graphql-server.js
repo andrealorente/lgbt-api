@@ -585,7 +585,7 @@ app.post('/events/:id/comments',function(req,res){});
 /******* RUTAS DE USUARIO *******/
 
 //Loguear un usuario
-app.post('users/login', function(req,res) {
+app.post('/users/login', function(req,res) {
 	var user = req.body.user_name;
 	var pswd = req.body.user_pswd;
 	
