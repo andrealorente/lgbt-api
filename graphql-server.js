@@ -593,6 +593,7 @@ app.post('/users/login', function(req,res) {
 	
 	graphql.graphql(schema, mutation).then( function(result) {  
 		//console.log(JSON.stringify(result,null," "));
+		console.log(result);
 		res.json({
 			success: true,
 			data: result.data
