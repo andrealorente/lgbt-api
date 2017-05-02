@@ -70,7 +70,7 @@ var mutationType = new graphql.GraphQLObjectType({
 			resolve: function(_, args) {
 				return new Promise((resolve,reject) => {
 					//Comprobar que existe el nombre de usuario o email en la bd
-					User.findOne({ name: args.username }, function(err, user){
+					User.findOne({ username: args.username }, function(err, user){
 						if(err) reject(err);
 						else{
 							//Comprobar que la contraseña coincide con la que es
@@ -91,15 +91,18 @@ var mutationType = new graphql.GraphQLObjectType({
             type: userType,
             description: 'Crear un nuevo usuario',
             args: {
-                name: { type: graphql.GraphQLString },
-				email: {type: graphql.GraphQLString }
+                username: { type: graphql.GraphQLString },
+				email: {type: graphql.GraphQLString },
+				pswd: {type: graphql.GraphQLString }
             },
             resolve: function(_, args) {
                 return new Promise((resolve,reject) => {
                     
                     User.create({
-                        'name' : args.name,
-                        'email' : args.email
+                        'username' : args.username,
+						'name': args.username,
+                        'email' : args.email,
+						'pswd': args.pswd
                     }, function(err, res){
                         if(err) reject(err);
                         else{ resolve(res); } 
@@ -114,6 +117,7 @@ var mutationType = new graphql.GraphQLObjectType({
 			description: 'Editar datos de un usuario existente',
 			args: {
 				userID: { type: graphql.GraphQLString },
+				username: { type: graphql.GraphQLString },
 				name: { type: graphql.GraphQLString },
 				email: { type: graphql.GraphQLString },
 			},
@@ -389,16 +393,6 @@ app.use(cors());
 
 /*************************************************************************************/
 
-app.get('/user', function(req, res) {
-    //Recibe los datos del formulario
-    //var u = req.body;
-	var query ='mutation { createUser( user: { name: "cons", email: "cons" }) { name }}';
-    //res.json({ name: u.name, email: u.email });
-	graphql.graphql(schema, query).then( function(result) {  
-        //console.log(JSON.stringify(result,null," "));
-        res.json(result);
-    });
-});
 
 app.use('/graphql', graphqlHTTP({
     schema: schema,
@@ -590,7 +584,7 @@ app.post('/users/login', function(req,res) {
 	var user = req.body.user_name;
 	var pswd = req.body.user_pswd;
 	
-	var mutation = 'mutation { loginUser(username: \"' + user + '\", password: \"'+pswd +'\"){ id, name, bio }}';
+	var mutation = 'mutation { loginUser(username: \"' + user + '\", password: \"'+pswd +'\"){ id, username, bio }}';
 	
 	graphql.graphql(schema, mutation).then( function(result) {  
 		//console.log(JSON.stringify(result));
@@ -606,7 +600,7 @@ app.post('/users/login', function(req,res) {
 //Obtiene un usuario 
 app.get('/users/:id', function(req, res){ //para pasarle un parámetro
 	
-	var query = ' query { user(userID:\"' + req.params.id + '\") { id, name, bio, place } }';
+	var query = ' query { user(userID:\"' + req.params.id + '\") { id, username, bio, place } }';
 	
 	graphql.graphql(schema, query).then( function(result) {  
 		//console.log(JSON.stringify(result,null," "));
@@ -621,16 +615,11 @@ app.get('/users/:id', function(req, res){ //para pasarle un parámetro
 //Crea un usuario
 app.post('/users', function(req,res) {
 	var user = new User();
-	user.name = req.body.user_name;
+	user.username = req.body.user_name;
 	user.email = req.body.user_email;
 	user.pswd = req.body.user_pswd;
 	
-	user.save(function(err){
-		if(err)
-			res.send(err);
-		
-		res.json({ message: 'Usuario creado!'});
-	});
+	var mutation = ' mutation { createUser() { id, username } }';
 });
 
 //Actualiza datos de un usuario
