@@ -70,7 +70,13 @@ var mutationType = new graphql.GraphQLObjectType({
     fields: ()=> ({
 		
 		loginUser: {
-			type: userType,
+			type: new graphql.GraphQLObjectType({
+				name: 'loginUserResult',
+				fields: {
+					user: { type: userType },
+					error: { type: errorType }
+				}
+			}),
 			description: 'Loguear usuario',
 			args: {
 				username: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) },
@@ -79,19 +85,40 @@ var mutationType = new graphql.GraphQLObjectType({
 			resolve: function(_, args) {
 				return new Promise((resolve,reject) => {
 					//Comprobar que existe el nombre de usuario o email en la bd
-					User.findOne({ username: args.username }, function(err, user){
+					User.findOne({
+						$or:[
+							{ 'username': args.username },
+							{ 'email': args.username }
+						]
+					}, function(err, user){
 						if(err) reject(err);
-						else{
+						else if(user!=null){
 							//Comprobar que la contraseña coincide con la que es
-							//user.token = createToken(user);
-							resolve(user);
+							if(user.pswd == args.password){
+								resolve({
+									user: user,
+									error: null
+								});
+							}else{
+								resolve({
+									user: null,
+									error: {
+										code: 2,
+										message: "La contraseña no es correcta."
+									}
+								});
+							}
+							
+						}else{
+							resolve({
+								user: null,
+								error: {
+									code: 1,
+									message: "No existe un usuario con ese nombre o correo."
+								}
+							});
 						}
 					});
-					//Si existe, comprobar que coincide la contraseña
-					
-					//Si coincide crear y devolver un object con los campos: success, token, user
-					//El token que devuelva lo tendrá que usar el usuario en cada cabecera de la petición get/post al servidor
-					//Se almacena en el cliente, en localStorage y es el middleware el que se encarga de generar y descifrar el token
 				});
 			}
 		},
@@ -633,16 +660,24 @@ app.post('/users/login', function(req,res) {
 	var user = req.body.user_name;
 	var pswd = req.body.user_pswd;
 	
-	var mutation = 'mutation { loginUser(username: \"' + user + '\", password: \"'+pswd +'\"){ id, username, bio }}';
+	var mutation = 'mutation { loginUser(username: \"' + user + '\", password: \"'+pswd +'\"){ user { id, username, bio }, error { code, message } }}';
 	
 	graphql.graphql(schema, mutation).then( function(result) {  
 		//console.log(JSON.stringify(result));
 		console.log(result);
-		res.json({
-			success: true,
-			data: result.data,
-			token: createToken(result.data.loginUser)
-		});
+		if(result.data.loginUser.user==null){
+			res.json({
+				success: false,
+				error: result.data.loginUser.error
+			});
+		}else{
+			res.json({
+				success: true,
+				data: result.data,
+				token: createToken(result.data.loginUser.user)
+			});
+		}
+		
 	});
 });
 
