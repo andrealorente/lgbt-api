@@ -1,11 +1,6 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var MinUserSchema = new Schema({
-  _id: String,
-  name: String,
-});
-
 var UserSchema = new Schema({
   username: String,
   name: String,
@@ -13,7 +8,9 @@ var UserSchema = new Schema({
   bio: String,
   email: String,
   place: String,
-  followers: [MinUserSchema],
+  public: Boolean,
+  follows: [String],
+  followers: [String],
 });
 
 var User = mongoose.model('users', UserSchema); //nombre de la colección en la bd

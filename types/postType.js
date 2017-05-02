@@ -1,4 +1,6 @@
 var graphql = require('graphql');
+var commentType = require('./commentType');
+var Comment = require('./../models/commentModel');
 
 var postType = new graphql.GraphQLObjectType({
     name: 'postType',
@@ -8,8 +10,21 @@ var postType = new graphql.GraphQLObjectType({
         content: { type: graphql.GraphQLString },
         author: { type: graphql.GraphQLString },
         tags: { type: new graphql.GraphQLList(graphql.GraphQLString)},
-        image: { type: graphql.GraphQLString }
-		//El campo de comments sería como en eventType (copiar)
+        image: { type: graphql.GraphQLString },
+		comments: {
+			type: new graphql.GraphQLList(commentType),
+			args: {
+				targetID: { type: graphql.GraphQLString }
+			},
+			resolve: function(_, { targetID }) {
+				return new Promise((resolve,reject) => {
+                    Comment.find({ 'target_id': targetID }, function(err, res){
+                        if(err) reject(err);
+                        else resolve(res);
+                    });
+                });
+			}
+		}
     }
 });
 

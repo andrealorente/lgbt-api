@@ -31,6 +31,7 @@ var channelType = require('./types/channelType');
 var commentType = require('./types/commentType');
 var eventType = require('./types/eventType');
 var postType = require('./types/postType');
+var errorType = require('./types/errorType');
 
 //Conectar con la bd
 mongoose.connect('mongodb://admin:admin@ds145868.mlab.com:45868/lgbt-app');
@@ -53,15 +54,6 @@ var userInputType = new graphql.GraphQLInputObjectType({
     name: { type: graphql.GraphQLString },
     email: { type: graphql.GraphQLString },
   }
-});
-
-//Error type (prueba)
-var errorType = new graphql.GraphQLObjectType({
-	name: 'errorType',
-	fields: {
-		code: { type: graphql.GraphQLInt },
-		message: { type: graphql.GraphQLString }
-	}
 });
 
 //Definir mutation type
@@ -371,6 +363,16 @@ var queryType = new graphql.GraphQLObjectType({
                 
             } //Fin resolve
         }, //Fin consultar user
+		/*relationship: {
+			type: 
+			args: {
+				me: { type: graphql.GraphQLString },
+				other: { type: graphql.GraphQLString }
+			},
+			resolve: function(_, args){
+				
+			}
+		},*/
         allPosts: {
             type: new graphql.GraphQLList(postType),
             resolve: function(_){
@@ -491,9 +493,9 @@ app.get('/posts', middleware.ensureAuthorised, function(req, res) {
 });
 
 //Obtener un post concreto
-app.get('/posts/:id', function(req,res) {
+app.get('/posts/:id', middleware.ensureAuthorised, function(req,res) {
 	
-	var query = 'query { onePost(postID:\"' + req.params.id + '\") { title, author, content } }'; 
+	var query = 'query { onePost(postID:\"' + req.params.id + '\") { title, author, content, tags, comments( targetID: \"' + req.params.id +'\") { content, author, created_time } } }'; 
 	graphql.graphql(schema, query).then( function(result) {  
         
 		console.log(result); // { data: oneEvent: null }
@@ -505,7 +507,7 @@ app.get('/posts/:id', function(req,res) {
 		}else{
 			res.json({
 				success: true,
-				data: result.data
+				data: result.data.onePost
 			});	
 		}
         
@@ -513,7 +515,13 @@ app.get('/posts/:id', function(req,res) {
 });
 
 //Comentar en un post
-app.post('posts/:id/comments',function(req,res){});
+app.post('posts/:id/comments', middleware.ensureAuthorised, function(req,res){
+	var userid = req.body.user_id;
+	var content = req.body.content;
+	var targetid = req.body.target_id;
+	
+	var mutation = ' mutation { createComment() {} }';
+});
 //Dar like a un post
 app.post('posts/:id/likes',function(req,res){});
 
@@ -611,7 +619,7 @@ app.get('/channels/:id', function(req,res) {
 
 /******* RUTAS DE EVENTOS ********/
 
-app.get('/events', function(req, res) {
+app.get('/events', middleware.ensureAuthorised, function(req, res) {
 
     var query = 'query { allEvents { id, title, description, place, start_time } }'; 
     graphql.graphql(schema, query).then( function(result) {  
@@ -626,7 +634,7 @@ app.get('/events', function(req, res) {
 
 app.get('/events/:id', function(req,res) {
 	
-	var query = 'query { oneEvent(eventID:\"' + req.params.id + '\") { title, description, place, start_time } }'; 
+	var query = 'query { oneEvent(eventID:\"' + req.params.id + '\") { title, description, place, start_time, comments(targetID:\"' + req.params.id +'\") { author, content, created_time } } }'; 
     graphql.graphql(schema, query).then( function(result) {  
         
 		console.log(result); // { data: oneEvent: null }
@@ -673,7 +681,7 @@ app.post('/users/login', function(req,res) {
 		}else{
 			res.json({
 				success: true,
-				data: result.data,
+				data: result.data.loginUser.user,
 				token: createToken(result.data.loginUser.user)
 			});
 		}
@@ -684,13 +692,13 @@ app.post('/users/login', function(req,res) {
 //Obtiene un usuario 
 app.get('/users/:id', function(req, res){ //para pasarle un parámetro
 	
-	var query = ' query { user(userID:\"' + req.params.id + '\") { id, username, bio, place } }';
+	var query = ' query { user(userID:\"' + req.params.id + '\") { id, username, name, bio, place, public } }';
 	
 	graphql.graphql(schema, query).then( function(result) {  
 		//console.log(JSON.stringify(result,null," "));
 		res.json({
 			success: true,
-			data: result.data
+			data: result.data.user
 		});
 	});
 
@@ -715,7 +723,7 @@ app.post('/users', function(req,res) {
 		}else{
 			res.json({
 				success: true,
-				data: result.data
+				data: result.data.createUser.user
 			});
 		}
 		
@@ -729,6 +737,19 @@ app.put('/users/:user-id', function(req,res){
 	
 });
 
+//Obtiene lista de follows de un usuario
+app.get('/users/:user-id/follows', function(req,res){
+	var query = ' query { user(userID:\"' + req.params.id + '\") { follows } }';
+	graphql.graphql(schema, query).then( function(result) {  
+		//console.log(JSON.stringify(result,null," "));
+		res.json({
+			success: true,
+			data: result.data.user
+		});
+	});
+});
+//Obtiene lista de followed-by de un usuario
+app.get('/users/:user-id/followed-by', function(req,res){});
 //Seguir a un usuario
 app.post('/users/:id/follows',function(req,res){});
 
