@@ -525,7 +525,7 @@ app.post('posts/:id/comments', middleware.ensureAuthorised, function(req,res){
 //Dar like a un post
 app.post('posts/:id/likes',function(req,res){});
 
-app.post('posts/:id/update',/*middleware.ensureAuthorised,*/function(req,res){
+app.post('posts/:id/update',middleware.ensureAuthorised,function(req,res){
     console.log("hola");
     var form = new formidable.IncomingForm();
     form.keepExtensions = true;
