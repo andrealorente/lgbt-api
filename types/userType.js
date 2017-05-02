@@ -15,6 +15,7 @@ var userType = new graphql.GraphQLObjectType({
     fields: {
         id: { type: graphql.GraphQLString }, //Cada campo puede tener un resolve
         name: { type: graphql.GraphQLString },
+		pswd: { type: graphql.GraphQLString },
 		bio: { type: graphql.GraphQLString },
         email: { type: graphql.GraphQLString },
 		place: { type: graphql.GraphQLString },

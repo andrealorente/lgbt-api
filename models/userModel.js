@@ -8,6 +8,7 @@ var MinUserSchema = new Schema({
 
 var UserSchema = new Schema({
   name: String,
+  pswd: String,
   bio: String,
   email: String,
   place: String,

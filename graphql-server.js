@@ -621,7 +621,9 @@ app.get('/users/:id', function(req, res){ //para pasarle un parámetro
 //Crea un usuario
 app.post('/users', function(req,res) {
 	var user = new User();
-	user.name = req.body.name;
+	user.name = req.body.user_name;
+	user.email = req.body.user_email;
+	user.pswd = req.body.user_pswd;
 	
 	user.save(function(err){
 		if(err)
