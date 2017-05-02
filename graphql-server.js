@@ -407,7 +407,7 @@ app.use('/graphql', graphqlHTTP({
 
 /******** RUTAS DE POSTS *******/
 
-app.get('/posts', function(req, res) {
+app.get('/posts', middleware.ensureAuthorised, function(req, res) {
     // This is just an internal test
     var query = 'query { allPosts { id, title, content, author, tags } }'; 
     graphql.graphql(schema, query).then( function(result) {  
