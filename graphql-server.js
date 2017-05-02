@@ -55,6 +55,15 @@ var userInputType = new graphql.GraphQLInputObjectType({
   }
 });
 
+//Error type (prueba)
+var errorType = new graphql.GraphQLObjectType({
+	name: 'errorType',
+	fields: {
+		code: { type: graphql.GraphQLInt },
+		message: { type: graphql.GraphQLString }
+	}
+});
+
 //Definir mutation type
 var mutationType = new graphql.GraphQLObjectType({
     name: 'Mutation',
@@ -88,7 +97,13 @@ var mutationType = new graphql.GraphQLObjectType({
 		},
 		
         createUser: { 
-            type: userType,
+            type: new graphql.GraphQLObjectType({
+				name: 'createUserResult',
+				fields: {
+					user: { type: userType },
+					error: { type: errorType }
+				}
+			}),
             description: 'Crear un nuevo usuario',
             args: {
                 username: { type: graphql.GraphQLString },
@@ -97,21 +112,51 @@ var mutationType = new graphql.GraphQLObjectType({
             },
             resolve: function(_, args) {
                 return new Promise((resolve,reject) => {
-                    
-                    User.create({
-                        username : args.username,
-						name: args.username,
-                        email : args.email,
-						pswd: args.pswd
-                    }, function(err, res){
-                        if(err) reject(err);
-                        else{ 
-							console.log("Hola");
-							console.log(res);
-							resolve(res); 
-						} 
-                        
-                    });
+					
+					User.findOne({username: args.username}, function(err, user){
+						if(err) reject(err);
+						else if(user!=null){ //Nombre de usuario ya utilizado
+							console.log("Nombre de usuario ya utilizado.");
+							resolve({
+								user: null,
+								error: {
+									code: 1,
+									message: "Nombre de usuario en uso."
+								}
+							});
+						}else{
+							
+							User.findOne({email: args.email}, function(err, user){
+								if(err) reject(err);
+								else if(user!=null){//Correo ya en uso
+									resolve({
+										user: null,
+										error: {
+											code: 2,
+											message: "Correo electrónico ya en uso."
+										}
+									});
+								}else{
+									User.create({
+										username : args.username,
+										name: args.username,
+										email : args.email,
+										pswd: args.pswd
+									}, function(err, res){
+										if(err) reject(err);
+										else{ 
+											console.log(res);
+											resolve({
+												user: res,
+												error: null
+											}); 
+										} 
+										
+									});
+								}
+							});
+						}
+					});      
                 });
             }
         },
@@ -623,14 +668,22 @@ app.post('/users', function(req,res) {
 	var email = req.body.user_email;
 	var pswd = req.body.user_pswd;
 	
-	var mutation = ' mutation { createUser(username:\"'+ username +'\", email: \"' + email + '\", pswd: \"'+ pswd +'\") { id, username, name } }';
+	var mutation = ' mutation { createUser(username:\"'+ username +'\", email: \"' + email + '\", pswd: \"'+ pswd +'\") { user{id, username, name}, error {code, message} } }';
 	
 	graphql.graphql(schema, mutation).then( function(result) {  
 		//console.log(JSON.stringify(result,null," "));
-		res.json({
-			success: true,
-			data: result.data
-		});
+		if(result.data.createUser.user==null){
+			res.json({
+				success: false,
+				error: result.data.createUser.error
+			});
+		}else{
+			res.json({
+				success: true,
+				data: result.data
+			});
+		}
+		
 	});
 });
 
