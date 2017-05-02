@@ -3,9 +3,10 @@ var Schema = mongoose.Schema;
 
 var CommentSchema = new Schema({
   target_id: String,
-  user: String,
+  author: String,
   content: String,
-  created_time: String
+  created_time: String,
+  state: String
 });
 
 var Comment = mongoose.model('comments', CommentSchema); //nombre de la colección en la bd

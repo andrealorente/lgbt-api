@@ -5,9 +5,10 @@ const commentType = new graphql.GraphQLObjectType({
 	fields: {
 		id: { type: graphql.GraphQLString },
 		target_id: { type: graphql.GraphQLString }, //Id del post, evento o lo que sea
-		user: { type: graphql.GraphQLString }, //Esto sería todos los datos necesarios del usuario
+		author: { type: graphql.GraphQLString }, //Esto sería todos los datos necesarios del usuario
 		content: { type: graphql.GraphQLString },
-		created_time: { type: graphql.GraphQLString }
+		created_time: { type: graphql.GraphQLString },
+		state: { type: graphql.GraphQLString }
 	}
 });
 
