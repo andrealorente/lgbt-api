@@ -87,25 +87,29 @@ var mutationType = new graphql.GraphQLObjectType({
 			}
 		},
 		
-        createUser: { //Entry point
+        createUser: { 
             type: userType,
             description: 'Crear un nuevo usuario',
             args: {
                 username: { type: graphql.GraphQLString },
-				email: {type: graphql.GraphQLString },
-				pswd: {type: graphql.GraphQLString }
+				email: { type: graphql.GraphQLString },
+				pswd: { type: graphql.GraphQLString }
             },
             resolve: function(_, args) {
                 return new Promise((resolve,reject) => {
                     
                     User.create({
-                        'username' : args.username,
-						'name': args.username,
-                        'email' : args.email,
-						'pswd': args.pswd
+                        username : args.username,
+						name: args.username,
+                        email : args.email,
+						pswd: args.pswd
                     }, function(err, res){
                         if(err) reject(err);
-                        else{ resolve(res); } 
+                        else{ 
+							console.log("Hola");
+							console.log(res);
+							resolve(res); 
+						} 
                         
                     });
                 });
@@ -614,12 +618,12 @@ app.get('/users/:id', function(req, res){ //para pasarle un parámetro
 
 //Crea un usuario
 app.post('/users', function(req,res) {
-	var user = new User();
-	user.username = req.body.user_name;
-	user.email = req.body.user_email;
-	user.pswd = req.body.user_pswd;
 	
-	var mutation = ' mutation { createUser(username:\"'+ user.username +', email: \"' + user.email + ', pswd: \"'+ user.pswd +') { id, username, name } }';
+	var username = req.body.user_name;
+	var email = req.body.user_email;
+	var pswd = req.body.user_pswd;
+	
+	var mutation = ' mutation { createUser(username:\"'+ username +'\", email: \"' + email + '\", pswd: \"'+ pswd +'\") { id, username, name } }';
 	
 	graphql.graphql(schema, mutation).then( function(result) {  
 		//console.log(JSON.stringify(result,null," "));
