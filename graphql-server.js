@@ -525,9 +525,9 @@ app.post('posts/:id/comments', middleware.ensureAuthorised, function(req,res){
 //Dar like a un post
 app.post('posts/:id/likes',function(req,res){});
 
-app.post('posts/:id/update',middleware.ensureAuthorised,function(req,res){
+app.post('/posts/:id/update',middleware.ensureAuthorised,function(req,res){
     console.log("hola");
-    var form = new formidable.IncomingForm();
+    /*var form = new formidable.IncomingForm();
     form.keepExtensions = true;
     form.multiples = true;
     form.parse(reject, function(err, fields, files){
@@ -567,8 +567,8 @@ app.post('posts/:id/update',middleware.ensureAuthorised,function(req,res){
                             width: 300,
                             height: 300,
                             format: "png",
-                            folder: "posts"/*,
-                            tags: ['posts', Post._id, Post.name, user.account.user]*/
+                            folder: "posts"//,
+                            //tags: ['posts', Post._id, Post.name, user.account.user]
                         }
                     );
                 } else {
@@ -577,7 +577,7 @@ app.post('posts/:id/update',middleware.ensureAuthorised,function(req,res){
                 }
             }
         }
-    });
+    });*/
 });
 
 /******* RUTAS DE CANALES ******/
