@@ -619,7 +619,15 @@ app.post('/users', function(req,res) {
 	user.email = req.body.user_email;
 	user.pswd = req.body.user_pswd;
 	
-	var mutation = ' mutation { createUser() { id, username } }';
+	var mutation = ' mutation { createUser(username:\"'+ user.username +', email: \"' + user.email + ', pswd: \"'+ user.pswd +') { id, username, name } }';
+	
+	graphql.graphql(schema, mutation).then( function(result) {  
+		//console.log(JSON.stringify(result,null," "));
+		res.json({
+			success: true,
+			data: result.data
+		});
+	});
 });
 
 //Actualiza datos de un usuario
