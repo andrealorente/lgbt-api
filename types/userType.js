@@ -1,4 +1,6 @@
 var graphql = require('graphql');
+var relationshipType = require('./relationshipType');
+var activityType = require('./activityType');
 
 //Definir User type
 var userType = new graphql.GraphQLObjectType({
@@ -11,8 +13,8 @@ var userType = new graphql.GraphQLObjectType({
 		bio: { type: graphql.GraphQLString },
         email: { type: graphql.GraphQLString },
 		place: { type: graphql.GraphQLString },
-		follows: { type: new graphql.GraphQLList(graphql.GraphQLString)},
-        followers: { type: new graphql.GraphQLList(graphql.GraphQLString)},
+		relationships: { type: new graphql.GraphQLList(relationshipType)},
+		activity: { type: new graphql.GraphQLList(activityType) },
 		public: { type: graphql.GraphQLBoolean },
 		token: { type: graphql.GraphQLString }
     }
