@@ -537,32 +537,42 @@ var queryType = new graphql.GraphQLObjectType({
 			},
 			resolve: function(_, args){
 				return new Promise((resolve,reject) => {
-					User.findById(args.originID, function(err,user){
-						if(err) reject(err);
-						else{
-							var status = {};
-							status.incoming = "none";
-							status.outgoing = "none";
-							
-							//Si el usuario es privado 
-							if(user.public == false){
-								if((user.requests.indexOf(args.targetID))>-1) status.incoming = "requested-by";
-								//Cómo saber si el outgoing es requested (mirar en los requests del otro usuario???)
-							}
-							
-							if((user.followers.indexOf(args.targetID))==-1){  //followed-by || requested-by || none
-								status.incoming = "none";
-							}else status.incoming = "followed-by";
-							
-							if((user.follows.indexOf(args.targetID))==-1){ //follows || requested || none
-								status.outgoing = "none"
-							}else status.outgoing = "follows";
-							
+					User.find({_id: { 
+					$in: [args.originID, args.targetID ]}, 'relationships.id':{$in: [args.originID, args.targetID ]}},function(err, res){ //obtiene los dos usuarios
+						
+						console.log(res);
+						
+						if(res.length == 0){ //No hay relación
 							resolve({
-								status: status,
+								status: {
+									outgoing: "none",
+									incoming: "none"
+								},
 								error: null
 							});
+						}else{ //Existe relación
+							
+							var user = {};
+							//Buscar el doc del usuario origin
+							if(res[0]._id == args.originID)
+								user = res[0];
+							else
+								user = res[1];
+							
+							for(i in user.relationships){
+								if(user.relationships[i].id == args.targetID){
+									console.log(user.relationships[i]);
+									resolve({
+										status: {
+											outgoing: user.relationships[i].outgoing_status,
+											incoming: user.relationships[i].incoming_status
+										},
+										error: null
+									});
+								}
+							}
 						}
+						
 					});
 				});
 			}
