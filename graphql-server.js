@@ -56,6 +56,15 @@ var userInputType = new graphql.GraphQLInputObjectType({
   }
 });
 
+var statusType = new graphql.GraphQLObjectType({
+	name: 'statusType',
+	description: 'Status of the relationship',
+	fields: {
+		incoming: {type: graphql.GraphQLString},
+		outgoing: { type: graphql.GraphQLString }
+	}
+});
+
 //Definir mutation type
 var mutationType = new graphql.GraphQLObjectType({
     name: 'Mutation',
@@ -202,6 +211,155 @@ var mutationType = new graphql.GraphQLObjectType({
 				Model.update(query, { $set: { name: 'jason borne' }}, options, callback)
 				
 				*/
+			}
+		},
+		/** Modificar la relación entre dos usuarios **/
+		relationship: {
+			type: new graphql.GraphQLObjectType({
+				name: 'relationshipResult',
+				fields: {
+					status: { type: graphql.GraphQLString },
+					error: { type: errorType }
+				}
+			}),
+			description: 'Modificar la relación con un usuario',
+			args: {
+				originID: { type: graphql.GraphQLString },
+				targetID: { type: graphql.GraphQLString },
+				action: { type: graphql.GraphQLString } //valores: follow || unfollow || approve || ignore
+			},
+			resolve: function(_,args) {
+
+				return new Promise((resolve, reject) => {
+			
+					User.find({_id: { 
+					$in: [args.originID, args.targetID ]}, 'relationships.id':{$in: [args.originID, args.targetID ]}},function(err, res){ //obtiene los dos usuarios
+						
+						console.log(res);
+						
+						//Según qué acción sea
+						var outgoing_status = "";
+						var incoming_status = "";
+						var outgoing_status2 = "";
+						var incoming_status2 = "";
+												
+						if(args.action == "follow"){
+							outgoing_status = "follows"; 
+							incoming_status2 = "followed-by";
+						}else if(args.action == "unfollow"){
+							outgoing_status = "none";
+							incoming_status2 = "none";
+						}else if(args.action == "approve"){
+							incoming_status = "followed-by";
+							outgoing_status2 = "follows";
+						}else if(args.action == "ignore"){
+							incoming_status = "none";
+							outgoing_status = "none";
+						} 
+						
+						if(res.length==0){ //No existe esa relación entre los usuarios
+							
+							User.find({_id: { 
+								$in: [args.originID, args.targetID ]}}, //Busca a los dos usuarios origin y target (NO LOS DEVUELVE EN ORDEN JODER)
+							function(err, users){
+								if(err) reject(err);
+								else{
+									console.log(users);
+									var user1 = {};
+									var user2 = {};
+									
+									if(users[0]._id == args.targetID) {
+										user1 = users[1];
+										user2 = users[0];
+									}else{
+										user1 = users[0];
+										user2 = users[1];
+									}
+									//ORIGIN
+									user1.relationships.push({ 
+										id: args.targetID,
+										outgoing_status: "follows",
+										incoming_status: "none"
+									});
+									
+									user1.save(function(err){
+										if(!err){
+											//TARGET
+											user2.relationships.push({ 
+												id: args.originID,
+												outgoing_status: "none",
+												incoming_status: "followed-by"
+											});
+											
+											user2.save(function(err){
+												if(!err){
+													resolve({
+														status: "Following",
+														error: null
+													});													
+												}else reject(err);												
+											});											
+										}else reject(err);
+										
+									});								
+								}
+							});
+							
+						}else{
+							//Ya existe la relación, solo hay que actualizarla
+							console.log("Existe la relación!!!!");
+							console.log(res);
+							
+							var user1 = {};
+							var user2 = {};
+							
+							if(res[0]._id == args.originID){
+								user1 = res[0];
+								user2 = res[1];
+							}else{
+								user1 = res[1];
+								user2 = res[0];
+							}
+							
+							//Buscar el doc en el usuario origin
+							for(i in user1.relationships){
+								
+								if(user1.relationships[i].id == args.targetID){
+									if(outgoing_status!='')
+										user1.relationships[i].outgoing_status = outgoing_status;
+									if(incoming_status!='')
+										user1.relationships[i].incoming_status = incoming_status;
+								}
+							}
+							
+							user1.save(function(err){
+								if(err) reject(err);
+								else{
+									//Buscar el doc en el usuario target
+									for(j in user2.relationships){
+										
+										if(user2.relationships[j].id == args.originID){
+											if(outgoing_status2!='')
+												user2.relationships[j].outgoing_status = outgoing_status2;
+											if(incoming_status2!='')
+												user2.relationships[j].incoming_status = incoming_status2;
+										}
+									}
+									
+									user2.save(function(err){
+										if(err) reject(err);
+										else{
+											resolve({
+												status: "Following",
+												error: null
+											});
+										}
+									});
+								}
+							});
+						}//Fin else res==null				
+					});	
+				});
 			}
 		},
 		
@@ -396,16 +554,53 @@ var queryType = new graphql.GraphQLObjectType({
                 
             } //Fin resolve
         }, //Fin consultar user
-		/*relationship: {
-			type: 
+		
+		//Consultar relación entre dos usuarios
+		relationship: {
+			type: new graphql.GraphQLObjectType({
+				name: 'getrelationshipResult',
+				fields: {
+					status: { type: statusType },
+					error: { type: errorType }
+				}
+			}),
 			args: {
-				me: { type: graphql.GraphQLString },
-				other: { type: graphql.GraphQLString }
+				originID: { type: graphql.GraphQLString },
+				targetID: { type: graphql.GraphQLString }
 			},
 			resolve: function(_, args){
-				
+				return new Promise((resolve,reject) => {
+					User.findById(args.originID, function(err,user){
+						if(err) reject(err);
+						else{
+							var status = {};
+							status.incoming = "none";
+							status.outgoing = "none";
+							
+							//Si el usuario es privado 
+							if(user.public == false){
+								if((user.requests.indexOf(args.targetID))>-1) status.incoming = "requested-by";
+								//Cómo saber si el outgoing es requested (mirar en los requests del otro usuario???)
+							}
+							
+							if((user.followers.indexOf(args.targetID))==-1){  //followed-by || requested-by || none
+								status.incoming = "none";
+							}else status.incoming = "followed-by";
+							
+							if((user.follows.indexOf(args.targetID))==-1){ //follows || requested || none
+								status.outgoing = "none"
+							}else status.outgoing = "follows";
+							
+							resolve({
+								status: status,
+								error: null
+							});
+						}
+					});
+				});
 			}
-		},*/
+		},
+		
         allPosts: {
             type: new graphql.GraphQLList(postType),
             resolve: function(_){
@@ -799,8 +994,21 @@ app.get('/users/:user-id/follows', function(req,res){
 });
 //Obtiene lista de followed-by de un usuario
 app.get('/users/:user-id/followed-by', function(req,res){});
-//Seguir a un usuario
-app.post('/users/:id/follows',function(req,res){});
+
+//Obtiene la relación entre el usuario y otro usuario
+app.get('/users/:user-id/relationship', function(req,res){
+	/****** PREGUNTA: LA ID DEL USUARIO ORIGEN HACE FALTA ENVIARLA TAMBIÉN O SE PUEDE SACAR CON EL TOKEN????????*******/
+	var query = '';
+	
+});
+
+//Modifica la relación entre el usuario y otro usuario
+app.get('/users/:user-id/relationship', function(req,res){
+	//Necesario incluir parámetro de ACTION
+	var mutation = '';
+	
+});
+
 
 /*********************************************************************************************/
 

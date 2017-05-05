@@ -1,6 +1,12 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
+var RelationshipSchema = new Schema({
+	id: String,
+	incoming_status: String,
+	outgoing_status: String
+});
+
 var UserSchema = new Schema({
   username: String,
   name: String,
@@ -9,8 +15,7 @@ var UserSchema = new Schema({
   email: String,
   place: String,
   public: Boolean,
-  follows: [String],
-  followers: [String],
+  relationships: [RelationshipSchema]
 });
 
 var User = mongoose.model('users', UserSchema); //nombre de la colección en la bd
