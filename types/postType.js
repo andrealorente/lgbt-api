@@ -24,7 +24,8 @@ var postType = new graphql.GraphQLObjectType({
                     });
                 });
 			}
-		}
+		},
+        state: { type: graphql.GraphQLString }
     }
 });
 

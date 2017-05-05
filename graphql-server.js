@@ -389,26 +389,59 @@ var mutationType = new graphql.GraphQLObjectType({
         },
         
         updatePost: {
-            type: postType,
+            type: new graphql.GraphQLObjectType({
+				name: 'updatePostResult',
+				fields: {
+					post: { type: postType },
+					error: { type: errorType }
+				}
+			}),
             description: 'Editar un post ya existente',
             args: {
                 postID: {type: graphql.GraphQLString},
                 title: {type: graphql.GraphQLString},
                 content: {type: graphql.GraphQLString},
                 tags: {type: new graphql.GraphQLList(graphql.GraphQLString)},
-                image: {type: graphql.GraphQLString}
+                image: {type: graphql.GraphQLString},
+                state: {type: graphql.GraphQLString}
             },
             resolve: function(root,args){
+            console.log(args.state);
                 return new Promise((resolve, reject) => {
                     Post.findOneAndUpdate(
                         {_id: args.postID},//"58e7ca08a364171f3c3fe58d"},
-                        {$set:{title: args.title, content: args.content, tags: args.tags, image: args.image}}, 
+                        {$set:{title: args.title, content: args.content, tags: args.tags, image: args.image, state: args.state}}, 
                         {new: true}
-                    ,function(err, res){
+                    ,function(err, post){
                         if(err) reject(err);
-                        else{ 
-                            resolve(res); 
-                        }   
+						else if(post!=null){
+                        //Comprobar que la contraseña coincide con la que es
+							//if(post.author == args.password){
+                            console.log("no es null");
+                            //console.log(args.tags);
+                            resolve({
+                                post: post,
+                                error: null
+                            });
+							//}else{
+								//resolve({
+									//postMessage: null,
+									//error: {
+										//code: 2,
+										//message: "La contraseña no es correcta."
+									//}
+								//});
+							//}
+							
+						}else{
+							resolve({
+								post: null,
+								error: {
+									code: 1,
+									message: "No existe el post que deseas modificar."
+								}
+							});
+						}
                         
                     });
                 });
@@ -700,7 +733,7 @@ app.get('/posts', middleware.ensureAuthorised, function(req, res) {
 //Obtener un post concreto
 app.get('/posts/:id', middleware.ensureAuthorised, function(req,res) {
 	
-	var query = 'query { onePost(postID:\"' + req.params.id + '\") { title, author, content, tags, comments( targetID: \"' + req.params.id +'\") { content, author, created_time } } }'; 
+	var query = 'query { onePost(postID:\"' + req.params.id + '\") { title, author, content, tags, image, comments( targetID: \"' + req.params.id +'\") { content, author, created_time } } }'; 
 	graphql.graphql(schema, query).then( function(result) {  
         
 		console.log(result); // { data: oneEvent: null }
@@ -720,7 +753,7 @@ app.get('/posts/:id', middleware.ensureAuthorised, function(req,res) {
 });
 
 //Comentar en un post
-app.post('posts/:id/comments', middleware.ensureAuthorised, function(req,res){
+app.post('/posts/:id/comments', middleware.ensureAuthorised, function(req,res){
 	var userid = req.body.user_id;
 	var content = req.body.content;
 	var targetid = req.body.target_id;
@@ -728,32 +761,31 @@ app.post('posts/:id/comments', middleware.ensureAuthorised, function(req,res){
 	var mutation = ' mutation { createComment() {} }';
 });
 //Dar like a un post
-app.post('posts/:id/likes',function(req,res){});
+app.post('/posts/:id/likes',function(req,res){});
 
 app.post('/posts/:id/update',middleware.ensureAuthorised,function(req,res){
-    console.log("hola");
-    /*var form = new formidable.IncomingForm();
+
+    var form = new formidable.IncomingForm();
     form.keepExtensions = true;
     form.multiples = true;
-    form.parse(reject, function(err, fields, files){
+    //console.log(form);
+    
+    form.parse(req, function(err, fields, files){
+        var tagspost=[];
+        if(fields.tags!="undefined" && fields.tags.split(", ")!=""){tagspost = fields.tags.split(', ');}
+        
         var temp_path;
-        console.log(files.images);
         if (files.images) {
             if (!files.images.length) {
                 if (files.images.name != "") {
-                    console.log(files.images.path);
                     temp_path = files.images.path;
                     cloudinary.uploader.upload(
                         temp_path,
                         function (result) {
-                            console.log(result);
-                            //plan.images.push(result.public_id);
                             console.log("Actualizado con 1 foto");
-                            var query = "mutation{updatePost(postID:\""+ fields.id +"\",title:\""+ fields.title +"\",content:\""+ fields.content +"\",tags:\""+ fields.tags +"\",image:\""+ files.images.name +"\"){id,title,content,tags,image}}";
-	                       graphql.graphql(schema, query).then( function(result) {  
-        
-		                      console.log(result); // { data: oneEvent: null }
-		                      if(result.data.onePost == null){ //No sé si esto está bien así o habría que mandar el error desde graphql
+                            var mutation = "mutation{updatePost(postID:\""+ fields.id +"\",title:\""+ fields.title +"\",content:\""+ fields.content +"\",tags:"+ JSON.stringify(tagspost) +",image:\""+ result.version+"/"+result.public_id +"\",state:\""+ fields.state +"\"){post{id,title,content,tags,image,state},error{code,message}}}";
+	                       graphql.graphql(schema, mutation).then( function(result) {
+		                      if(result.data.updatePost == null){
 			                     res.json({
 				                    success: false,
 				                    error: "No se ha encontrado ningún post con esa ID"
@@ -761,7 +793,7 @@ app.post('/posts/:id/update',middleware.ensureAuthorised,function(req,res){
 		                      }else{
 			                     res.json({
 				                    success: true,
-				                    data: result.data
+				                    data: result.data.updatePost
 			                     });	
 		                      }
         
@@ -772,17 +804,33 @@ app.post('/posts/:id/update',middleware.ensureAuthorised,function(req,res){
                             width: 300,
                             height: 300,
                             format: "png",
-                            folder: "posts"//,
-                            //tags: ['posts', Post._id, Post.name, user.account.user]
+                            folder: "posts",
+                            tags: ['posts', fields.id, fields.title/*, fields.author*/]
                         }
                     );
                 } else {
-                    //updatePlan();
                     console.log("Actualizado sin 1 foto");
                 }
             }
         }
-    });*/
+        else{
+            console.log("Actualizado sin 1 foto");
+            var mutation = "mutation{updatePost(postID:\""+ fields.id +"\",title:\""+ fields.title +"\",content:\""+ fields.content +"\",tags:"+ JSON.stringify(tagspost) +",image:\"1493935772/no-image_u8eu8r\",state:\""+ fields.state +"\"){post{id,title,content,tags,image,state},error{code,message}}}";
+            graphql.graphql(schema, mutation).then( function(result) {
+                 if(result.data.updatePost == null){
+                     res.json({
+                        success: false,
+                        error: "No se ha encontrado ningún post con esa ID"
+                     });	
+                  }else{
+                     res.json({
+                        success: true,
+                        data: result.data.updatePost
+                     });	
+                  }	              
+            });
+        }
+    });
 });
 
 /******* RUTAS DE CANALES ******/
