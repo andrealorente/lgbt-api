@@ -46,7 +46,7 @@ var createToken = function(user) {
 		iat: moment().unix(),
 		exp: moment().add(14, "days").unix()
 	};
-	
+
 	return jwt.encode(payload, config.TOKEN_SECRET);
 };
 
@@ -76,36 +76,36 @@ app.use('/graphql', graphqlHTTP({
 
 app.get('/posts', middleware.ensureAuthorised, function(req, res) {
     // This is just an internal test
-    var query = 'query { allPosts { id, title, content, author, tags } }'; 
-    graphql.graphql(schema, query).then( function(result) {  
+    var query = 'query { allPosts { id, title, content, author, tags } }';
+    graphql.graphql(schema, query).then( function(result) {
         //console.log(JSON.stringify(result,null," "));
         res.json({
 			success: true,
 			data: result.data
 		});
     });
- 
+
 });
 
 //Obtener un post concreto
 app.get('/posts/:id', middleware.ensureAuthorised, function(req,res) {
-	
-	var query = 'query { onePost(postID:\"' + req.params.id + '\") { title, author, content, tags, image, comments( targetID: \"' + req.params.id +'\") { content, author, created_time } } }'; 
-	graphql.graphql(schema, query).then( function(result) {  
-        
+
+	var query = 'query { onePost(postID:\"' + req.params.id + '\") { title, author, content, tags, image, comments( targetID: \"' + req.params.id +'\") { content, author, created_time } } }';
+	graphql.graphql(schema, query).then( function(result) {
+
 		console.log(result); // { data: oneEvent: null }
 		if(result.data.onePost == null){ //No sé si esto está bien así o habría que mandar el error desde graphql
 			res.json({
 				success: false,
 				error: "No se ha encontrado ningún post con esa ID"
-			});	
+			});
 		}else{
 			res.json({
 				success: true,
 				data: result.data.onePost
-			});	
+			});
 		}
-        
+
     });
 });
 
@@ -114,7 +114,7 @@ app.post('/posts/:id/comments', middleware.ensureAuthorised, function(req,res){
 	var userid = req.body.user_id;
 	var content = req.body.content;
 	var targetid = req.body.target_id;
-	
+
 	var mutation = ' mutation { createComment() {} }';
 });
 //Dar like a un post
@@ -126,11 +126,11 @@ app.post('/posts/:id/update',middleware.ensureAuthorised,function(req,res){
     form.keepExtensions = true;
     form.multiples = true;
     //console.log(form);
-    
+
     form.parse(req, function(err, fields, files){
         var tagspost=[];
         if(fields.tags!="undefined" && fields.tags.split(", ")!=""){tagspost = fields.tags.split(', ');}
-        
+
         var temp_path;
         if (files.images) {
             if (!files.images.length) {
@@ -146,15 +146,15 @@ app.post('/posts/:id/update',middleware.ensureAuthorised,function(req,res){
 			                     res.json({
 				                    success: false,
 				                    error: "No se ha encontrado ningún post con esa ID"
-			                     });	
+			                     });
 		                      }else{
 			                     res.json({
 				                    success: true,
 				                    data: result.data.updatePost
-			                     });	
+			                     });
 		                      }
-        
-                            });            
+
+                            });
                         },
                         {
                             crop: 'limit',
@@ -178,13 +178,13 @@ app.post('/posts/:id/update',middleware.ensureAuthorised,function(req,res){
                      res.json({
                         success: false,
                         error: "No se ha encontrado ningún post con esa ID"
-                     });	
+                     });
                   }else{
                      res.json({
                         success: true,
                         data: result.data.updatePost
-                     });	
-                  }	              
+                     });
+                  }
             });
         }
     });
@@ -194,37 +194,37 @@ app.post('/posts/:id/update',middleware.ensureAuthorised,function(req,res){
 
 //Obtener todos los canales
 app.get('/channels', function(req, res) {
-	
-    var query = 'query { allChannels { id, title, description } }'; 
-    graphql.graphql(schema, query).then( function(result) {  
+
+    var query = 'query { allChannels { id, title, description } }';
+    graphql.graphql(schema, query).then( function(result) {
         //console.log(JSON.stringify(result,null," "));
         res.json({
 			success: true,
 			data: result.data
 		});
     });
- 
+
 });
 
 //Obtener un canal concreto
 app.get('/channels/:id', function(req,res) {
-	
-	var query = 'query { oneChannel(channelID:\"' + req.params.id + '\") { title, description } }'; 
-	graphql.graphql(schema, query).then( function(result) {  
-        
+
+	var query = 'query { oneChannel(channelID:\"' + req.params.id + '\") { title, description } }';
+	graphql.graphql(schema, query).then( function(result) {
+
 		console.log(result); // { data: oneEvent: null }
 		if(result.data.oneChannel == null){ //No sé si esto está bien así o habría que mandar el error desde graphql
 			res.json({
 				success: false,
 				error: "No se ha encontrado ningún canal con esa ID"
-			});	
+			});
 		}else{
 			res.json({
 				success: true,
 				data: result.data
-			});	
+			});
 		}
-        
+
     });
 });
 
@@ -232,35 +232,35 @@ app.get('/channels/:id', function(req,res) {
 
 app.get('/events', middleware.ensureAuthorised, function(req, res) {
 
-    var query = 'query { allEvents { id, title, description, place, start_time } }'; 
-    graphql.graphql(schema, query).then( function(result) {  
+    var query = 'query { allEvents { id, title, description, place, start_time } }';
+    graphql.graphql(schema, query).then( function(result) {
         //console.log(JSON.stringify(result,null," "));
         res.json({
 			success: true,
 			data: result.data
 		});
     });
- 
+
 });
 
 app.get('/events/:id', function(req,res) {
-	
-	var query = 'query { oneEvent(eventID:\"' + req.params.id + '\") { title, description, place, start_time, comments(targetID:\"' + req.params.id +'\") { author, content, created_time } } }'; 
-    graphql.graphql(schema, query).then( function(result) {  
-        
+
+	var query = 'query { oneEvent(eventID:\"' + req.params.id + '\") { title, description, place, start_time, comments(targetID:\"' + req.params.id +'\") { author, content, created_time } } }';
+    graphql.graphql(schema, query).then( function(result) {
+
 		console.log(result); // { data: oneEvent: null }
 		if(result.data.oneEvent == null){ //No sé si esto está bien así o habría que mandar el error desde graphql
 			res.json({
 				success: false,
 				error: "No se ha encontrado ningún evento con esa ID"
-			});	
+			});
 		}else{
 			res.json({
 				success: true,
 				data: result.data
-			});	
+			});
 		}
-        
+
     });
 });
 
@@ -278,10 +278,10 @@ app.post('/events/:id/comments',function(req,res){});
 app.post('/users/login', function(req,res) {
 	var user = req.body.user_name;
 	var pswd = req.body.user_pswd;
-	
+
 	var mutation = 'mutation { loginUser(username: \"' + user + '\", password: \"'+pswd +'\"){ user { id, username, bio }, error { code, message } }}';
-	
-	graphql.graphql(schema, mutation).then( function(result) {  
+
+	graphql.graphql(schema, mutation).then( function(result) {
 		//console.log(JSON.stringify(result));
 		console.log(result);
 		if(result.data.loginUser.user==null){
@@ -296,16 +296,14 @@ app.post('/users/login', function(req,res) {
 				token: createToken(result.data.loginUser.user)
 			});
 		}
-		
+
 	});
 });
 
-//Obtiene un usuario 
+//Obtiene un usuario
 app.get('/users/:id', function(req, res){ //para pasarle un parámetro
-	
 	var query = ' query { user(userID:\"' + req.params.id + '\") { id, username, name, bio, place, public } }';
-	
-	graphql.graphql(schema, query).then( function(result) {  
+	graphql.graphql(schema, query).then( function(result) {
 		//console.log(JSON.stringify(result,null," "));
 		res.json({
 			success: true,
@@ -317,14 +315,14 @@ app.get('/users/:id', function(req, res){ //para pasarle un parámetro
 
 //Crea un usuario
 app.post('/users', function(req,res) {
-	
+
 	var username = req.body.user_name;
 	var email = req.body.user_email;
 	var pswd = req.body.user_pswd;
-	
+
 	var mutation = ' mutation { createUser(username:\"'+ username +'\", email: \"' + email + '\", pswd: \"'+ pswd +'\") { user{id, username, name}, error {code, message} } }';
-	
-	graphql.graphql(schema, mutation).then( function(result) {  
+
+	graphql.graphql(schema, mutation).then( function(result) {
 		//console.log(JSON.stringify(result,null," "));
 		if(result.data.createUser.user==null){
 			res.json({
@@ -337,43 +335,67 @@ app.post('/users', function(req,res) {
 				data: result.data.createUser.user
 			});
 		}
-		
+
 	});
 });
 
 //Actualiza datos de un usuario
-app.put('/users/:user-id', function(req,res){
-	
+app.put('/users/:id', function(req,res){
+
 	var query = ' query { editUser(userID:\"' + ') }';
-	
+
 });
 
 //Obtiene lista de follows de un usuario
-app.get('/users/:user-id/follows', function(req,res){
-	var query = ' query { user(userID:\"' + req.params.id + '\") { follows } }';
-	graphql.graphql(schema, query).then( function(result) {  
+app.get('/users/:id/follows', function(req,res){
+	var query = ' query { user(userID:\"' + req.params.id + '\") { relationships { id, user_data {username, bio }, outgoing_status, incoming_status } } }';
+	graphql.graphql(schema, query).then( function(result) {
 		//console.log(JSON.stringify(result,null," "));
+    var relationships = [];
+    for(i in result.data.user.relationships ){
+        if(result.data.user.relationships[i].outgoing_status=="follows")
+          relationships.push(result.data.user.relationships[i]);
+    }
 		res.json({
 			success: true,
-			data: result.data.user
+			data: relationships
 		});
 	});
 });
 //Obtiene lista de followed-by de un usuario
-app.get('/users/:user-id/followed-by', function(req,res){});
+app.get('/users/:id/followed-by', function(req,res){
+  var query = ' query { user(userID:\"' + req.params.id + '\") { relationships { id, user_data {username, bio }, outgoing_status, incoming_status } } }';
+	graphql.graphql(schema, query).then( function(result) {
+		//console.log(JSON.stringify(result,null," "));
+    var relationships = [];
+    for(i in result.data.user.relationships ){
+        if(result.data.user.relationships[i].incoming_status=="followed-by")
+          relationships.push(result.data.user.relationships[i]);
+    }
+		res.json({
+			success: true,
+			data: relationships
+		});
+	});
+});
 
 //Obtiene la relación entre el usuario y otro usuario
-app.get('/users/:user-id/relationship', function(req,res){
-	/****** PREGUNTA: LA ID DEL USUARIO ORIGEN HACE FALTA ENVIARLA TAMBIÉN O SE PUEDE SACAR CON EL TOKEN????????*******/
-	var query = '';
+app.get('/users/:id/relationship', function(req,res){
 	
+	var query = ' query { relationship(originID: ,targetID: ,) { } }';
+  /*var variable = api+"/posts/search/search";
+        $http({
+            method: 'GET',
+            url: variable,
+            params: {searchparams:$scope.searchparams,type:'title'},
+        }).then(function(response){*/
 });
 
 //Modifica la relación entre el usuario y otro usuario
-app.get('/users/:user-id/relationship', function(req,res){
+app.post('/users/:id/relationship', function(req,res){
 	//Necesario incluir parámetro de ACTION
-	var mutation = '';
-	
+	var mutation = 'mutation { relationship() {} }';
+
 });
 
 
