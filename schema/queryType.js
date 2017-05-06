@@ -122,30 +122,118 @@ var queryType = new graphql.GraphQLObjectType({
 		},
 		
         allPosts: {
-            type: new graphql.GraphQLList(postType),
+            type: new graphql.GraphQLObjectType({
+				name: 'allPostsResult',
+				fields: {
+					post: { type: new graphql.GraphQLList(postType) },
+					error: { type: errorType }
+				}
+			}),
             resolve: function(_){
                 return new Promise((resolve,reject) => {
-                    Post.find(function(err, res){
+                    Post.find(function(err, post){
                         if(err) reject(err);
-                        else resolve(res);
+						else if(post!=null){
+                            resolve({
+                                post: post,
+                                error: null
+                            });							
+						}else{
+							resolve({
+								post: null,
+								error: {
+									code: 1,
+									message: "No hay ningún post creado."
+								}
+							});
+						}
                     });
                 });
             }
         },
 		onePost: {
-			type: postType,
+			type: new graphql.GraphQLObjectType({
+				name: 'onePostResult',
+				fields: {
+					post: { type: postType },
+					error: { type: errorType }
+				}
+			}),
 			args: {
 				postID: { type: graphql.GraphQLString }
 			},
 			resolve: function(_, {postID}) {
 				return new Promise((resolve,reject) => {
-					Post.findById(postID, function(err, res) {
-						if (err) reject(err);
-						else resolve(res);
+					Post.findById(postID, function(err, post) {
+						if(err) reject(err);
+						else if(post!=null){
+                            resolve({
+                                post: post,
+                                error: null
+                            });							
+						}else{
+							resolve({
+								post: null,
+								error: {
+									code: 1,
+									message: "No existe este post."
+								}
+							});
+						}
 					});
 				});
 			}
 		},
+        searchPost: {
+            type: new graphql.GraphQLObjectType({
+				name: 'searchPostResult',
+				fields: {
+					post: { type: new graphql.GraphQLList(postType) },
+					error: { type: errorType }
+				}
+			}),
+            description: 'Buscar un post ya existente',
+            args: {
+                searchparams: {type: graphql.GraphQLString},
+                type: {type: graphql.GraphQLString}
+            },
+            resolve: function(_, {searchparams}){
+                console.log(searchparams);
+                return new Promise((resolve, reject) => {
+                    Post.find( { $or: [ { title: { $regex: ".*"+searchparams+".*", $options: 'i' } }, { content: { $regex: ".*"+searchparams+".*", $options: 'i' }  } ] }
+                    ,function(err, post){
+                        if(err) reject(err);
+						else if(post!=null){
+                            //if(post.author == args.password){
+                            console.log(post);
+                            resolve({
+                                post: post,
+                                error: null
+                            });
+							//}else{
+								//resolve({
+									//postMessage: null,
+									//error: {
+										//code: 2,
+										//message: "La contraseña no es correcta."
+									//}
+								//});
+							//}
+							
+						}else{
+							resolve({
+								post: null,
+								error: {
+									code: 1,
+									message: "No se encuentra ningún post con esa búsqueda."
+								}
+							});
+						}
+                        
+                    });
+                });
+            }
+        },
 		allChannels: { //Esto sería más bien para la página de Explorar canales (que muestra todos)
 			type: new graphql.GraphQLList(channelType),
 			resolve: function(_) {
