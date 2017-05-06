@@ -1,11 +1,6 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-
-var RelationshipSchema = new Schema({
-	id: String,
-	incoming_status: String,
-	outgoing_status: String
-});
+var RelationshipSchema = require('./relationshipModel');
 
 var UserSchema = new Schema({
   username: String,
