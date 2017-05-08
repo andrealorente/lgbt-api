@@ -18,27 +18,17 @@ var moment = require('moment');
 var middleware = require('./middleware');
 var config = require('./config');
 
-//Models
-var User = require('./models/userModel');
-var Post = require('./models/postModel');
-var Channel = require('./models/channelModel');
-var Event = require('./models/eventModel');
-var Comment = require('./models/commentModel');
-
-//Custom types
-var userType = require('./types/userType');
-var channelType = require('./types/channelType');
-var commentType = require('./types/commentType');
-var eventType = require('./types/eventType');
-var postType = require('./types/postType');
-var errorType = require('./types/errorType');
-
 var queryType = require('./schema/queryType');
 var mutationType = require('./schema/mutationType');
 
 //Conectar con la bd
 mongoose.connect('mongodb://admin:admin@ds145868.mlab.com:45868/lgbt-app');
 
+/***Controllers**/
+var postController = require('./controllers/postController');
+var channelController = require('./controllers/channelController');
+
+/****/
 var createToken = function(user) {
 	console.log(user);
 	var payload = {
@@ -74,174 +64,31 @@ app.use('/graphql', graphqlHTTP({
 
 /******** RUTAS DE POSTS *******/
 
-app.get('/posts', middleware.ensureAuthorised, function(req, res) {
-    // This is just an internal test
-    var query = 'query { allPosts { id, title, content, author, tags } }';
-    graphql.graphql(schema, query).then( function(result) {
-        //console.log(JSON.stringify(result,null," "));
-        res.json({
-			success: true,
-			data: result.data
-		});
-    });
-
-});
-
+//Crear un post
+app.post('/create/post', middleware.ensureAuthorised, postController.createPost);
+//Obtener todos los posts
+app.get('/posts', middleware.ensureAuthorised, postController.allPosts);
 //Obtener un post concreto
-app.get('/posts/:id', middleware.ensureAuthorised, function(req,res) {
-
-	var query = 'query { onePost(postID:\"' + req.params.id + '\") { title, author, content, tags, image, comments( targetID: \"' + req.params.id +'\") { content, author, created_time } } }';
-	graphql.graphql(schema, query).then( function(result) {
-
-		console.log(result); // { data: oneEvent: null }
-		if(result.data.onePost == null){ //No sé si esto está bien así o habría que mandar el error desde graphql
-			res.json({
-				success: false,
-				error: "No se ha encontrado ningún post con esa ID"
-			});
-		}else{
-			res.json({
-				success: true,
-				data: result.data.onePost
-			});
-		}
-
-    });
-});
-
+app.get('/posts/:id', middleware.ensureAuthorised, postController.onePost);
+//Modificar un post concreto
+app.post('/posts/:id/update',middleware.ensureAuthorised, postController.updatePost);
 //Comentar en un post
-app.post('/posts/:id/comments', middleware.ensureAuthorised, function(req,res){
-	var userid = req.body.user_id;
-	var content = req.body.content;
-	var targetid = req.body.target_id;
-
-	var mutation = ' mutation { commentPost(userID:\"' + userid + '\", postID:\"'+ targetid +'\", content:\"'+ content +'\" ) { comment { id, content }, error{ code, message } } }';
-  graphql.graphql(schema, mutation).then( function(result) {
-    res.json({
-     success: true,
-     data: result
-    });
-  });
-});
-
+app.post('/posts/:id/comments', middleware.ensureAuthorised, postController.commentPost);
 //Dar like a un post
-app.post('/posts/:id/likes', middleware.ensureAuthorised, function(req,res){
-  var mutation = ' mutation { likePost(userID: \"' +  + '\",postID: \"' + req.params.id + '\" ) { data, error{ code, message } } }';
-  graphql.graphql(schema, mutation).then( function(result) {
-       res.json({
-         success: true,
-         data: "Aquí se podría devolver la cantidad de likes que tiene ahora."
-       });
-  });
-});
-
-app.post('/posts/:id/update',middleware.ensureAuthorised,function(req,res){
-
-    var form = new formidable.IncomingForm();
-    form.keepExtensions = true;
-    form.multiples = true;
-    //console.log(form);
-
-    form.parse(req, function(err, fields, files){
-        var tagspost=[];
-        if(fields.tags!="undefined" && fields.tags.split(", ")!=""){tagspost = fields.tags.split(', ');}
-
-        var temp_path;
-        if (files.images) {
-            if (!files.images.length) {
-                if (files.images.name != "") {
-                    temp_path = files.images.path;
-                    cloudinary.uploader.upload(
-                        temp_path,
-                        function (result) {
-                            console.log("Actualizado con 1 foto");
-                            var mutation = "mutation{updatePost(postID:\""+ fields.id +"\",title:\""+ fields.title +"\",content:\""+ fields.content +"\",tags:"+ JSON.stringify(tagspost) +",image:\""+ result.version+"/"+result.public_id +"\",state:\""+ fields.state +"\"){post{id,title,content,tags,image,state},error{code,message}}}";
-	                       graphql.graphql(schema, mutation).then( function(result) {
-		                      if(result.data.updatePost == null){
-			                     res.json({
-				                    success: false,
-				                    error: "No se ha encontrado ningún post con esa ID"
-			                     });
-		                      }else{
-			                     res.json({
-				                    success: true,
-				                    data: result.data.updatePost
-			                     });
-		                      }
-
-                            });
-                        },
-                        {
-                            crop: 'limit',
-                            width: 300,
-                            height: 300,
-                            format: "png",
-                            folder: "posts",
-                            tags: ['posts', fields.id, fields.title/*, fields.author*/]
-                        }
-                    );
-                } else {
-                    console.log("Actualizado sin 1 foto");
-                }
-            }
-        }
-        else{
-            console.log("Actualizado sin 1 foto");
-            var mutation = "mutation{updatePost(postID:\""+ fields.id +"\",title:\""+ fields.title +"\",content:\""+ fields.content +"\",tags:"+ JSON.stringify(tagspost) +",image:\"1493935772/no-image_u8eu8r\",state:\""+ fields.state +"\"){post{id,title,content,tags,image,state},error{code,message}}}";
-            graphql.graphql(schema, mutation).then( function(result) {
-                 if(result.data.updatePost == null){
-                     res.json({
-                        success: false,
-                        error: "No se ha encontrado ningún post con esa ID"
-                     });
-                  }else{
-                     res.json({
-                        success: true,
-                        data: result.data.updatePost
-                     });
-                  }
-            });
-        }
-    });
-});
+app.post('/posts/:id/likes', middleware.ensureAuthorised, postController.likePost);
+//Buscar un post por titulo
+app.get('/search/post',middleware.ensureAuthorised, postController.searchPost);
 
 /******* RUTAS DE CANALES ******/
 
+//Crear un canal
+app.post('/create/channel', middleware.ensureAuthorised, channelController.createChannel);
 //Obtener todos los canales
-app.get('/channels', function(req, res) {
-
-    var query = 'query { allChannels { id, title, description } }';
-    graphql.graphql(schema, query).then( function(result) {
-        //console.log(JSON.stringify(result,null," "));
-        res.json({
-			success: true,
-			data: result.data
-		});
-    });
-
-});
-
+app.get('/channels', middleware.ensureAuthorised, channelController.allChannels);
 //Obtener un canal concreto
-app.get('/channels/:id', function(req,res) {
-
-	var query = 'query { oneChannel(channelID:\"' + req.params.id + '\") { title, description } }';
-	graphql.graphql(schema, query).then( function(result) {
-
-		console.log(result); // { data: oneEvent: null }
-		if(result.data.oneChannel == null){ //No sé si esto está bien así o habría que mandar el error desde graphql
-			res.json({
-				success: false,
-				error: "No se ha encontrado ningún canal con esa ID"
-			});
-		}else{
-			res.json({
-				success: true,
-				data: result.data
-			});
-		}
-
-    });
-});
+app.get('/channels/:id', middleware.ensureAuthorised, channelController.oneChannel);
+//Enviar mensaje al canal
+app.post('/channels/:id/message', middleware.ensureAuthorised, channelController.sendMessage);
 
 /******* RUTAS DE EVENTOS ********/
 
