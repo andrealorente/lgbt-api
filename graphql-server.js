@@ -26,6 +26,7 @@ mongoose.connect('mongodb://admin:admin@ds145868.mlab.com:45868/lgbt-app');
 
 /***Controllers**/
 var postController = require('./controllers/postController');
+var channelController = require('./controllers/channelController');
 
 /****/
 var createToken = function(user) {
@@ -63,6 +64,8 @@ app.use('/graphql', graphqlHTTP({
 
 /******** RUTAS DE POSTS *******/
 
+//Crear un post
+app.post('/create/post', middleware.ensureAuthorised, postController.createPost);
 //Obtener todos los posts
 app.get('/posts', middleware.ensureAuthorised, postController.allPosts);
 //Obtener un post concreto
@@ -78,41 +81,14 @@ app.get('/search/post',middleware.ensureAuthorised, postController.searchPost);
 
 /******* RUTAS DE CANALES ******/
 
+//Crear un canal
+app.post('/create/channel', middleware.ensureAuthorised, channelController.createChannel);
 //Obtener todos los canales
-app.get('/channels', function(req, res) {
-
-    var query = 'query { allChannels { id, title, description } }';
-    graphql.graphql(schema, query).then( function(result) {
-        //console.log(JSON.stringify(result,null," "));
-        res.json({
-			success: true,
-			data: result.data
-		});
-    });
-
-});
-
+app.get('/channels', middleware.ensureAuthorised, channelController.allChannels);
 //Obtener un canal concreto
-app.get('/channels/:id', function(req,res) {
-
-	var query = 'query { oneChannel(channelID:\"' + req.params.id + '\") { title, description } }';
-	graphql.graphql(schema, query).then( function(result) {
-
-		console.log(result); // { data: oneEvent: null }
-		if(result.data.oneChannel == null){ //No sé si esto está bien así o habría que mandar el error desde graphql
-			res.json({
-				success: false,
-				error: "No se ha encontrado ningún canal con esa ID"
-			});
-		}else{
-			res.json({
-				success: true,
-				data: result.data
-			});
-		}
-
-    });
-});
+app.get('/channels/:id', middleware.ensureAuthorised, channelController.oneChannel);
+//Enviar mensaje al canal
+app.post('/channels/:id/message', middleware.ensureAuthorised, channelController.sendMessage);
 
 /******* RUTAS DE EVENTOS ********/
 

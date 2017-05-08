@@ -30,6 +30,7 @@ var commentType = require('./../types/commentType');
 var eventType = require('./../types/eventType');
 var postType = require('./../types/postType');
 var errorType = require('./../types/errorType');
+var messageType = require('./../types/messageType');
 
 var createToken = function(user) {
   console.log(user);
@@ -393,31 +394,63 @@ var mutationType = new graphql.GraphQLObjectType({
     },
 
     createPost: {
-      type: postType,
+      type: new graphql.GraphQLObjectType({
+        name: 'createPostResult',
+        fields: {
+          post: {
+            type: postType
+          },
+          error: {
+            type: errorType
+          }
+        }
+      }),
       description: 'Crear un nuevo post',
       args: {
         title: {
-          type: graphql.GraphQLString
+            type: graphql.GraphQLString
         },
         content: {
+            type: graphql.GraphQLString
+        },
+        tags: {
+          type: new graphql.GraphQLList(graphql.GraphQLString)
+        },
+        image: {
           type: graphql.GraphQLString
         },
-        author: {
+        state: {
           type: graphql.GraphQLString
         },
-
+        author_id: {
+            type: graphql.GraphQLString
+        },
       },
       resolve: function(root, args) {
         return new Promise((resolve, reject) => {
           Post.create({
-            title: args.title,
-            content: args.content,
-            author: args.userid
-          }, function(err, res) {
-            if (err) reject(err);
-            else {
-              resolve(res);
-            }
+              title: args.title,
+              content: args.content,
+              tags: args.tags,
+              image: args.image,
+              state: args.state,
+              author_id: args.author_id
+          }, function(err, post) {
+              if (err) reject(err);
+              else if (post != null) {
+                resolve({
+                  post: post,
+                  error: null
+                });
+              } else {
+                resolve({
+                  post: null,
+                  error: {
+                    code: 1,
+                    message: "No se ha podido crear el post."
+                  }
+                });
+              }
           });
         });
       }
@@ -657,6 +690,58 @@ var mutationType = new graphql.GraphQLObjectType({
         });
       }
     },
+      
+    sendMessage: {
+       type: new graphql.GraphQLObjectType({
+        name: 'sendMessageResult',
+        fields: {
+          message: {
+            type: messageType
+          },
+          error: {
+            type: errorType
+          }
+        }
+      }),
+      description: 'Enviar un mensaje a un canal',
+      args: {
+        channelID: {
+          type: graphql.GraphQLString
+        },
+        content:{
+           type: graphql.GraphQLString   
+        },
+        created_time:{
+            type: graphql.GraphQLString
+        }
+      },
+      resolve: function(root, args) {
+        console.log(args.state);
+        return new Promise((resolve, reject) => {
+            Message.create({
+              content: args.content,
+              created_time: args.created_time,
+              channel: args.channelID
+            },function(err, message) {
+              if (err) reject(err);
+              else if (message != null) {
+                resolve({
+                  message: message,
+                  error: null
+                });
+              } else {
+                resolve({
+                  message: null,
+                  error: {
+                    code: 1,
+                    message: "No se ha podido crear el mensaje."
+                  }
+                });
+              }
+            });
+        });
+      } 
+    }
 
   })
 });

@@ -18,10 +18,80 @@ var mutationType = require('./../schema/mutationType');
 
 var schema = new graphql.GraphQLSchema({query: queryType, mutation: mutationType});
 
+//Crear un post
+module.exports.createPost = function(req,res){
+
+    var form = new formidable.IncomingForm();
+    form.keepExtensions = true;
+    form.multiples = true;
+    //console.log(form);
+    
+    form.parse(req, function(err, fields, files){
+        var tagspost=[];
+        if(fields.tags!="undefined" && fields.tags.split(", ")!=""){tagspost = fields.tags.split(', ');}
+        
+        var temp_path;
+        if (files.images) {
+            if (!files.images.length) {
+                if (files.images.name != "") {
+                    temp_path = files.images.path;
+                    cloudinary.uploader.upload(
+                        temp_path,
+                        function (result) {
+                            console.log("Actualizado con 1 foto");
+                            var mutation = "mutation{createPost(title:\""+ fields.title +"\",content:\""+ fields.content +"\",tags:"+ JSON.stringify(tagspost) +",image:\""+ result.version+"/"+result.public_id +"\",state:\""+ fields.state +"\",author_id:\""+ fields.author +"\"){post{title,content,tags,image,state,author_id},error{code,message}}}";
+	                       graphql.graphql(schema, mutation).then( function(result) {
+		                      if(result.data.createPost == null){
+			                     res.json({
+				                    success: false,
+				                    error: "No se ha creado el post"
+			                     });	
+		                      }else{
+			                     res.json({
+				                    success: true,
+				                    data: result.data.createPost
+			                     });	
+		                      }
+        
+                            });            
+                        },
+                        {
+                            crop: 'limit',
+                            width: 300,
+                            height: 300,
+                            format: "png",
+                            folder: "posts",
+                            tags: ['posts', fields.id, fields.title/*, fields.author*/]
+                        }
+                    );
+                } else {
+                    console.log("Actualizado sin 1 foto");
+                }
+            }
+        }
+        else{
+            console.log("Actualizado sin 1 foto");
+            var mutation = "mutation{createPost(title:\""+ fields.title +"\",content:\""+ fields.content +"\",tags:"+ JSON.stringify(tagspost) +",image:\"1493935772/no-image_u8eu8r\",state:\""+ fields.state +"\",author_id:\""+ fields.author +"\"){post{id,title,content,tags,image,state,author_id},error{code,message}}}";
+            graphql.graphql(schema, mutation).then( function(result) {
+                 if(result.data.createPost == null){
+                     res.json({
+                        success: false,
+                        error: "No se ha encontrado ningún post con esa ID"
+                     });	
+                  }else{
+                     res.json({
+                        success: true,
+                        data: result.data.createPost
+                     });	
+                  }	              
+            });
+        }
+    });
+};
 //Obtener todos los posts
 module.exports.allPosts = function(req, res) {
     // This is just an internal test
-    var query = 'query { allPosts {post{id,title,content,author,tags},error{code,message}} }'; 
+    var query = 'query { allPosts {post{id,title,content,author_id,tags},error{code,message}} }'; 
     graphql.graphql(schema, query).then( function(result) {  
         //console.log(JSON.stringify(result,null," "));
         if(result.data.allPosts == null){
@@ -41,7 +111,7 @@ module.exports.allPosts = function(req, res) {
 //Obtener un post concreto
 module.exports.onePost = function(req,res) {
 	
-	var query = 'query { onePost(postID:\"' + req.params.id + '\") {post{ title, author, content, tags, image, comments( targetID: \"' + req.params.id +'\") { content, author, created_time } },error{code,message}} }'; 
+	var query = 'query { onePost(postID:\"' + req.params.id + '\") {post{ title, author_id, content, tags, image, comments( targetID: \"' + req.params.id +'\") { content, author, created_time } },error{code,message}} }'; 
 	graphql.graphql(schema, query).then( function(result) {  
         console.log(result);
 		if(result.data.onePost == null){
@@ -141,7 +211,7 @@ module.exports.likePost = function(req,res){};
 //Buscar post
 module.exports.searchPost = function(req,res){
     console.log(req);
-    var query = 'query { searchPost(searchparams:\"' + req.query.searchparams + '\",type:\"' + req.query.type + '\") {post{title,content,author},error{code,message}}}';
+    var query = 'query { searchPost(searchparams:\"' + req.query.searchparams + '\",type:\"' + req.query.type + '\") {post{title,content,author_id},error{code,message}}}';
     graphql.graphql(schema, query).then( function(result) {  
         console.log(result.data.searchPost.post);
 		if(result.data.searchPost == null){ 
