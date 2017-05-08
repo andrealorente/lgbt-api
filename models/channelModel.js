@@ -6,7 +6,7 @@ var ChannelSchema = new Schema({
   title: String,
   description: String,
   author: String,
-  message: String //[MessageSchema]
+  messages: [MessageSchema]
 });
 
 var Channel = mongoose.model('channels', ChannelSchema); //nombre de la colección en la bd

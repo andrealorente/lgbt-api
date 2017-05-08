@@ -843,13 +843,13 @@ var mutationType = new graphql.GraphQLObjectType({
         });
       }
     },
-      
+
     sendMessage: {
        type: new graphql.GraphQLObjectType({
         name: 'sendMessageResult',
         fields: {
           message: {
-            type: messageType
+            type: graphql.GraphQLString
           },
           error: {
             type: errorType
@@ -862,16 +862,34 @@ var mutationType = new graphql.GraphQLObjectType({
           type: graphql.GraphQLString
         },
         content:{
-           type: graphql.GraphQLString   
-        },
-        created_time:{
-            type: graphql.GraphQLString
+           type: graphql.GraphQLString
         }
       },
       resolve: function(root, args) {
         console.log(args.state);
         return new Promise((resolve, reject) => {
-            Message.create({
+          //Buscar canal
+          Channel.findById(args.channelID, function(err,channel){
+            if(err) reject(err);
+            else{
+              channel.messages.push({
+                content: args.content,
+                created_time: new Date(),
+                channel: args.channelID
+              });
+
+              channel.save(function(err){
+                if(err) reject(err);
+                else{
+                  resolve({
+                    message: args.content,
+                    error: null
+                  });
+                }
+              });
+            }
+          });
+            /*Message.create({
               content: args.content,
               created_time: args.created_time,
               channel: args.channelID
@@ -891,9 +909,9 @@ var mutationType = new graphql.GraphQLObjectType({
                   }
                 });
               }
-            });
+            });*/
         });
-      } 
+      }
     }
 
   })

@@ -7,6 +7,6 @@ var MessageSchema = new Schema({
     created_time: String,
     channel: String
 });
-var Message = mongoose.model('message', MessageSchema); 
+//var Message = mongoose.model('message', MessageSchema);
 
-module.exports = Message;
+module.exports = MessageSchema;
