@@ -115,10 +115,25 @@ app.post('/posts/:id/comments', middleware.ensureAuthorised, function(req,res){
 	var content = req.body.content;
 	var targetid = req.body.target_id;
 
-	var mutation = ' mutation { createComment() {} }';
+	var mutation = ' mutation { commentPost(userID:\"' + userid + '\", postID:\"'+ targetid +'\", content:\"'+ content +'\" ) { comment { id, content }, error{ code, message } } }';
+  graphql.graphql(schema, mutation).then( function(result) {
+    res.json({
+     success: true,
+     data: result
+    });
+  });
 });
+
 //Dar like a un post
-app.post('/posts/:id/likes',function(req,res){});
+app.post('/posts/:id/likes', middleware.ensureAuthorised, function(req,res){
+  var mutation = ' mutation { likePost(userID: \"' +  + '\",postID: \"' + req.params.id + '\" ) { data, error{ code, message } } }';
+  graphql.graphql(schema, mutation).then( function(result) {
+       res.json({
+         success: true,
+         data: "Aquí se podría devolver la cantidad de likes que tiene ahora."
+       });
+  });
+});
 
 app.post('/posts/:id/update',middleware.ensureAuthorised,function(req,res){
 
@@ -232,14 +247,14 @@ app.get('/channels/:id', function(req,res) {
 
 app.get('/events', middleware.ensureAuthorised, function(req, res) {
 
-    var query = 'query { allEvents { id, title, description, place, start_time } }';
-    graphql.graphql(schema, query).then( function(result) {
-        //console.log(JSON.stringify(result,null," "));
-        res.json({
-			success: true,
-			data: result.data
-		});
-    });
+  var query = 'query { allEvents { id, title, description, place, start_time } }';
+  graphql.graphql(schema, query).then( function(result) {
+      //console.log(JSON.stringify(result,null," "));
+      res.json({
+      	success: true,
+      	data: result.data
+      });
+  });
 
 });
 
@@ -381,7 +396,7 @@ app.get('/users/:id/followed-by', function(req,res){
 
 //Obtiene la relación entre el usuario y otro usuario
 app.get('/users/:id/relationship', function(req,res){
-	
+
 	var query = ' query { relationship(originID: ,targetID: ,) { } }';
   /*var variable = api+"/posts/search/search";
         $http({

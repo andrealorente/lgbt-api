@@ -22,6 +22,7 @@ var Post = require('./../models/postModel');
 var Channel = require('./../models/channelModel');
 var Event = require('./../models/eventModel');
 var Comment = require('./../models/commentModel');
+var Activity = require('./../models/activityModel');
 
 //Custom types
 var userType = require('./../types/userType');
@@ -29,6 +30,7 @@ var channelType = require('./../types/channelType');
 var commentType = require('./../types/commentType');
 var eventType = require('./../types/eventType');
 var postType = require('./../types/postType');
+var activityType = require('./../types/activityType');
 var errorType = require('./../types/errorType');
 
 var createToken = function(user) {
@@ -322,9 +324,20 @@ var mutationType = new graphql.GraphQLObjectType({
 
                         user2.save(function(err) {
                           if (!err) {
-                            resolve({
-                              status: "Following",
-                              error: null
+                            //Registrar actividad
+                            Activity.create({
+                              origin_id: args.originID,
+                              target_id: args.targetID,
+                              action: " ha seguido a ",
+                              created_time: new Date()
+                            },function(err,act){
+                              if(err) reject(err);
+                              else{
+                                resolve({
+                                  status: "Following",
+                                  error: null
+                                });
+                              }
                             });
                           } else reject(err);
                         });
@@ -379,7 +392,7 @@ var mutationType = new graphql.GraphQLObjectType({
                     if (err) reject(err);
                     else {
                       resolve({
-                        status: "Following",
+                        status: "Relación modificada correctamente.",
                         error: null
                       });
                     }
@@ -556,17 +569,157 @@ var mutationType = new graphql.GraphQLObjectType({
       },
       resolve: function(root,args) {
         return new Promise((resolve, reject) => {
+          //Igual antes habría que comprobar si existe ese post o evento
+          var date = new Date();
           Comment.create({
             target_id: args.postID,
             content: args.content,
             author: args.userID,
-            created_time: new Date(),
+            created_time: date,
           }, function(err, res) {
             if (err) reject(err);
             else {
-              resolve({
-                comment: res,
-                error: null
+              //Registrar actividad
+              Activity.create({
+                origin_id: args.userID,
+                target_id: args.postID,
+                action: " ha comentado en ",
+                created_time: date
+              }, function(err,activity){
+                if(err) reject(err);
+                else{
+                  resolve({
+                    comment: res,
+                    error: null
+                  });
+                }
+              });
+
+            }
+          });
+        });
+      }
+    },
+
+    likePost: {
+      type: new graphql.GraphQLObjectType({
+        name: 'likePostResult',
+        fields: {
+          data: {
+            type: graphql.GraphQLString
+          },
+          error: {
+            type: errorType
+          }
+        }
+      }),
+      description: 'Dar o quitar like de un post',
+      args: {
+        userID: { type: graphql.GraphQLString },
+        postID: { type: graphql.GraphQLString }
+      },
+      resolve: function(_,args) {
+        return new Promise((resolve, reject) => {
+        //Buscar post
+        Post.findById(args.postID, function(err,post){
+          if(err) reject(err);
+          else{
+            //Buscar si está el usuario entre los likes del post o no
+            var index = post.likes.indexOf(args.userID);
+            var action = "";
+            if(index==-1){
+              post.likes.push(args.userID);
+              action = " ha dado me gusta a ";
+            }else{
+              //Borrar del array la id del usuario
+              post.likes.splice(index,1);
+            }
+
+            post.save(function(err){
+              //Registrar actividad
+              /*Activity.create({ //Si se quita el like no registrar la actividad (borrarla tb???)
+                origin_id: args.userID,
+                target_id: args.postID,
+                action: " ha dado me gusta a ",
+                created_time: new Date()
+              },function(err,res){
+
+              });*/
+              if(err) reject(err);
+              else {
+                  resolve({
+                    data: "Correcto",
+                    error: null
+                  });
+              }
+            });
+          }
+        });
+      });
+      }
+    },
+
+    assistEvent: {
+      type: eventType,
+      description: 'Asistir (o dejar de asistir) a un evento',
+      args: {
+        userID: { type: graphql.GraphQLString },
+        eventID: { type: graphql.GraphQLString }
+      },
+      resolve: function(_,args) {
+        return new Promise((resolve, reject) => {
+          //Buscar evento
+          Event.findById(args.eventID, function(err,ev){
+            if(err) reject(err);
+            else{
+              var index = ev.assistants.indexOf(args.userID);
+              if(index==-1){
+                ev.assistants.push(args.userID);
+              }else{
+                ev.assistants.splice(index,1);
+              }
+
+              //Guardar evento
+              ev.save(function(err){
+                if(err) reject(err);
+                else{
+                  //Registrar actividad
+
+                  resolve(ev);
+                }
+              });
+            }//Fin else
+          });
+        });
+      }
+    },
+
+    interestEvent: {
+      type: eventType,
+      description: 'Marcar si te interesa o no un evento.',
+      args: {
+        userID: { type: graphql.GraphQLString },
+        eventID: { type: graphql.GraphQLString }
+      },
+      resolve: function(_,args) {
+        return new Promise((resolve, reject) => {
+          //Buscar evento
+          Event.findById(args.eventID, function(err,ev){
+            if(err) reject(err);
+            else{
+              var index = ev.interested.indexOf(args.userID);
+              if(index == -1)
+                ev.interested.push(args.userID);
+              else
+                ev.interested.splice(index,1);
+
+              ev.save(function(err){
+                if(err) reject(err);
+                else{
+                  //Registrar actividad
+
+                  resolve(ev);
+                }
               });
             }
           });

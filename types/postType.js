@@ -25,7 +25,8 @@ var postType = new graphql.GraphQLObjectType({
             });
 			}
 		},
-        state: { type: graphql.GraphQLString }
+        state: { type: graphql.GraphQLString },
+        likes: { type: new graphql.GraphQLList(graphql.GraphQLString) }
     }
 });
 

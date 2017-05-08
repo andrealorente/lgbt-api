@@ -1,6 +1,7 @@
 var graphql = require('graphql');
 var relationshipType = require('./relationshipType');
 var activityType = require('./activityType');
+var Activity = require('./../models/activityModel');
 
 //Definir User type
 var userType = new graphql.GraphQLObjectType({
@@ -14,7 +15,19 @@ var userType = new graphql.GraphQLObjectType({
         email: { type: graphql.GraphQLString },
     		place: { type: graphql.GraphQLString },
     		relationships: { type: new graphql.GraphQLList(relationshipType) },
-    		activity: { type: new graphql.GraphQLList(activityType) },
+    		activity: {
+          type: new graphql.GraphQLList(activityType),
+          resolve: (user) => {
+            return new Promise((resolve,reject) => {
+              Activity.find({ origin_id: user.id}, function(err, act){
+                if(err) reject(err);
+                else{
+                  resolve(act);
+                }
+              });
+            });
+          }
+        },
     		public: { type: graphql.GraphQLBoolean },
     		token: { type: graphql.GraphQLString }
     }

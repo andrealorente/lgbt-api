@@ -6,7 +6,9 @@ var EventSchema = new Schema({
   description: String,
   place: String,
   start_time: String,
-  comments: [String]
+  comments: [String],
+  assistants: [String],
+  interested: [String]
 });
 
 var Event = mongoose.model('events', EventSchema); //nombre de la colección en la bd
