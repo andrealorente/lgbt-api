@@ -30,6 +30,7 @@ var commentType = require('./../types/commentType');
 var eventType = require('./../types/eventType');
 var postType = require('./../types/postType');
 var errorType = require('./../types/errorType');
+var activityType = require('./../types/activityType');
 
 var statusType = new graphql.GraphQLObjectType({
 	name: 'statusType',
@@ -114,13 +115,37 @@ var queryType = new graphql.GraphQLObjectType({
 								}
 							}
 						}
-
 					});
 				});
-			} 
+			}
 		},
 
-        allPosts: {
+    activity: {
+      type: new graphql.GraphQLList(activityType),
+      description: 'Cargar la actividad de mis seguidos.',
+      args: {
+        userID: { type: graphql.GraphQLString } //Mi id
+      },
+      resolve: function(_,args) {
+        //Buscar mi usuario en la bd
+        return new Promise((resolve,reject) => {
+          User.findById(args.userID, function(err, me){
+            if(err) reject(err);
+            else{
+              //Buscar a mis seguidos y obtener su actividad reciente
+              var follows = [];
+              for(i in me.relationships) {
+                if(me.relationships[i].outgoing_status == "follows"){
+                  follows.push(me.relationships[i]);
+                }
+              }//Fin for
+            }
+          });
+        });
+      }
+    },
+
+    allPosts: {
             type: new graphql.GraphQLObjectType({
 				name: 'allPostsResult',
 				fields: {
@@ -136,7 +161,7 @@ var queryType = new graphql.GraphQLObjectType({
                             resolve({
                                 post: post,
                                 error: null
-                            });							
+                            });
 						}else{
 							resolve({
 								post: null,
@@ -169,7 +194,7 @@ var queryType = new graphql.GraphQLObjectType({
                             resolve({
                                 post: post,
                                 error: null
-                            });							
+                            });
 						}else{
 							resolve({
 								post: null,
@@ -218,7 +243,7 @@ var queryType = new graphql.GraphQLObjectType({
 									//}
 								//});
 							//}
-							
+
 						}else{
 							resolve({
 								post: null,
@@ -228,7 +253,7 @@ var queryType = new graphql.GraphQLObjectType({
 								}
 							});
 						}
-                        
+
                     });
                 });
             }
@@ -245,26 +270,83 @@ var queryType = new graphql.GraphQLObjectType({
 			}
 		},
 		oneChannel: {
-			type: channelType,
+			type: new graphql.GraphQLObjectType({
+        name: 'oneChannelResult',
+        fields: {
+          data: { type: channelType },
+          error: { type: errorType }
+        }
+      }),
 			args: {
 				channelID: { type: graphql.GraphQLString }
 			},
 			resolve: function(_, {channelID}) {
 				return new Promise((resolve,reject) => {
-					Channel.findById(channelID, function(err, res) {
-						if (err) reject(err);
-						else resolve(res);
-					});
+          if (channelID.match(/^[0-9a-fA-F]{24}$/)) {
+            // Yes, it's a valid ObjectId, proceed with `findById` call.
+            Channel.findById(channelID, function(err, res) {
+  						if (err) reject(err);
+              else if(res == null) {
+                resolve({
+                  data: null,
+                  error: {
+                    code: 2,
+                    message: 'No se ha encontrado un canal con esa ID'
+                  }
+                });
+              }else{
+                resolve({
+                  data: res,
+                  error: null
+                });
+              }
+  					});
+          }else{
+            //No es una ID válida para hacer la llamada a la bd
+            resolve({
+              data: null,
+              error: {
+                code: 1,
+                message: 'No es una ID válida'
+              }
+            });
+          }
 				});
 			}
 		},
 		allEvents: { //En el futuro esto va por meses
-			type: new graphql.GraphQLList(eventType),
-			resolve: function(_) {
+			type: new graphql.GraphQLObjectType({
+        name: 'allEventsResult',
+        fields: {
+          data: { type: new graphql.GraphQLList(eventType) },
+          error: { type: errorType }
+        }
+      }),
+      args: {
+        month: { type: graphql.GraphQLInt },
+        year: { type: graphql.GraphQLInt }
+      },
+			resolve: function(_, args) {
 				return new Promise((resolve, reject) => {
 					Event.find(function(err, res) {
 						if(err) reject(err);
-						else resolve(res);
+						else{
+              var events = [];
+              //Guardar solo los eventos que sean del mes y año que se pasarle
+              console.log(res);
+              for(i in res) {
+                var date = new Date(res[i].start_time);
+                console.log(date);
+                if(date.getMonth() == args.month && date.getFullYear() == args.year){
+                  events.push(res[i]);
+                }
+              }
+              //Faltaría ordenar por días
+              resolve({
+                data: events,
+                error: null
+              });
+            }
 					});
 				});
 			}

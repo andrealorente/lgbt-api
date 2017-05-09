@@ -25,11 +25,11 @@ module.exports.createChannel = function(req,res){
     form.keepExtensions = true;
     form.multiples = true;
     //console.log(form);
-    
+
     form.parse(req, function(err, fields, files){
         var tagspost=[];
         if(fields.tags!="undefined" && fields.tags.split(", ")!=""){tagspost = fields.tags.split(', ');}
-        
+
         var temp_path;
         if (files.images) {
             if (!files.images.length) {
@@ -45,15 +45,15 @@ module.exports.createChannel = function(req,res){
 			                     res.json({
 				                    success: false,
 				                    error: "No se ha creado el post"
-			                     });	
+			                     });
 		                      }else{
 			                     res.json({
 				                    success: true,
 				                    data: result.data.createChannel
-			                     });	
+			                     });
 		                      }
-        
-                            });            
+
+                            });
                         },
                         {
                             crop: 'limit',
@@ -77,13 +77,13 @@ module.exports.createChannel = function(req,res){
                      res.json({
                         success: false,
                         error: "No se ha encontrado ningún post con esa ID"
-                     });	
+                     });
                   }else{
                      res.json({
                         success: true,
                         data: result.data.createChannel
-                     });	
-                  }	              
+                     });
+                  }
             });
         }
     });
@@ -104,19 +104,19 @@ module.exports.allChannels = function(req, res) {
 //Obtener un canal concreto
 module.exports.oneChannel = function(req,res) {
 
-	var query = 'query { oneChannel(channelID:\"' + req.params.id + '\") { title, description } }';
+	var query = 'query { oneChannel(channelID:\"' + req.params.id + '\") { title, description, author } }';
 	graphql.graphql(schema, query).then( function(result) {
 
 		console.log(result); // { data: oneEvent: null }
-		if(result.data.oneChannel == null){ //No sé si esto está bien así o habría que mandar el error desde graphql
+		if(result.data.oneChannel.error != null){
 			res.json({
 				success: false,
-				error: "No se ha encontrado ningún canal con esa ID"
+				error: result.data.oneChannel.error
 			});
 		}else{
 			res.json({
 				success: true,
-				data: result.data
+				data: result.data.oneChannel.data
 			});
 		}
 
@@ -130,13 +130,12 @@ module.exports.sendMessage = function(req,res) {
              res.json({
                 success: false,
                 error: "No se ha podido enviar ningún mensaje."
-             });	
+             });
           }else{
              res.json({
                 success: true,
                 data: result.data.sendMessage
-             });	
+             });
           }
     });
 };
-
