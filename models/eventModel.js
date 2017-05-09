@@ -4,6 +4,8 @@ var Schema = mongoose.Schema;
 var EventSchema = new Schema({
   title: String,
   description: String,
+  image: String,
+  author: String,
   place: String,
   start_time: String,
   comments: [String],

@@ -132,7 +132,16 @@ app.get('/events/:id/assist', middleware.ensureAuthorised, function(req,res){});
 //Ver interesados de un evento
 app.get('/events/:id/interested', middleware.ensureAuthorised, function(req,res){});
 //Asistir a un evento
-app.post('/events/:id/assist', middleware.ensureAuthorised, function(req,res){});
+app.post('/events/:id/assist', middleware.ensureAuthorised, function(req,res){
+  var mutation = 'mutation { assistEvent(userID: \"'+ req.body.user_id +'\", eventID: \"'+ req.params.id +'\") { assistants, interested } }';
+  graphql.graphql(schema, mutation).then( function(result) {
+      //console.log(JSON.stringify(result,null," "));
+      res.json({
+      	success: true,
+      	data: result.data.assistEvent
+      });
+  });
+});
 //Me interesa un evento
 app.post('/events/:id/interested', middleware.ensureAuthorised,function(req,res){});
 //Comentar un evento
