@@ -109,7 +109,7 @@ app.get('/events', function(req, res) {
 //Obtener un evento
 app.get('/events/:id', middleware.ensureAuthorised, function(req,res) {
 
-	var query = 'query { oneEvent(eventID:\"' + req.params.id + '\") { title, description, place, start_time, comments(targetID:\"' + req.params.id +'\") { author, content, created_time } } }';
+	var query = 'query { oneEvent(eventID:\"' + req.params.id + '\") { title, description, place, start_time, comments(targetID:\"' + req.params.id +'\") { author, content, created_time }, assistants, interested } }';
     graphql.graphql(schema, query).then( function(result) {
 
 		console.log(result); // { data: oneEvent: null }
@@ -143,7 +143,16 @@ app.post('/events/:id/assist', middleware.ensureAuthorised, function(req,res){
   });
 });
 //Me interesa un evento
-app.post('/events/:id/interested', middleware.ensureAuthorised,function(req,res){});
+app.post('/events/:id/interested', middleware.ensureAuthorised,function(req,res){
+  var mutation = 'mutation { interestEvent(userID: \"'+ req.body.user_id +'\", eventID: \"'+ req.params.id +'\") { assistants, interested } }';
+  graphql.graphql(schema, mutation).then( function(result) {
+      //console.log(JSON.stringify(result,null," "));
+      res.json({
+      	success: true,
+      	data: result.data.interestEvent
+      });
+  });
+});
 //Comentar un evento
 app.post('/events/:id/comments', middleware.ensureAuthorised, function(req,res){});
 
