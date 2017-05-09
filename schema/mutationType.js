@@ -708,6 +708,10 @@ var mutationType = new graphql.GraphQLObjectType({
               var index = ev.assistants.indexOf(args.userID);
               if(index==-1){
                 ev.assistants.push(args.userID);
+                //Hay que quitarlo de interesados
+                var index2 = ev.interested.indexOf(args.userID);
+                if(index2 != -1)
+                  ev.interested.splice(index2,1);
               }else{
                 ev.assistants.splice(index,1);
               }
@@ -741,9 +745,13 @@ var mutationType = new graphql.GraphQLObjectType({
             if(err) reject(err);
             else{
               var index = ev.interested.indexOf(args.userID);
-              if(index == -1)
+              if(index == -1){
                 ev.interested.push(args.userID);
-              else
+                //Hay que quitarlo de asistentes si está
+                var index2 = ev.assistants.indexOf(args.userID);
+                if(index2 != -1)
+                  ev.assistants.splice(index2,1);
+              }else
                 ev.interested.splice(index,1);
 
               ev.save(function(err){
@@ -910,6 +918,48 @@ var mutationType = new graphql.GraphQLObjectType({
                 });
               }
             });*/
+        });
+      }
+    },
+
+    suscribeChannel: {
+      type: channelType,
+      description: 'Suscribirte o desuscribirte de un canal.',
+      args: {
+        userID: { type: graphql.GraphQLString },
+        channelID: { type: graphql.GraphQLString }
+      },
+      resolve: function(_,args){
+        return new Promise((resolve, reject) => {
+          //Buscar el canal
+          Channel.findById(args.channelID, function(err,ch){
+            if(err) reject(err);
+            else{
+              var index = ch.susc.indexOf(args.userID);
+
+              if(index==-1) ch.susc.push(args.userID);
+              else ch.susc.splice(index,1);
+
+              ch.save(function(err){
+                if(err) reject(err);
+                else resolve(ch);
+              });
+            }
+          });
+        });
+      }
+    },
+
+    notifChannel: {
+      type: channelType,
+      description: 'Activar/desactivar notificaciones de un canal',
+      args: {
+        userID: { type: graphql.GraphQLString },
+        channelID: { type: graphql.GraphQLString }
+      },
+      resolve: function(_,args) {
+        return new Promise((resolve, reject) => {
+
         });
       }
     }

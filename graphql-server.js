@@ -88,7 +88,7 @@ app.get('/channels/:id', middleware.ensureAuthorised, channelController.oneChann
 //Enviar mensaje al canal
 app.post('/channels/:id/message', middleware.ensureAuthorised, channelController.sendMessage);
 //Suscribirse a un canal
-app.post('/channels/:id/suscribe', middleware.ensureAuthorised, function(req,res){});
+app.post('/channels/:id/suscribe', middleware.ensureAuthorised, channelController.suscribeChannel);
 //Silenciar notificaciones de un canal
 app.post('/channels/:id/notifications', middleware.ensureAuthorised, function(req,res){});
 

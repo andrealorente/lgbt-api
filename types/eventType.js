@@ -28,7 +28,8 @@ const eventType = new graphql.GraphQLObjectType({
     			}
     		},
         assistants: { type: new graphql.GraphQLList(graphql.GraphQLString) },
-        interested: { type: new graphql.GraphQLList(graphql.GraphQLString) }
+        interested: { type: new graphql.GraphQLList(graphql.GraphQLString) },
+        
     }
 });
 
