@@ -992,27 +992,12 @@ var mutationType = new graphql.GraphQLObjectType({
               }
             }
           });
-          //Buscar el canal
-          /*Channel.findById(args.channelID, function(err,ch){
-            if(err) reject(err);
-            else{
-              var index = ch.susc.indexOf(args.userID);
-
-              if(index==-1) ch.susc.push(args.userID);
-              else ch.susc.splice(index,1);
-
-              ch.save(function(err){
-                if(err) reject(err);
-                else resolve(ch);
-              });
-            }
-          });*/
         });
       }
     },
 
     notifChannel: {
-      type: channelType,
+      type: userType,
       description: 'Activar/desactivar notificaciones de un canal',
       args: {
         userID: { type: graphql.GraphQLString },
@@ -1020,7 +1005,18 @@ var mutationType = new graphql.GraphQLObjectType({
       },
       resolve: function(_,args) {
         return new Promise((resolve, reject) => {
-
+          User.findOne({
+            _id: args.userID,
+            'channels.channel_id': args.channelID
+          },function(err, res){
+            if(err) reject(err);
+            for(i in res.channels){
+              if(res.channels[i].channel_id == args.channelID){
+                res.channels[i].notifications = (!res.channels[i].notifications);
+                resolve(res);
+              }
+            }
+          });
         });
       }
     }

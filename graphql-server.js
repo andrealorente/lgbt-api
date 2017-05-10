@@ -90,7 +90,7 @@ app.post('/channels/:id/message', middleware.ensureAuthorised, channelController
 //Suscribirse a un canal
 app.post('/channels/:id/suscribe', middleware.ensureAuthorised, channelController.suscribeChannel);
 //Silenciar notificaciones de un canal
-app.post('/channels/:id/notifications', middleware.ensureAuthorised, function(req,res){});
+app.post('/channels/:id/notifications', middleware.ensureAuthorised, channelController.notifChannel);
 
 /******* RUTAS DE EVENTOS ********/
 
@@ -284,7 +284,21 @@ app.post('/users/:id/relationship', middleware.ensureAuthorised, function(req,re
 	});
 });
 //Cargar peticiones de seguimiento
-app.get('/users/me/requested-by', middleware.ensureAuthorised, function(req,res){});
+app.get('/requests', middleware.ensureAuthorised, function(req,res){
+  var query = ' query { user(userID:\"' + middleware.payload.sub + '\") { relationships { id, user_data {username, bio }, outgoing_status, incoming_status } } }';
+	graphql.graphql(schema, query).then( function(result) {
+		//console.log(JSON.stringify(result,null," "));
+    var relationships = [];
+    for(i in result.data.user.relationships ){
+        if(result.data.user.relationships[i].incoming_status=="requested-by")
+          relationships.push(result.data.user.relationships[i]);
+    }
+		res.json({
+			success: true,
+			data: relationships
+		});
+	});
+});
 //Carga la actividad de los seguidos del usuario
 app.get('/activity', middleware.ensureAuthorised, function(req,res){});
 //Reportar usuario
