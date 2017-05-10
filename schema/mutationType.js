@@ -249,7 +249,7 @@ var mutationType = new graphql.GraphQLObjectType({
         },
         action: {
           type: graphql.GraphQLString
-        } //valores: follow || unfollow || approve || ignore
+        } //valores: follow || request || unfollow || approve || ignore
       },
       resolve: function(_, args) {
 
@@ -275,6 +275,9 @@ var mutationType = new graphql.GraphQLObjectType({
             if (args.action == "follow") {
               outgoing_status = "follows";
               incoming_status2 = "followed-by";
+            } else if(args.action == "request"){
+              outgoing_status = "requested";
+              incoming_status2 = "requested-by";
             } else if (args.action == "unfollow") {
               outgoing_status = "none";
               incoming_status2 = "none";
@@ -308,19 +311,28 @@ var mutationType = new graphql.GraphQLObjectType({
                       user2 = users[1];
                     }
                     //ORIGIN
+                    //Comprobar si el user2 es privado
+                    var aux = "follows";
+                    if(user2.public == false)
+                      aux = "requested";
+
                     user1.relationships.push({
                       id: args.targetID,
-                      outgoing_status: "follows",
+                      outgoing_status: aux,
                       incoming_status: "none"
                     });
 
                     user1.save(function(err) {
                       if (!err) {
                         //TARGET
+                        var aux2 = "followed-by";
+                        if(aux == "requested")
+                          aux2 = "requested-by";
+
                         user2.relationships.push({
                           id: args.originID,
                           outgoing_status: "none",
-                          incoming_status: "followed-by"
+                          incoming_status: aux2
                         });
 
                         user2.save(function(err) {
@@ -923,7 +935,7 @@ var mutationType = new graphql.GraphQLObjectType({
     },
 
     suscribeChannel: {
-      type: channelType,
+      type: userType,
       description: 'Suscribirte o desuscribirte de un canal.',
       args: {
         userID: { type: graphql.GraphQLString },
@@ -931,8 +943,57 @@ var mutationType = new graphql.GraphQLObjectType({
       },
       resolve: function(_,args){
         return new Promise((resolve, reject) => {
+          User.find({
+            _id: args.userID,
+            'channels.channel_id': args.channelID
+          }, function(err, res) {
+            if(err) reject(err);
+            else{
+              if(res.length == 0){
+                //No está suscrito al canal
+                User.findById(args.userID, function(err, user){
+                  user.channels.push({
+                    channel_id: args.channelID,
+                    notifications: true
+                  });
+
+                  user.save(function(err){
+                    if(err) reject(err);
+                    else{
+                      //Añadir la ID al array de suscriptores del canal
+                      Channel.findOneAndUpdate({
+                        _id: args.channelID
+                        }, { $push: { susc: args.userID } }, {
+                        new: true
+                        }, function(err, result){
+                          if(err) reject(err);
+                          else resolve(user);
+                      });
+                    }
+                  });
+                });
+              }else{ //Si está suscrito
+                //Buscar el canal que es
+                for(i in res[0].channels){
+                  if(res[0].channels[i].channel_id == args.channelID){
+                    res[0].channels.splice(i, 1);
+                    res[0].save(function(err){
+                      if(err) reject(err);
+                      Channel.findOneAndUpdate(
+                        { _id: args.channelID },
+                        { $pull: { susc: args.userID } },
+                      function(err){
+                        if(err) reject(err);
+                        resolve(res[0]);
+                      });
+                    });
+                  }
+                } //Fin del for
+              }
+            }
+          });
           //Buscar el canal
-          Channel.findById(args.channelID, function(err,ch){
+          /*Channel.findById(args.channelID, function(err,ch){
             if(err) reject(err);
             else{
               var index = ch.susc.indexOf(args.userID);
@@ -945,7 +1006,7 @@ var mutationType = new graphql.GraphQLObjectType({
                 else resolve(ch);
               });
             }
-          });
+          });*/
         });
       }
     },
