@@ -91,7 +91,7 @@ module.exports.createPost = function(req,res){
 //Obtener todos los posts
 module.exports.allPosts = function(req, res) {
     // This is just an internal test
-    var query = 'query { allPosts {post{id,title,content,author_id,tags},error{code,message}} }';
+    var query = 'query { allPosts { post { id, title, content, author_id, author_data { username, name },tags },error{code,message}} }';
     graphql.graphql(schema, query).then( function(result) {
         //console.log(JSON.stringify(result,null," "));
         if(result.data.allPosts == null){
@@ -111,7 +111,7 @@ module.exports.allPosts = function(req, res) {
 //Obtener un post concreto
 module.exports.onePost = function(req,res) {
 
-	var query = 'query { onePost(postID:\"' + req.params.id + '\") {post{ title, author_id, content, tags, image, comments( targetID: \"' + req.params.id +'\") { content, author, created_time } },error{code,message}} }';
+	var query = 'query { onePost(postID:\"' + req.params.id + '\") {post{ title, author_id, author_data { username, name } content, tags, image, comments( targetID: \"' + req.params.id +'\") { content, author, created_time } },error{code,message}} }';
 	graphql.graphql(schema, query).then( function(result) {
         console.log(result);
 		if(result.data.onePost == null){
