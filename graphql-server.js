@@ -83,6 +83,8 @@ app.get('/search/post',middleware.ensureAuthorised, postController.searchPost);
 app.post('/create/channel', middleware.ensureAuthorised, channelController.createChannel);
 //Obtener todos los canales
 app.get('/channels', middleware.ensureAuthorised, channelController.allChannels);
+//Obtener los canales a los que estoy suscrito
+//app.get('/channels/me', middleware.ensureAuthorised, channelController.allChannels);
 //Obtener un canal concreto
 app.get('/channels/:id', middleware.ensureAuthorised, channelController.oneChannel);
 //Enviar mensaje al canal
