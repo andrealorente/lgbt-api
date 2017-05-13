@@ -95,7 +95,7 @@ app.post('/channels/:id/notifications', middleware.ensureAuthorised, channelCont
 /******* RUTAS DE EVENTOS ********/
 
 //Obtener los eventos de un mes
-app.get('/events', function(req, res) {
+app.get('/events', middleware.ensureAuthorised, function(req, res) {
   //Se le pasan los parámetros en la url -> /events?month=4&year=2017 en RESTClient
   var query = 'query { allEvents (month:'+ req.query.month + ', year:'+ req.query.year +') { data{ id, title, description, place, start_time }, error { code, message } } }';
   graphql.graphql(schema, query).then( function(result) {
@@ -285,7 +285,7 @@ app.post('/users/:id/relationship', middleware.ensureAuthorised, function(req,re
 });
 //Cargar peticiones de seguimiento
 app.get('/requests', middleware.ensureAuthorised, function(req,res){
-  var query = ' query { user(userID:\"' + middleware.payload.sub + '\") { relationships { id, user_data {username, bio }, outgoing_status, incoming_status } } }';
+  var query = ' query { user(userID:\"' + req.params.id + '\") { relationships { id, user_data {username, bio }, outgoing_status, incoming_status } } }';
 	graphql.graphql(schema, query).then( function(result) {
 		//console.log(JSON.stringify(result,null," "));
     var relationships = [];

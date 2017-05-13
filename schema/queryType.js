@@ -146,34 +146,34 @@ var queryType = new graphql.GraphQLObjectType({
     },
 
     allPosts: {
-            type: new graphql.GraphQLObjectType({
-				name: 'allPostsResult',
-				fields: {
-					post: { type: new graphql.GraphQLList(postType) },
-					error: { type: errorType }
-				}
-			}),
-            resolve: function(_){
-                return new Promise((resolve,reject) => {
-                    Post.find(function(err, post){
-                        if(err) reject(err);
-						else if(post!=null){
-                            resolve({
-                                post: post,
-                                error: null
-                            });
-						}else{
-							resolve({
-								post: null,
-								error: {
-									code: 1,
-									message: "No hay ningún post creado."
-								}
-							});
-						}
-                    });
+        type: new graphql.GraphQLObjectType({
+  				name: 'allPostsResult',
+  				fields: {
+  					post: { type: new graphql.GraphQLList(postType) },
+  					error: { type: errorType }
+  				}
+			   }),
+        resolve: function(_) {
+          return new Promise((resolve, reject) => {
+            Post.find(function(err, post) {
+              if (err) reject(err);
+              else if (post != null) {
+                resolve({
+                  post: post,
+                  error: null
                 });
-            }
+              } else {
+                resolve({
+                  post: null,
+                  error: {
+                    code: 1,
+                    message: "No hay ningún post creado."
+                  }
+                });
+              }
+            });
+          });
+        }
         },
 		onePost: {
 			type: new graphql.GraphQLObjectType({
@@ -191,10 +191,10 @@ var queryType = new graphql.GraphQLObjectType({
 					Post.findById(postID, function(err, post) {
 						if(err) reject(err);
 						else if(post!=null){
-                            resolve({
-                                post: post,
-                                error: null
-                            });
+                resolve({
+                    post: post,
+                    error: null
+                });
 						}else{
 							resolve({
 								post: null,
@@ -314,7 +314,7 @@ var queryType = new graphql.GraphQLObjectType({
 				});
 			}
 		},
-		allEvents: { //En el futuro esto va por meses
+		allEvents: { 
 			type: new graphql.GraphQLObjectType({
         name: 'allEventsResult',
         fields: {

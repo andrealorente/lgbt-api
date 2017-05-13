@@ -1,6 +1,8 @@
 var graphql = require('graphql');
 var commentType = require('./commentType');
 var Comment = require('./../models/commentModel');
+var userType = require('./userType');
+var User = require('./../models/userModel');
 
 var postType = new graphql.GraphQLObjectType({
     name: 'postType',
@@ -9,6 +11,17 @@ var postType = new graphql.GraphQLObjectType({
         title: { type: graphql.GraphQLString },
         content: { type: graphql.GraphQLString },
         author_id: { type: graphql.GraphQLString },
+        author_data: {
+          type: userType,
+          resolve: function(root){
+            return new Promise((resolve,reject) => {
+                User.findById(root.author_id, function(err, user){
+                    if(err) reject(err);
+                    else resolve(user);
+                });
+            });
+          }
+        },
         tags: { type: new graphql.GraphQLList(graphql.GraphQLString)},
         image: { type: graphql.GraphQLString },
 		    comments: {

@@ -95,16 +95,16 @@ module.exports.allPosts = function(req, res) {
     graphql.graphql(schema, query).then( function(result) {
         //console.log(JSON.stringify(result,null," "));
         if(result.data.allPosts == null){
-			res.json({
-				success: false,
-				error: "No se ha encontrado ningún post con esa ID"
-			});
-		}else{
-			res.json({
-				success: true,
-				data: result.data.allPosts
-			});
-		}
+    			res.json({
+    				success: false,
+    				error: "No se ha encontrado ningún post en la base de datos."
+    			});
+    		}else{
+    			res.json({
+    				success: true,
+    				data: result.data.allPosts
+    			});
+		     }
     });
 
 };
