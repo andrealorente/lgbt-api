@@ -3,12 +3,12 @@ var Schema = mongoose.Schema;
 
 var CommentSchema = new Schema({
   target_id: String,
-  author: String,
+  author_id: String,
   content: String,
   created_time: String,
   state: String
 });
 
-var Comment = mongoose.model('comments', CommentSchema); //nombre de la colección en la bd
+var Comment = mongoose.model('comments', CommentSchema); //nombre de la colecciï¿½n en la bd
 
 module.exports = Comment;

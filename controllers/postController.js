@@ -111,7 +111,7 @@ module.exports.allPosts = function(req, res) {
 //Obtener un post concreto
 module.exports.onePost = function(req,res) {
 
-	var query = 'query { onePost(postID:\"' + req.params.id + '\") {post{ title, author_id, author_data { username, name } content, tags, image, comments( targetID: \"' + req.params.id +'\") { content, author, created_time } },error{code,message}} }';
+	var query = 'query { onePost(postID:\"' + req.params.id + '\") {post{ title, author_id, author_data { username, name } content, tags, image, comments( targetID: \"' + req.params.id +'\") { content, author_id, author_data { username, name }, created_time } },error{code,message}} }';
 	graphql.graphql(schema, query).then( function(result) {
         console.log(result);
 		if(result.data.onePost == null){
