@@ -2,6 +2,11 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var RelationshipSchema = require('./relationshipModel');
 
+var MinChannel = new Schema({ //Pasar esto a otro archivo
+  channel_id: String,
+  notifications: Boolean
+});
+
 var UserSchema = new Schema({
   username: String,
   name: String,
@@ -10,7 +15,8 @@ var UserSchema = new Schema({
   email: String,
   place: String,
   public: Boolean,
-  relationships: [RelationshipSchema]
+  relationships: [RelationshipSchema],
+  channels: [MinChannel]
 });
 
 var User = mongoose.model('users', UserSchema); //nombre de la colección en la bd

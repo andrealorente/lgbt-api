@@ -29,7 +29,15 @@ var userType = new graphql.GraphQLObjectType({
           }
         },
     		public: { type: graphql.GraphQLBoolean },
-    		token: { type: graphql.GraphQLString }
+    		token: { type: graphql.GraphQLString },
+        channels: { type: new graphql.GraphQLList(new graphql.GraphQLObjectType({
+          name: 'minChannel',
+          fields: {
+            channel_id: { type: graphql.GraphQLString },
+            notifications: { type: graphql.GraphQLBoolean }
+          }
+        })
+      )}
     }
 });
 

@@ -8,7 +8,8 @@ var channelType = new graphql.GraphQLObjectType({
         title: { type: graphql.GraphQLString },
         description: { type: graphql.GraphQLString },
         author: { type: graphql.GraphQLString },
-        messages: { type: new graphql.GraphQLList(messageType)}
+        messages: { type: new graphql.GraphQLList(messageType)},
+        susc: { type: new graphql.GraphQLList(graphql.GraphQLString)}
     }
 });
 

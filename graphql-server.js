@@ -32,7 +32,7 @@ var channelController = require('./controllers/channelController');
 var createToken = function(user) {
 	console.log(user);
 	var payload = {
-		sub: user._id,
+		sub: user.id,
 		iat: moment().unix(),
 		exp: moment().add(14, "days").unix()
 	};
@@ -67,7 +67,7 @@ app.get('/posts', middleware.ensureAuthorised, postController.allPosts);
 //Obtener un post concreto
 app.get('/posts/:id', middleware.ensureAuthorised, postController.onePost);
 //Ver likes de un post
-app.get('/posts/:id/likes', middleware.ensureAuthorised, function(req,res){});
+app.get('/posts/:id/likes', middleware.ensureAuthorised, postController.getLikes);
 //Modificar un post concreto
 app.post('/posts/:id/update',middleware.ensureAuthorised, postController.updatePost);
 //Comentar en un post
@@ -83,21 +83,23 @@ app.get('/search/post',middleware.ensureAuthorised, postController.searchPost);
 app.post('/create/channel', middleware.ensureAuthorised, channelController.createChannel);
 //Obtener todos los canales
 app.get('/channels', middleware.ensureAuthorised, channelController.allChannels);
+//Obtener los canales a los que estoy suscrito
+//app.get('/channels/me', middleware.ensureAuthorised, channelController.allChannels);
 //Obtener un canal concreto
 app.get('/channels/:id', middleware.ensureAuthorised, channelController.oneChannel);
 //Enviar mensaje al canal
 app.post('/channels/:id/message', middleware.ensureAuthorised, channelController.sendMessage);
 //Suscribirse a un canal
-app.post('/channels/:id/suscribe', middleware.ensureAuthorised, function(req,res){});
+app.post('/channels/:id/suscribe', middleware.ensureAuthorised, channelController.suscribeChannel);
 //Silenciar notificaciones de un canal
-app.post('/channels/:id/notifications', middleware.ensureAuthorised, function(req,res){});
+app.post('/channels/:id/notifications', middleware.ensureAuthorised, channelController.notifChannel);
 
 /******* RUTAS DE EVENTOS ********/
 
 //Obtener los eventos de un mes
-app.get('/events', function(req, res) {
+app.get('/events', middleware.ensureAuthorised, function(req, res) {
   //Se le pasan los parámetros en la url -> /events?month=4&year=2017 en RESTClient
-  var query = 'query { allEvents (month:'+ req.query.month + ', year:'+ req.query.year +') { data{ id, title, description, place, start_time }, error { code, message } } }';
+  var query = 'query { allEvents (month:'+ req.query.month + ', year:'+ req.query.year +') { data{ id, title, description, place, start_time, assistants, interested }, error { code, message } } }';
   graphql.graphql(schema, query).then( function(result) {
       //console.log(JSON.stringify(result,null," "));
       res.json({
@@ -109,7 +111,7 @@ app.get('/events', function(req, res) {
 //Obtener un evento
 app.get('/events/:id', middleware.ensureAuthorised, function(req,res) {
 
-	var query = 'query { oneEvent(eventID:\"' + req.params.id + '\") { title, description, place, start_time, comments(targetID:\"' + req.params.id +'\") { author, content, created_time } } }';
+	var query = 'query { oneEvent(eventID:\"' + req.params.id + '\") { title, description, place, start_time, author, comments(targetID:\"' + req.params.id +'\") { author_data { id, username, name }, content, created_time }, assistants, interested } }';
     graphql.graphql(schema, query).then( function(result) {
 
 		console.log(result); // { data: oneEvent: null }
@@ -132,9 +134,27 @@ app.get('/events/:id/assist', middleware.ensureAuthorised, function(req,res){});
 //Ver interesados de un evento
 app.get('/events/:id/interested', middleware.ensureAuthorised, function(req,res){});
 //Asistir a un evento
-app.post('/events/:id/assist', middleware.ensureAuthorised, function(req,res){});
+app.post('/events/:id/assist', middleware.ensureAuthorised, function(req,res){
+  var mutation = 'mutation { assistEvent(userID: \"'+ req.body.user_id +'\", eventID: \"'+ req.params.id +'\") { assistants, interested } }';
+  graphql.graphql(schema, mutation).then( function(result) {
+      //console.log(JSON.stringify(result,null," "));
+      res.json({
+      	success: true,
+      	data: result.data.assistEvent
+      });
+  });
+});
 //Me interesa un evento
-app.post('/events/:id/interested', middleware.ensureAuthorised,function(req,res){});
+app.post('/events/:id/interested', middleware.ensureAuthorised,function(req,res){
+  var mutation = 'mutation { interestEvent(userID: \"'+ req.body.user_id +'\", eventID: \"'+ req.params.id +'\") { assistants, interested } }';
+  graphql.graphql(schema, mutation).then( function(result) {
+      //console.log(JSON.stringify(result,null," "));
+      res.json({
+      	success: true,
+      	data: result.data.interestEvent
+      });
+  });
+});
 //Comentar un evento
 app.post('/events/:id/comments', middleware.ensureAuthorised, function(req,res){});
 
@@ -170,12 +190,18 @@ app.post('/users/login', function(req,res) {
 app.post('/users/logout', function(req,res) {});
 //Obtiene un usuario
 app.get('/users/:id', middleware.ensureAuthorised, function(req, res){ //para pasarle un parámetro
-	var query = ' query { user(userID:\"' + req.params.id + '\") { id, username, name, bio, place, public } }';
+  var user = req.params.id;
+
+  if(req.params.id == "me"){
+    user = req.user; //En req.user está la id que coge del token de la cabecera
+  }
+
+	var query = ' query { user(userID:\"' + user + '\") { id, username, name, bio, place, public } }';
 	graphql.graphql(schema, query).then( function(result) {
 		//console.log(JSON.stringify(result,null," "));
 		res.json({
 			success: true,
-			data: result.data.user
+			data: result.data.user,
 		});
 	});
 
@@ -266,7 +292,21 @@ app.post('/users/:id/relationship', middleware.ensureAuthorised, function(req,re
 	});
 });
 //Cargar peticiones de seguimiento
-app.get('/users/me/requested-by', middleware.ensureAuthorised, function(req,res){});
+app.get('/requests', middleware.ensureAuthorised, function(req,res){
+  var query = ' query { user(userID:\"' + req.params.id + '\") { relationships { id, user_data {username, bio }, outgoing_status, incoming_status } } }';
+	graphql.graphql(schema, query).then( function(result) {
+		//console.log(JSON.stringify(result,null," "));
+    var relationships = [];
+    for(i in result.data.user.relationships ){
+        if(result.data.user.relationships[i].incoming_status=="requested-by")
+          relationships.push(result.data.user.relationships[i]);
+    }
+		res.json({
+			success: true,
+			data: relationships
+		});
+	});
+});
 //Carga la actividad de los seguidos del usuario
 app.get('/activity', middleware.ensureAuthorised, function(req,res){});
 //Reportar usuario

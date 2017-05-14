@@ -90,27 +90,26 @@ module.exports.createPost = function(req,res){
 };
 //Obtener todos los posts
 module.exports.allPosts = function(req, res) {
-    // This is just an internal test
-    var query = 'query { allPosts {data{id,title,content,author_id,tags},error{code,message}} }';
+    var query = 'query { allPosts { data { id, title, content, author_id, author_data { username, name },tags },error{code,message}} }';
     graphql.graphql(schema, query).then( function(result) {
         if(result.data.allPosts == null){
-			res.json({
-				success: false,
-				error: "No se ha encontrado ningún post con esa ID"
-			});
-		}else{
-			res.json({
-				success: true,
-				data: result.data.allPosts.data
-			});
-		}
+            res.json({
+                success: false,
+                error: "No se ha encontrado ningún post en la base de datos."
+            });
+        }else{
+            res.json({
+                success: true,
+                data: result.data.allPosts.data
+            });
+        }
     });
 
 };
 //Obtener un post concreto
 module.exports.onePost = function(req,res) {
 
-	var query = 'query { onePost(postID:\"' + req.params.id + '\") {data{ title, author_id, content, tags, image, comments( targetID: \"' + req.params.id +'\") { content, author, created_time } },error{code,message}} }';
+	var query = 'query { onePost(postID:\"' + req.params.id + '\") {data{ title, author_id, author_data { username, name }, content, tags, image, likes, comments( targetID: \"' + req.params.id +'\") { content, author_id, author_data { username, name }, created_time } },error{code,message}} }';
 	graphql.graphql(schema, query).then( function(result) {
         console.log(result);
 		if(result.data.onePost == null){
@@ -213,11 +212,11 @@ module.exports.commentPost = function(req,res){
 };
 //Dar like a un post
 module.exports.likePost = function(req,res){
-  var mutation = ' mutation { likePost(userID: \"' +  + '\",postID: \"' + req.params.id + '\" ) { data, error{ code, message } } }';
+  var mutation = ' mutation { likePost(userID: \"' + req.user  + '\",postID: \"' + req.params.id + '\" ) { data, error{ code, message } } }';
   graphql.graphql(schema, mutation).then( function(result) {
        res.json({
          success: true,
-         data: "Aquí se podría devolver la cantidad de likes que tiene ahora."
+         count: result.data.likePost.data
        });
   });
 };
@@ -239,5 +238,24 @@ module.exports.searchPost = function(req,res){
 			});
 		}
 
+    });
+};
+//Obtener los usuarios que han dado like a un post
+module.exports.getLikes = function(req,res){
+
+  var query = 'query { getUsersLikes(postID:\"'+req.params.id+'\") { id, username, name, bio, public } }';
+  graphql.graphql(schema, query).then( function(result) {
+        console.log(result);
+		if(result.data.getUsersLikes == null){
+			res.json({
+				success: false,
+				error: "No se ha encontrado ningún usuario en los likes."
+			});
+		}else{
+			res.json({
+				success: true,
+				data: result.data.getUsersLikes
+			});
+		}
     });
 };

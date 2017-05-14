@@ -208,6 +208,31 @@ var queryType = new graphql.GraphQLObjectType({
 				});
 			}
 		},
+    getUsersLikes: {
+      type: new graphql.GraphQLList(userType),
+      args: {
+        postID: { type: graphql.GraphQLString }
+      },
+      resolve: function(_,args){
+        return new Promise((resolve,reject) => {
+          Post.findById(args.postID, function(err, post){
+            if(err) reject(err);
+            else{
+              if(post!=null){
+                User.find({
+                  '_id': { $in: post.likes }
+                  }, function(err, docs){
+                       console.log(docs);
+                       resolve(docs);
+                  });
+              }
+            }
+
+          });
+
+      });
+    }
+    },
         searchPost: {
             type: new graphql.GraphQLObjectType({
 				name: 'searchPostResult',
@@ -338,37 +363,37 @@ var queryType = new graphql.GraphQLObjectType({
         /**Eventos**/
 		allEvents: { //En el futuro esto va por meses
 			type: new graphql.GraphQLObjectType({
-        name: 'allEventsResult',
-        fields: {
-          data: { type: new graphql.GraphQLList(eventType) },
-          error: { type: errorType }
-        }
-      }),
-      args: {
-        month: { type: graphql.GraphQLInt },
-        year: { type: graphql.GraphQLInt }
-      },
+                name: 'allEventsResult',
+                fields: {
+                    data: { type: new graphql.GraphQLList(eventType) },
+                    error: { type: errorType }
+                }
+            }),
+            args: {
+                month: { type: graphql.GraphQLInt },
+                year: { type: graphql.GraphQLInt }
+            },
 			resolve: function(_, args) {
 				return new Promise((resolve, reject) => {
 					Event.find(function(err, res) {
 						if(err) reject(err);
 						else{
-              var events = [];
-              //Guardar solo los eventos que sean del mes y año que se pasarle
-              console.log(res);
-              for(i in res) {
-                var date = new Date(res[i].start_time);
-                console.log(date);
-                if(date.getMonth() == args.month && date.getFullYear() == args.year){
-                  events.push(res[i]);
-                }
-              }
-              //Faltaría ordenar por días
-              resolve({
-                data: events,
-                error: null
-              });
-            }
+                            var events = [];
+                            //Guardar solo los eventos que sean del mes y año que se pasarle
+                            console.log(res);
+                            for(i in res) {
+                                var date = new Date(res[i].start_time);
+                                console.log(date);
+                                if(date.getMonth() == args.month && date.getFullYear() == args.year){
+                                    events.push(res[i]);
+                                }
+                            }
+                            //Faltaría ordenar por días
+                            resolve({
+                                data: events,
+                                error: null
+                            });
+                        }
 					});
 				});
 			}
