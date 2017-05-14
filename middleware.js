@@ -22,6 +22,5 @@ exports.ensureAuthorised = function(req, res, next) {
 	}
 
 	req.user = payload.sub; //No se guarda na????
-	console.log(req.user);
 	next();
 };

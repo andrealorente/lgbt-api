@@ -190,9 +190,13 @@ app.post('/users/login', function(req,res) {
 app.post('/users/logout', function(req,res) {});
 //Obtiene un usuario
 app.get('/users/:id', middleware.ensureAuthorised, function(req, res){ //para pasarle un parámetro
-  var token = req.headers.authorization.split(" ")[1];
-  var payload = jwt.decode(token, config.TOKEN_SECRET, true, 'HS512');
-	var query = ' query { user(userID:\"' + payload.sub + '\") { id, username, name, bio, place, public } }';
+  var user = req.params.id;
+
+  if(req.params.id == "me"){
+    user = req.user; //En req.user está la id que coge del token de la cabecera
+  }
+
+	var query = ' query { user(userID:\"' + user + '\") { id, username, name, bio, place, public } }';
 	graphql.graphql(schema, query).then( function(result) {
 		//console.log(JSON.stringify(result,null," "));
 		res.json({
