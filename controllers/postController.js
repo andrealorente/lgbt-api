@@ -224,7 +224,6 @@ module.exports.likePost = function(req,res){
 };
 //Buscar post
 module.exports.searchPost = function(req,res){
-    console.log(req);
     var query = 'query { searchPost(searchparams:\"' + req.query.searchparams + '\",type:\"' + req.query.type + '\") {post{title,content,author_id},error{code,message}}}';
     graphql.graphql(schema, query).then( function(result) {
         console.log(result.data.searchPost.post);
@@ -240,5 +239,24 @@ module.exports.searchPost = function(req,res){
 			});
 		}
 
+    });
+};
+//Obtener los usuarios que han dado like a un post
+module.exports.getLikes = function(req,res){
+
+  var query = 'query { getUsersLikes(postID:\"'+req.params.id+'\") { id, username, name, bio, public } }';
+  graphql.graphql(schema, query).then( function(result) {
+        console.log(result);
+		if(result.data.getUsersLikes == null){
+			res.json({
+				success: false,
+				error: "No se ha encontrado ningún usuario en los likes."
+			});
+		}else{
+			res.json({
+				success: true,
+				data: result.data.getUsersLikes
+			});
+		}
     });
 };

@@ -208,6 +208,31 @@ var queryType = new graphql.GraphQLObjectType({
 				});
 			}
 		},
+    getUsersLikes: {
+      type: new graphql.GraphQLList(userType),
+      args: {
+        postID: { type: graphql.GraphQLString }
+      },
+      resolve: function(_,args){
+        return new Promise((resolve,reject) => {
+          Post.findById(args.postID, function(err, post){
+            if(err) reject(err);
+            else{
+              if(post!=null){
+                User.find({
+                  '_id': { $in: post.likes }
+                  }, function(err, docs){
+                       console.log(docs);
+                       resolve(docs);
+                  });
+              }
+            }
+
+          });
+
+      });
+    }
+    },
         searchPost: {
             type: new graphql.GraphQLObjectType({
 				name: 'searchPostResult',
@@ -314,7 +339,7 @@ var queryType = new graphql.GraphQLObjectType({
 				});
 			}
 		},
-		allEvents: { 
+		allEvents: {
 			type: new graphql.GraphQLObjectType({
         name: 'allEventsResult',
         fields: {

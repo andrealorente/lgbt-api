@@ -67,7 +67,7 @@ app.get('/posts', middleware.ensureAuthorised, postController.allPosts);
 //Obtener un post concreto
 app.get('/posts/:id', middleware.ensureAuthorised, postController.onePost);
 //Ver likes de un post
-app.get('/posts/:id/likes', middleware.ensureAuthorised, function(req,res){});
+app.get('/posts/:id/likes', middleware.ensureAuthorised, postController.getLikes);
 //Modificar un post concreto
 app.post('/posts/:id/update',middleware.ensureAuthorised, postController.updatePost);
 //Comentar en un post
