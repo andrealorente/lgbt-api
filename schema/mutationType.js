@@ -651,7 +651,7 @@ var mutationType = new graphql.GraphQLObjectType({
         name: 'likePostResult',
         fields: {
           data: {
-            type: graphql.GraphQLString
+            type: graphql.GraphQLInt
           },
           error: {
             type: errorType
@@ -693,7 +693,7 @@ var mutationType = new graphql.GraphQLObjectType({
               if(err) reject(err);
               else {
                   resolve({
-                    data: "Correcto",
+                    count: post.likes.length,
                     error: null
                   });
               }

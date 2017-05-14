@@ -90,7 +90,7 @@ module.exports.createPost = function(req,res){
 };
 //Obtener todos los posts
 module.exports.allPosts = function(req, res) {
-    
+
     var query = 'query { allPosts { post { id, title, content, author_id, author_data { username, name },tags },error{code,message}} }';
     graphql.graphql(schema, query).then( function(result) {
         //console.log(JSON.stringify(result,null," "));
@@ -214,11 +214,11 @@ module.exports.commentPost = function(req,res){
 };
 //Dar like a un post
 module.exports.likePost = function(req,res){
-  var mutation = ' mutation { likePost(userID: \"' +  + '\",postID: \"' + req.params.id + '\" ) { data, error{ code, message } } }';
+  var mutation = ' mutation { likePost(userID: \"' + req.user  + '\",postID: \"' + req.params.id + '\" ) { data, error{ code, message } } }';
   graphql.graphql(schema, mutation).then( function(result) {
        res.json({
          success: true,
-         data: "Aquí se podría devolver la cantidad de likes que tiene ahora."
+         count: result.data
        });
   });
 };
