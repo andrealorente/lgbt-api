@@ -218,7 +218,7 @@ module.exports.likePost = function(req,res){
   graphql.graphql(schema, mutation).then( function(result) {
        res.json({
          success: true,
-         count: result.data
+         count: result.data.likePost.count
        });
   });
 };
