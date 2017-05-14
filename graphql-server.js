@@ -99,7 +99,7 @@ app.post('/channels/:id/notifications', middleware.ensureAuthorised, channelCont
 //Obtener los eventos de un mes
 app.get('/events', middleware.ensureAuthorised, function(req, res) {
   //Se le pasan los parámetros en la url -> /events?month=4&year=2017 en RESTClient
-  var query = 'query { allEvents (month:'+ req.query.month + ', year:'+ req.query.year +') { data{ id, title, description, place, start_time }, error { code, message } } }';
+  var query = 'query { allEvents (month:'+ req.query.month + ', year:'+ req.query.year +') { data{ id, title, description, place, start_time, assistants, interested }, error { code, message } } }';
   graphql.graphql(schema, query).then( function(result) {
       //console.log(JSON.stringify(result,null," "));
       res.json({
@@ -111,7 +111,7 @@ app.get('/events', middleware.ensureAuthorised, function(req, res) {
 //Obtener un evento
 app.get('/events/:id', middleware.ensureAuthorised, function(req,res) {
 
-	var query = 'query { oneEvent(eventID:\"' + req.params.id + '\") { title, description, place, start_time, author, comments(targetID:\"' + req.params.id +'\") { author_data { username, name }, content, created_time }, assistants, interested } }';
+	var query = 'query { oneEvent(eventID:\"' + req.params.id + '\") { title, description, place, start_time, author, comments(targetID:\"' + req.params.id +'\") { author_data { id, username, name }, content, created_time }, assistants, interested } }';
     graphql.graphql(schema, query).then( function(result) {
 
 		console.log(result); // { data: oneEvent: null }
