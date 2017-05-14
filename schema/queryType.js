@@ -120,36 +120,36 @@ var queryType = new graphql.GraphQLObjectType({
 			}
 		},
 
-    activity: {
-      type: new graphql.GraphQLList(activityType),
-      description: 'Cargar la actividad de mis seguidos.',
-      args: {
-        userID: { type: graphql.GraphQLString } //Mi id
-      },
-      resolve: function(_,args) {
-        //Buscar mi usuario en la bd
-        return new Promise((resolve,reject) => {
-          User.findById(args.userID, function(err, me){
-            if(err) reject(err);
-            else{
-              //Buscar a mis seguidos y obtener su actividad reciente
-              var follows = [];
-              for(i in me.relationships) {
-                if(me.relationships[i].outgoing_status == "follows"){
-                  follows.push(me.relationships[i]);
+        activity: {
+          type: new graphql.GraphQLList(activityType),
+          description: 'Cargar la actividad de mis seguidos.',
+          args: {
+            userID: { type: graphql.GraphQLString } //Mi id
+          },
+          resolve: function(_,args) {
+            //Buscar mi usuario en la bd
+            return new Promise((resolve,reject) => {
+              User.findById(args.userID, function(err, me){
+                if(err) reject(err);
+                else{
+                  //Buscar a mis seguidos y obtener su actividad reciente
+                  var follows = [];
+                  for(i in me.relationships) {
+                    if(me.relationships[i].outgoing_status == "follows"){
+                      follows.push(me.relationships[i]);
+                    }
+                  }//Fin for
                 }
-              }//Fin for
-            }
-          });
-        });
-      }
-    },
-
-    allPosts: {
+              });
+            });
+          }
+        },
+        /**POSTS**/
+        allPosts: {
             type: new graphql.GraphQLObjectType({
 				name: 'allPostsResult',
 				fields: {
-					post: { type: new graphql.GraphQLList(postType) },
+					data: { type: new graphql.GraphQLList(postType) },
 					error: { type: errorType }
 				}
 			}),
@@ -159,12 +159,12 @@ var queryType = new graphql.GraphQLObjectType({
                         if(err) reject(err);
 						else if(post!=null){
                             resolve({
-                                post: post,
+                                data: post,
                                 error: null
                             });
 						}else{
 							resolve({
-								post: null,
+								data: null,
 								error: {
 									code: 1,
 									message: "No hay ningún post creado."
@@ -179,7 +179,7 @@ var queryType = new graphql.GraphQLObjectType({
 			type: new graphql.GraphQLObjectType({
 				name: 'onePostResult',
 				fields: {
-					post: { type: postType },
+					data: { type: postType },
 					error: { type: errorType }
 				}
 			}),
@@ -192,12 +192,12 @@ var queryType = new graphql.GraphQLObjectType({
 						if(err) reject(err);
 						else if(post!=null){
                             resolve({
-                                post: post,
+                                data: post,
                                 error: null
                             });
 						}else{
 							resolve({
-								post: null,
+								data: null,
 								error: {
 									code: 1,
 									message: "No existe este post."
@@ -212,7 +212,7 @@ var queryType = new graphql.GraphQLObjectType({
             type: new graphql.GraphQLObjectType({
 				name: 'searchPostResult',
 				fields: {
-					post: { type: new graphql.GraphQLList(postType) },
+					data: { type: new graphql.GraphQLList(postType) },
 					error: { type: errorType }
 				}
 			}),
@@ -231,7 +231,7 @@ var queryType = new graphql.GraphQLObjectType({
                             //if(post.author == args.password){
                             console.log(post);
                             resolve({
-                                post: post,
+                                data: post,
                                 error: null
                             });
 							//}else{
@@ -246,7 +246,7 @@ var queryType = new graphql.GraphQLObjectType({
 
 						}else{
 							resolve({
-								post: null,
+								data: null,
 								error: {
 									code: 1,
 									message: "No se encuentra ningún post con esa búsqueda."
@@ -258,62 +258,84 @@ var queryType = new graphql.GraphQLObjectType({
                 });
             }
         },
+        /**CANALES**/
 		allChannels: { //Esto sería más bien para la página de Explorar canales (que muestra todos)
-			type: new graphql.GraphQLList(channelType),
-			resolve: function(_) {
-				return new Promise((resolve, reject) => {
-					Channel.find(function(err, res){
-						if(err) reject(err);
-						else resolve(res);
-					});
-				});
-			}
-		},
+			type: new graphql.GraphQLObjectType({
+				name: 'allChannelsResult',
+				fields: {
+					data: { type: new graphql.GraphQLList(channelType) },
+					error: { type: errorType }
+				}
+			}),
+            resolve: function(_){
+                return new Promise((resolve,reject) => {
+                    Channel.find(function(err, channel){
+                        if(err) reject(err);
+						else if(channel!=null){
+                            resolve({
+                                data: channel,
+                                error: null
+                            });
+						}else{
+							resolve({
+								data: null,
+								error: {
+									code: 1,
+									message: "No hay ningún canal creado."
+								}
+							});
+						}
+                    });
+                });
+            }
+        },
 		oneChannel: {
 			type: new graphql.GraphQLObjectType({
-        name: 'oneChannelResult',
-        fields: {
-          data: { type: channelType },
-          error: { type: errorType }
-        }
-      }),
-			args: {
-				channelID: { type: graphql.GraphQLString }
-			},
-			resolve: function(_, {channelID}) {
-				return new Promise((resolve,reject) => {
-          if (channelID.match(/^[0-9a-fA-F]{24}$/)) {
-            // Yes, it's a valid ObjectId, proceed with `findById` call.
-            Channel.findById(channelID, function(err, res) {
-  						if (err) reject(err);
-              else if(res == null) {
-                resolve({
-                  data: null,
-                  error: {
-                    code: 2,
-                    message: 'No se ha encontrado un canal con esa ID'
+            name: 'oneChannelResult',
+            fields: {
+                  data: { type: channelType },
+                  error: { type: errorType }
+                }
+            }),
+            args: {
+                channelID: { type: graphql.GraphQLString }
+            },
+            resolve: function(_, {channelID}) {
+                return new Promise((resolve,reject) => {
+                  if (channelID.match(/^[0-9a-fA-F]{24}$/)) {
+                    // Yes, it's a valid ObjectId, proceed with `findById` call.
+                    Channel.findById(channelID, function(err, channel) {
+                      if (err) reject(err);
+                      else if(channel != null) {
+                        resolve({
+                          data: channel,
+                          error: null
+                        });
+                      }else{
+                        resolve({
+                          data: null,
+                          error: {
+                            code: 2,
+                            message: 'No se ha encontrado un canal con esa ID'
+                          }
+                        });
+                      }
+                            });
+                  }else{
+                    //No es una ID válida para hacer la llamada a la bd
+                    resolve({
+                      data: null,
+                      error: {
+                        code: 1,
+                        message: 'No es una ID válida'
+                      }
+                    });
                   }
                 });
-              }else{
-                resolve({
-                  data: res,
-                  error: null
-                });
-              }
-  					});
-          }else{
-            //No es una ID válida para hacer la llamada a la bd
-            resolve({
-              data: null,
-              error: {
-                code: 1,
-                message: 'No es una ID válida'
-              }
-            });
-          }
-				});
-			}
-		},
+            }
+        },
+        //searchChannel: {},
+        /**Eventos**/
 		allEvents: { //En el futuro esto va por meses
 			type: new graphql.GraphQLObjectType({
         name: 'allEventsResult',
