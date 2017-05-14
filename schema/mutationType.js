@@ -693,7 +693,7 @@ var mutationType = new graphql.GraphQLObjectType({
               if(err) reject(err);
               else {
                   resolve({
-                    count: post.likes.length,
+                    data: post.likes.length,
                     error: null
                   });
               }
