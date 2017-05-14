@@ -90,8 +90,7 @@ module.exports.createPost = function(req,res){
 };
 //Obtener todos los posts
 module.exports.allPosts = function(req, res) {
-    // This is just an internal test
-    console.log(req);
+    
     var query = 'query { allPosts { post { id, title, content, author_id, author_data { username, name },tags },error{code,message}} }';
     graphql.graphql(schema, query).then( function(result) {
         //console.log(JSON.stringify(result,null," "));

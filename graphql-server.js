@@ -190,12 +190,14 @@ app.post('/users/login', function(req,res) {
 app.post('/users/logout', function(req,res) {});
 //Obtiene un usuario
 app.get('/users/:id', middleware.ensureAuthorised, function(req, res){ //para pasarle un parámetro
+
 	var query = ' query { user(userID:\"' + req.params.id + '\") { id, username, name, bio, place, public } }';
 	graphql.graphql(schema, query).then( function(result) {
 		//console.log(JSON.stringify(result,null," "));
 		res.json({
 			success: true,
-			data: result.data.user
+			data: result.data.user,
+      prueba: req.user
 		});
 	});
 

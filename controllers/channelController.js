@@ -95,9 +95,9 @@ module.exports.allChannels = function(req, res) {
     graphql.graphql(schema, query).then( function(result) {
         //console.log(JSON.stringify(result,null," "));
         res.json({
-			success: true,
-			data: result.data
-		});
+    			success: true,
+    			data: result.data
+    		});
     });
 
 };
