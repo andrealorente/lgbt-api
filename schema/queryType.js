@@ -285,12 +285,30 @@ var queryType = new graphql.GraphQLObjectType({
         },
 		allChannels: { //Esto sería más bien para la página de Explorar canales (que muestra todos)
 			type: new graphql.GraphQLList(channelType),
-			resolve: function(_) {
+      args: {
+        userSusc: { type: graphql.GraphQLString }
+      },
+			resolve: function(_,args) {
 				return new Promise((resolve, reject) => {
-					Channel.find(function(err, res){
-						if(err) reject(err);
-						else resolve(res);
-					});
+          if(args.userSusc == ""){ //Se piden todos los canales de la app
+            Channel.find(function(err, res){
+  						if(err) reject(err);
+  						else resolve(res);
+  					});
+          }else{
+            User.findById(args.userSusc, function(err, user){
+              var arrayIDs = [];
+              for(var i in user.channels){
+                arrayIDs.push(user.channels[i].channel_id);
+              }
+              Channel.find({
+                '_id': { $in: arrayIDs }
+              },function(err,channels){
+                resolve(channels);
+              });
+            });
+          }
+
 				});
 			}
 		},

@@ -91,7 +91,7 @@ module.exports.createChannel = function(req,res){
 //Obtener todos los canales
 module.exports.allChannels = function(req, res) {
 
-    var query = 'query { allChannels { id, title, description } }';
+    var query = 'query { allChannels(userSusc:"") { id, title, description } }';
     graphql.graphql(schema, query).then( function(result) {
         //console.log(JSON.stringify(result,null," "));
         res.json({
@@ -156,6 +156,17 @@ module.exports.notifChannel = function(req,res){
       res.json({
       	success: true,
       	data: result.data.notifChannel
+      });
+  });
+};
+//Obtener los canales a los que estoy suscrito
+module.exports.myChannels = function(req,res){
+  var query = 'query { allChannels(userSusc:\"'+ req.user +'\") { id, title, description } }';
+  graphql.graphql(schema, query).then( function(result) {
+      //console.log(JSON.stringify(result,null," "));
+      res.json({
+        success: true,
+        data: result.data
       });
   });
 };
