@@ -197,7 +197,7 @@ app.get('/users/:id', middleware.ensureAuthorised, function(req, res){ //para pa
 		res.json({
 			success: true,
 			data: result.data.user,
-      prueba: req.user
+      prueba: req
 		});
 	});
 
