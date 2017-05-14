@@ -111,7 +111,7 @@ app.get('/events', middleware.ensureAuthorised, function(req, res) {
 //Obtener un evento
 app.get('/events/:id', middleware.ensureAuthorised, function(req,res) {
 
-	var query = 'query { oneEvent(eventID:\"' + req.params.id + '\") { title, description, place, start_time, comments(targetID:\"' + req.params.id +'\") { author, content, created_time }, assistants, interested } }';
+	var query = 'query { oneEvent(eventID:\"' + req.params.id + '\") { title, description, place, start_time, author, comments(targetID:\"' + req.params.id +'\") { author_data { username, name }, content, created_time }, assistants, interested } }';
     graphql.graphql(schema, query).then( function(result) {
 
 		console.log(result); // { data: oneEvent: null }
