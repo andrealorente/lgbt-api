@@ -422,7 +422,7 @@ var mutationType = new graphql.GraphQLObjectType({
       type: new graphql.GraphQLObjectType({
         name: 'createPostResult',
         fields: {
-          post: {
+          data: {
             type: postType
           },
           error: {
@@ -464,12 +464,12 @@ var mutationType = new graphql.GraphQLObjectType({
               if (err) reject(err);
               else if (post != null) {
                 resolve({
-                  post: post,
+                  data: post,
                   error: null
                 });
               } else {
                 resolve({
-                  post: null,
+                  data: null,
                   error: {
                     code: 1,
                     message: "No se ha podido crear el post."
@@ -485,7 +485,7 @@ var mutationType = new graphql.GraphQLObjectType({
       type: new graphql.GraphQLObjectType({
         name: 'updatePostResult',
         fields: {
-          post: {
+          data: {
             type: postType
           },
           error: {
@@ -534,27 +534,14 @@ var mutationType = new graphql.GraphQLObjectType({
             function(err, post) {
               if (err) reject(err);
               else if (post != null) {
-                //Comprobar que la contraseña coincide con la que es
-                //if(post.author == args.password){
-                console.log("no es null");
-                //console.log(args.tags);
                 resolve({
-                  post: post,
+                  data: post,
                   error: null
                 });
-                //}else{
-                //resolve({
-                //postMessage: null,
-                //error: {
-                //code: 2,
-                //message: "La contraseña no es correcta."
-                //}
-                //});
-                //}
 
               } else {
                 resolve({
-                  post: null,
+                  data: null,
                   error: {
                     code: 1,
                     message: "No existe el post que deseas modificar."
@@ -592,7 +579,7 @@ var mutationType = new graphql.GraphQLObjectType({
       type: new graphql.GraphQLObjectType({
         name: 'commentPostResult',
         fields: {
-          comment: {
+          data: {
             type: commentType
           },
           error: {
@@ -634,7 +621,7 @@ var mutationType = new graphql.GraphQLObjectType({
                 if(err) reject(err);
                 else{
                   resolve({
-                    comment: res,
+                    data: res,
                     error: null
                   });
                 }
@@ -781,38 +768,76 @@ var mutationType = new graphql.GraphQLObjectType({
     },
 
     createChannel: {
-      type: channelType,
+      type: new graphql.GraphQLObjectType({
+        name: 'createChannelResult',
+        fields: {
+          data: {
+            type: channelType
+          },
+          error: {
+            type: errorType
+          }
+        }
+      }),
       description: 'Crear un nuevo canal',
       args: {
         title: {
+            type: graphql.GraphQLString
+        },
+        description: {
+            type: graphql.GraphQLString
+        },
+        created_time: {
           type: graphql.GraphQLString
         },
-        content: {
+        image: {
           type: graphql.GraphQLString
         },
-        author: {
-          type: graphql.GraphQLString
+        author_id: {
+            type: graphql.GraphQLString
         },
-
       },
       resolve: function(root, args) {
         return new Promise((resolve, reject) => {
           Channel.create({
-            title: args.title,
-            content: args.content,
-            author: args.userid
-          }, function(err, res) {
-            if (err) reject(err);
-            else {
-              resolve(res);
-            }
+              title: args.title,
+              description: args.description,
+              created_time: new Date(),
+              image: args.image,
+              author_id: args.author_id
+          }, function(err, channel) {
+              if (err) reject(err);
+              else if (channel != null) {
+                resolve({
+                  data: channel,
+                  error: null
+                });
+              } else {
+                resolve({
+                  data: null,
+                  error: {
+                    code: 1,
+                    message: "No se ha podido crear el canal."
+                  }
+                });
+              }
           });
         });
       }
     },
-
+    
     updateChannel: {
-      type: channelType,
+      type: new graphql.GraphQLObjectType({
+        name: 'updateChannelResult',
+        fields: {
+          data: {
+            type: channelType
+          },
+          error: {
+            type: errorType
+          }
+        }
+      }),
       description: 'Editar un canal ya existente',
       args: {
         channelID: {
@@ -820,28 +845,51 @@ var mutationType = new graphql.GraphQLObjectType({
         },
         title: {
           type: graphql.GraphQLString
+        },
+        description: {
+          type: graphql.GraphQLString
+        },
+        image: {
+          type: graphql.GraphQLString
         }
       },
       resolve: function(root, args) {
+        //console.log(args.state);
         return new Promise((resolve, reject) => {
-          Channel.findOneAndUpdate({
-            _id: args.channelID
-          }, {
-            $set: {
-              title: args.title
-            }
-          }, {
-            new: true
-          }, function(err, res) {
-            if (err) reject(err);
-            else {
-              resolve(res);
-            }
-          });
+          Post.findOneAndUpdate({
+              _id: args.channelID
+            }, //"58e7ca08a364171f3c3fe58d"},
+            {
+              $set: {
+                title: args.title,
+                description: args.description,
+                image: args.image
+              }
+            }, {
+              new: true
+            },
+            function(err, channel) {
+              if (err) reject(err);
+              else if (channel != null) {
+                resolve({
+                  data: channel,
+                  error: null
+                });
+
+              } else {
+                resolve({
+                  data: null,
+                  error: {
+                    code: 1,
+                    message: "No existe el canal que deseas modificar."
+                  }
+                });
+              }
+            });
         });
       }
     },
-
+    
     deleteChannel: {
       type: channelType,
       description: 'Eliminar un canal ya existente',
@@ -868,8 +916,8 @@ var mutationType = new graphql.GraphQLObjectType({
        type: new graphql.GraphQLObjectType({
         name: 'sendMessageResult',
         fields: {
-          message: {
-            type: graphql.GraphQLString
+          data: {
+            type: messageType
           },
           error: {
             type: errorType
@@ -891,7 +939,7 @@ var mutationType = new graphql.GraphQLObjectType({
           //Buscar canal
           Channel.findById(args.channelID, function(err,channel){
             if(err) reject(err);
-            else{
+            else if(channel!=null){
               channel.messages.push({
                 content: args.content,
                 created_time: new Date(),
@@ -902,34 +950,25 @@ var mutationType = new graphql.GraphQLObjectType({
                 if(err) reject(err);
                 else{
                   resolve({
-                    message: args.content,
+                    data: {
+                        content: args.content,
+                        created_time: new Date(),
+                        channel: args.channelID
+                    },
                     error: null
                   });
                 }
               });
-            }
-          });
-            /*Message.create({
-              content: args.content,
-              created_time: args.created_time,
-              channel: args.channelID
-            },function(err, message) {
-              if (err) reject(err);
-              else if (message != null) {
+            }else {
                 resolve({
-                  message: message,
-                  error: null
-                });
-              } else {
-                resolve({
-                  message: null,
+                  data: null,
                   error: {
                     code: 1,
-                    message: "No se ha podido crear el mensaje."
+                    message: "No se ha podido enviar el mensaje."
                   }
                 });
-              }
-            });*/
+            }
+          });
         });
       }
     },

@@ -39,7 +39,7 @@ module.exports.createPost = function(req,res){
                         temp_path,
                         function (result) {
                             console.log("Actualizado con 1 foto");
-                            var mutation = "mutation{createPost(title:\""+ fields.title +"\",content:\""+ fields.content +"\",tags:"+ JSON.stringify(tagspost) +",image:\""+ result.version+"/"+result.public_id +"\",state:\""+ fields.state +"\",author_id:\""+ fields.author +"\"){post{title,content,tags,image,state,author_id},error{code,message}}}";
+                            var mutation = "mutation{createPost(title:\""+ fields.title +"\",content:\""+ fields.content +"\",tags:"+ JSON.stringify(tagspost) +",image:\""+ result.version+"/"+result.public_id +"\",state:\""+ fields.state +"\",author_id:\""+ fields.author +"\"){data{title,content,tags,image,state,author_id},error{code,message}}}";
 	                       graphql.graphql(schema, mutation).then( function(result) {
 		                      if(result.data.createPost == null){
 			                     res.json({
@@ -49,7 +49,7 @@ module.exports.createPost = function(req,res){
 		                      }else{
 			                     res.json({
 				                    success: true,
-				                    data: result.data.createPost
+				                    data: result.data.createPost.data
 			                     });
 		                      }
 
@@ -90,28 +90,26 @@ module.exports.createPost = function(req,res){
 };
 //Obtener todos los posts
 module.exports.allPosts = function(req, res) {
-
-    var query = 'query { allPosts { post { id, title, content, author_id, author_data { username, name },tags },error{code,message}} }';
+    var query = 'query { allPosts { data { id, title, content, author_id, author_data { username, name },tags },error{code,message}} }';
     graphql.graphql(schema, query).then( function(result) {
-        //console.log(JSON.stringify(result,null," "));
         if(result.data.allPosts == null){
-    			res.json({
-    				success: false,
-    				error: "No se ha encontrado ningún post en la base de datos."
-    			});
-    		}else{
-    			res.json({
-    				success: true,
-    				data: result.data.allPosts
-    			});
-		     }
+            res.json({
+                success: false,
+                error: "No se ha encontrado ningún post en la base de datos."
+            });
+        }else{
+            res.json({
+                success: true,
+                data: result.data.allPosts.data
+            });
+        }
     });
 
 };
 //Obtener un post concreto
 module.exports.onePost = function(req,res) {
 
-	var query = 'query { onePost(postID:\"' + req.params.id + '\") {post{ title, author_id, author_data { username, name }, content, tags, image, likes, comments( targetID: \"' + req.params.id +'\") { content, author_id, author_data { username, name }, created_time } },error{code,message}} }';
+	var query = 'query { onePost(postID:\"' + req.params.id + '\") {data{ title, author_id, author_data { username, name }, content, tags, image, likes, comments( targetID: \"' + req.params.id +'\") { content, author_id, author_data { username, name }, created_time } },error{code,message}} }';
 	graphql.graphql(schema, query).then( function(result) {
         console.log(result);
 		if(result.data.onePost == null){
@@ -122,7 +120,7 @@ module.exports.onePost = function(req,res) {
 		}else{
 			res.json({
 				success: true,
-				data: result.data.onePost
+				data: result.data.onePost.data
 			});
 		}
 
@@ -149,7 +147,7 @@ module.exports.updatePost = function(req,res){
                         temp_path,
                         function (result) {
                             console.log("Actualizado con 1 foto");
-                            var mutation = "mutation{updatePost(postID:\""+ fields.id +"\",title:\""+ fields.title +"\",content:\""+ fields.content +"\",tags:"+ JSON.stringify(tagspost) +",image:\""+ result.version+"/"+result.public_id +"\",state:\""+ fields.state +"\"){post{id,title,content,tags,image,state},error{code,message}}}";
+                            var mutation = "mutation{updatePost(postID:\""+ fields.id +"\",title:\""+ fields.title +"\",content:\""+ fields.content +"\",tags:"+ JSON.stringify(tagspost) +",image:\""+ result.version+"/"+result.public_id +"\",state:\""+ fields.state +"\"){data{id,title,content,tags,image,state},error{code,message}}}";
 	                       graphql.graphql(schema, mutation).then( function(result) {
 		                      if(result.data.updatePost == null){
 			                     res.json({
@@ -159,7 +157,7 @@ module.exports.updatePost = function(req,res){
 		                      }else{
 			                     res.json({
 				                    success: true,
-				                    data: result.data.updatePost
+				                    data: result.data.updatePost.data
 			                     });
 		                      }
 
@@ -204,7 +202,7 @@ module.exports.commentPost = function(req,res){
 	var content = req.body.content;
 	var targetid = req.body.target_id;
 
-	var mutation = ' mutation { commentPost(userID:\"' + userid + '\", postID:\"'+ targetid +'\", content:\"'+ content +'\" ) { comment { id, content }, error{ code, message } } }';
+	var mutation = ' mutation { commentPost(userID:\"' + userid + '\", postID:\"'+ targetid +'\", content:\"'+ content +'\" ) { data { id, content }, error{ code, message } } }';
   graphql.graphql(schema, mutation).then( function(result) {
     res.json({
      success: true,
@@ -224,7 +222,8 @@ module.exports.likePost = function(req,res){
 };
 //Buscar post
 module.exports.searchPost = function(req,res){
-    var query = 'query { searchPost(searchparams:\"' + req.query.searchparams + '\",type:\"' + req.query.type + '\") {post{title,content,author_id},error{code,message}}}';
+    console.log(req);
+    var query = 'query { searchPost(searchparams:\"' + req.query.searchparams + '\",type:\"' + req.query.type + '\") {data{title,content,author_id},error{code,message}}}';
     graphql.graphql(schema, query).then( function(result) {
         console.log(result.data.searchPost.post);
 		if(result.data.searchPost == null){
@@ -235,7 +234,7 @@ module.exports.searchPost = function(req,res){
 		}else{
 			res.json({
 				success: true,
-				data: result.data.searchPost
+				data: result.data.searchPost.data
 			});
 		}
 

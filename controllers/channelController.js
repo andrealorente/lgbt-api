@@ -39,7 +39,7 @@ module.exports.createChannel = function(req,res){
                         temp_path,
                         function (result) {
                             console.log("Actualizado con 1 foto");
-                            var mutation = "mutation{createPost(title:\""+ fields.title +"\",content:\""+ fields.content +"\",tags:"+ JSON.stringify(tagspost) +",image:\""+ result.version+"/"+result.public_id +"\",state:\""+ fields.state +"\",author_id:\""+ fields.author +"\"){channel{title,content,tags,image,state,author_id},error{code,message}}}";
+                            var mutation = "mutation{createChannel(title:\""+ fields.title +"\",content:\""+ fields.content +"\",tags:"+ JSON.stringify(tagspost) +",image:\""+ result.version+"/"+result.public_id +"\",state:\""+ fields.state +"\",author_id:\""+ fields.author +"\"){channel{title,content,tags,image,state,author_id},error{code,message}}}";
 	                       graphql.graphql(schema, mutation).then( function(result) {
 		                      if(result.data.createChannel == null){
 			                     res.json({
@@ -49,7 +49,7 @@ module.exports.createChannel = function(req,res){
 		                      }else{
 			                     res.json({
 				                    success: true,
-				                    data: result.data.createChannel
+				                    data: result.data.createChannel.data
 			                     });
 		                      }
 
@@ -81,7 +81,7 @@ module.exports.createChannel = function(req,res){
                   }else{
                      res.json({
                         success: true,
-                        data: result.data.createChannel
+                        data: result.data.createChannel.data
                      });
                   }
             });
@@ -91,20 +91,26 @@ module.exports.createChannel = function(req,res){
 //Obtener todos los canales
 module.exports.allChannels = function(req, res) {
 
-    var query = 'query { allChannels(userSusc:"") { id, title, description } }';
+    var query = 'query { allChannels(userSusc:"") { data{id, title, description},error{code,message} } }';
     graphql.graphql(schema, query).then( function(result) {
-        //console.log(JSON.stringify(result,null," "));
-        res.json({
-    			success: true,
-    			data: result.data
-    		});
+        if(result.data.allChannels == null){
+			res.json({
+				success: false,
+				error: "No se ha encontrado ningún canal con esa ID"
+			});
+		}else{
+			res.json({
+				success: true,
+				data: result.data.allChannels.data
+			});
+		}
     });
 
 };
 //Obtener un canal concreto
 module.exports.oneChannel = function(req,res) {
 
-	var query = 'query { oneChannel(channelID:\"' + req.params.id + '\") { title, description, author } }';
+	var query = 'query { oneChannel(channelID:\"' + req.params.id + '\") data{title, description, author},error{code,message} }';
 	graphql.graphql(schema, query).then( function(result) {
 
 		console.log(result); // { data: oneEvent: null }
@@ -124,9 +130,11 @@ module.exports.oneChannel = function(req,res) {
 };
 //Enviar mensaje al canal
 module.exports.sendMessage = function(req,res) {
-    var mutation = "mutation { sendMessage(content:\""+ req.content +"\", created_time:\""+ req.created_time +"\", channel:\""+ req.channel +"\") { message{ content, created_time, channel}, error{code,message} } }";
+    console.log(req.body);
+    var mutation = "mutation { sendMessage(content:\""+ req.body.content +"\", channelID:\""+ req.body.channelID +"\") { message{ content, created_time, channel}, error{code,message} } }";
     graphql.graphql(schema, mutation).then( function(result) {
-        if(result.data.sendMessage == null){
+        if(result.data == null){
+            console.log(result);
              res.json({
                 success: false,
                 error: "No se ha podido enviar ningún mensaje."
