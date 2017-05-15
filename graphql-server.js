@@ -196,7 +196,7 @@ app.get('/users/:id', middleware.ensureAuthorised, function(req, res){ //para pa
     user = req.user; //En req.user está la id que coge del token de la cabecera
   }
 
-	var query = ' query { user(userID:\"' + user + '\") { id, username, name, bio, place, public } }';
+	var query = ' query { user(userID:\"' + user + '\") { id, username, name, bio, place, public, activity { action, target_id, created_time } } }';
 	graphql.graphql(schema, query).then( function(result) {
 		//console.log(JSON.stringify(result,null," "));
 		res.json({
