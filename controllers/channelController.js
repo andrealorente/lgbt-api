@@ -149,7 +149,7 @@ module.exports.sendMessage = function(req,res) {
 };
 //Suscribirme a un canal
 module.exports.suscribeChannel = function(req,res) {
-  var mutation = ' mutation { suscribeChannel(userID: \"'+ req.body.user_id +'\", channelID: \"'+ req.params.id +'\"){ susc } }';
+  var mutation = ' mutation { suscribeChannel(userID: \"'+ req.user +'\", channelID: \"'+ req.params.id +'\"){ susc } }';
   graphql.graphql(schema, mutation).then( function(result) {
       res.json({
       	success: true,
