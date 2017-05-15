@@ -169,12 +169,12 @@ module.exports.notifChannel = function(req,res){
 };
 //Obtener los canales a los que estoy suscrito
 module.exports.myChannels = function(req,res){
-  var query = 'query { allChannels(userSusc:\"'+ req.user +'\") { id, title, description } }';
+  var query = 'query { allChannels(userSusc:\"'+ req.user +'\") { data { id, title, description, susc }, error { code, message } } }';
   graphql.graphql(schema, query).then( function(result) {
       //console.log(JSON.stringify(result,null," "));
       res.json({
         success: true,
-        data: result.data
+        data: result.data.allChannels.data
       });
   });
 };
