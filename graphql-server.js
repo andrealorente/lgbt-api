@@ -290,12 +290,12 @@ app.get('/users/:id/relationship', middleware.ensureAuthorised, function(req,res
 //Modifica la relación entre el usuario y otro usuario
 app.post('/users/:id/relationship', middleware.ensureAuthorised, function(req,res){
 	//Necesario incluir parámetro de ACTION
-	var mutation = 'mutation { relationship(originID:\"\", targetID:\"'+ req.params.id +'\", action:\"\") { status, error { code, message } } }';
+	var mutation = 'mutation { relationship(originID:\"'+ req.user +'\", targetID:\"'+ req.params.id +'\", action:\"'+req.body.action+'\") { status , error { code, message } } }';
   graphql.graphql(schema, mutation).then( function(result) {
 		//console.log(JSON.stringify(result,null," "));
 		res.json({
 			success: true,
-			data: result.data
+			data: result.data.relationship.status
 		});
 	});
 });
