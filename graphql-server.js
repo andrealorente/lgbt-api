@@ -271,13 +271,21 @@ app.get('/users/:id/followed-by', middleware.ensureAuthorised, function(req,res)
 });
 //Obtiene la relación entre el usuario y otro usuario
 app.get('/users/:id/relationship', middleware.ensureAuthorised, function(req,res){
-	var query = ' query { relationship(originID:"" ,targetID: "",) { } }';
-  /*var variable = api+"/posts/search/search";
-        $http({
-            method: 'GET',
-            url: variable,
-            params: {searchparams:$scope.searchparams,type:'title'},
-        }).then(function(response){*/
+	var query = ' query { relationship(originID:\"'+req.user+'\" ,targetID: \"'+req.params.id+'\",) { status { outgoing, incoming }, error { code, message } } }';
+  graphql.graphql(schema, query).then( function(result) {
+    if(result.data.relationship.error == null){
+      res.json({
+  			success: true,
+  			data: result.data.relationship.status
+  		});
+    }else{
+      res.json({
+        success: false,
+        data: result.data.relationship.error
+      });
+    }
+
+	});
 });
 //Modifica la relación entre el usuario y otro usuario
 app.post('/users/:id/relationship', middleware.ensureAuthorised, function(req,res){
