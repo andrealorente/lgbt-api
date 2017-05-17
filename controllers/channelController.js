@@ -110,10 +110,8 @@ module.exports.allChannels = function(req, res) {
 //Obtener un canal concreto
 module.exports.oneChannel = function(req,res) {
 
-	var query = 'query { oneChannel(channelID:\"' + req.params.id + '\") data{title, description, author},error{code,message} }';
+	var query = 'query { oneChannel(channelID:\"' + req.params.id + '\") {data{title, description, author,messages{content}},error{code,message}}}';
 	graphql.graphql(schema, query).then( function(result) {
-
-		console.log(result); // { data: oneEvent: null }
 		if(result.data.oneChannel.error != null){
 			res.json({
 				success: false,
