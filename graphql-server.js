@@ -85,7 +85,7 @@ app.post('/create/channel', middleware.ensureAuthorised, channelController.creat
 //Obtener todos los canales
 app.get('/channels', middleware.ensureAuthorised, channelController.allChannels);
 //Obtener los canales a los que estoy suscrito
-//app.get('/channels/me', middleware.ensureAuthorised, channelController.allChannels);
+app.get('/me/channels', middleware.ensureAuthorised, channelController.myChannels);
 //Obtener un canal concreto
 app.get('/channels/:id', middleware.ensureAuthorised, channelController.oneChannel);
 //Enviar mensaje al canal
@@ -150,7 +150,7 @@ app.get('/users/:id', middleware.ensureAuthorised, function(req, res){ //para pa
     user = req.user; //En req.user está la id que coge del token de la cabecera
   }
 
-	var query = ' query { user(userID:\"' + user + '\") { id, username, name, bio, place, public } }';
+	var query = ' query { user(userID:\"' + user + '\") { id, username, name, bio, place, public, activity { action, target_id, created_time } } }';
 	graphql.graphql(schema, query).then( function(result) {
 		//console.log(JSON.stringify(result,null," "));
 		res.json({
@@ -225,23 +225,31 @@ app.get('/users/:id/followed-by', middleware.ensureAuthorised, function(req,res)
 });
 //Obtiene la relación entre el usuario y otro usuario
 app.get('/users/:id/relationship', middleware.ensureAuthorised, function(req,res){
-	var query = ' query { relationship(originID:"" ,targetID: "",) { } }';
-  /*var variable = api+"/posts/search/search";
-        $http({
-            method: 'GET',
-            url: variable,
-            params: {searchparams:$scope.searchparams,type:'title'},
-        }).then(function(response){*/
+	var query = ' query { relationship(originID:\"'+req.user+'\" ,targetID: \"'+req.params.id+'\",) { status { outgoing, incoming }, error { code, message } } }';
+  graphql.graphql(schema, query).then( function(result) {
+    if(result.data.relationship.error == null){
+      res.json({
+  			success: true,
+  			data: result.data.relationship.status
+  		});
+    }else{
+      res.json({
+        success: false,
+        data: result.data.relationship.error
+      });
+    }
+
+	});
 });
 //Modifica la relación entre el usuario y otro usuario
 app.post('/users/:id/relationship', middleware.ensureAuthorised, function(req,res){
 	//Necesario incluir parámetro de ACTION
-	var mutation = 'mutation { relationship(originID:\"\", targetID:\"'+ req.params.id +'\", action:\"\") { status, error { code, message } } }';
+	var mutation = 'mutation { relationship(originID:\"'+ req.user +'\", targetID:\"'+ req.params.id +'\", action:\"'+req.body.action+'\") { status , error { code, message } } }';
   graphql.graphql(schema, mutation).then( function(result) {
 		//console.log(JSON.stringify(result,null," "));
 		res.json({
 			success: true,
-			data: result.data
+			data: result.data.relationship.status
 		});
 	});
 });

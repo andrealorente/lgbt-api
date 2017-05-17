@@ -91,7 +91,7 @@ module.exports.createChannel = function(req,res){
 //Obtener todos los canales
 module.exports.allChannels = function(req, res) {
 
-    var query = 'query { allChannels { data{id, title, description},error{code,message} } }';
+    var query = 'query { allChannels(userSusc:"") { data{id, title, description},error{code,message} } }';
     graphql.graphql(schema, query).then( function(result) {
         if(result.data.allChannels == null){
 			res.json({
@@ -110,7 +110,7 @@ module.exports.allChannels = function(req, res) {
 //Obtener un canal concreto
 module.exports.oneChannel = function(req,res) {
 
-	var query = 'query { oneChannel(channelID:\"' + req.params.id + '\") {data{title, description, author,messages{content}},error{code,message}}}';
+	var query = 'query { oneChannel(channelID:\"' + req.params.id + '\"){ data{title, description, author, susc},error{code,message} } }';
 	graphql.graphql(schema, query).then( function(result) {
 		if(result.data.oneChannel.error != null){
 			res.json({
@@ -147,7 +147,7 @@ module.exports.sendMessage = function(req,res) {
 };
 //Suscribirme a un canal
 module.exports.suscribeChannel = function(req,res) {
-  var mutation = ' mutation { suscribeChannel(userID: \"'+ req.body.user_id +'\", channelID: \"'+ req.params.id +'\"){ susc } }';
+  var mutation = ' mutation { suscribeChannel(userID: \"'+ req.user +'\", channelID: \"'+ req.params.id +'\"){ channels { channel_id, notifications } } }';
   graphql.graphql(schema, mutation).then( function(result) {
       res.json({
       	success: true,
@@ -162,6 +162,17 @@ module.exports.notifChannel = function(req,res){
       res.json({
       	success: true,
       	data: result.data.notifChannel
+      });
+  });
+};
+//Obtener los canales a los que estoy suscrito
+module.exports.myChannels = function(req,res){
+  var query = 'query { allChannels(userSusc:\"'+ req.user +'\") { data { id, title, description, susc }, error { code, message } } }';
+  graphql.graphql(schema, query).then( function(result) {
+      //console.log(JSON.stringify(result,null," "));
+      res.json({
+        success: true,
+        data: result.data.allChannels.data
       });
   });
 };

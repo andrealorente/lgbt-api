@@ -284,35 +284,59 @@ var queryType = new graphql.GraphQLObjectType({
         },
         /**CANALES**/
 		allChannels: { //Esto sería más bien para la página de Explorar canales (que muestra todos)
-			type: new graphql.GraphQLObjectType({
-				name: 'allChannelsResult',
-				fields: {
-					data: { type: new graphql.GraphQLList(channelType) },
-					error: { type: errorType }
-				}
-			}),
-            resolve: function(_){
-                return new Promise((resolve,reject) => {
-                    Channel.find(function(err, channel){
-                        if(err) reject(err);
-						else if(channel!=null){
-                            resolve({
-                                data: channel,
-                                error: null
-                            });
-						}else{
-							resolve({
-								data: null,
-								error: {
-									code: 1,
-									message: "No hay ningún canal creado."
-								}
-							});
-						}
-                    });
+      type: new graphql.GraphQLObjectType({
+        name: 'allChannelsResult',
+        fields: {
+          data: { type: new graphql.GraphQLList(channelType) },
+          error: { type: errorType }
+        }
+      }),
+        args: {
+          userSusc: { type: graphql.GraphQLString }
+        },
+			resolve: function(_,args) {
+				return new Promise((resolve, reject) => {
+          if(args.userSusc == ""){ //Se piden todos los canales de la app
+            Channel.find(function(err, channel){
+              if(err) reject(err);
+              else if(channel!=null){
+                resolve({
+                    data: channel,
+                    error: null
+                });
+              }else{
+                resolve({
+                  data: null,
+                  error: {
+                    code: 1,
+                    message: "No hay ningún canal creado."
+                  }
                 });
             }
-        },
+  					});
+          }else{
+            User.findById(args.userSusc, function(err, user){
+              var arrayIDs = [];
+              for(var i in user.channels){
+                arrayIDs.push(user.channels[i].channel_id);
+              }
+              Channel.find({
+                '_id': { $in: arrayIDs }
+              },function(err,channels){
+                if(err)reject(err);
+                else{
+                  resolve({
+                    data: channels,
+                    error: null
+                  });
+                }
+              });
+            });
+          }
+
+				});
+			}
+		},
 		oneChannel: {
 			type: new graphql.GraphQLObjectType({
                 name: 'oneChannelResult',
