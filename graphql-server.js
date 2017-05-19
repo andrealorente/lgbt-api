@@ -27,6 +27,7 @@ mongoose.connect('mongodb://admin:admin@ds145868.mlab.com:45868/lgbt-app');
 /***Controllers**/
 var postController = require('./controllers/postController');
 var channelController = require('./controllers/channelController');
+var eventController = require('./controllers/eventController');
 
 /****/
 var createToken = function(user) {
@@ -97,66 +98,19 @@ app.post('/channels/:id/notifications', middleware.ensureAuthorised, channelCont
 /******* RUTAS DE EVENTOS ********/
 
 //Obtener los eventos de un mes
-app.get('/events', middleware.ensureAuthorised, function(req, res) {
-  //Se le pasan los parámetros en la url -> /events?month=4&year=2017 en RESTClient
-  var query = 'query { allEvents (month:'+ req.query.month + ', year:'+ req.query.year +') { data{ id, title, description, place, start_time, assistants, interested }, error { code, message } } }';
-  graphql.graphql(schema, query).then( function(result) {
-      //console.log(JSON.stringify(result,null," "));
-      res.json({
-      	success: true,
-      	data: result.data.allEvents.data
-      });
-  });
-});
+app.get('/events', middleware.ensureAuthorised, eventController.allEvents);
 //Obtener un evento
-app.get('/events/:id', middleware.ensureAuthorised, function(req,res) {
-
-	var query = 'query { oneEvent(eventID:\"' + req.params.id + '\") { title, description, place, start_time, author, comments(targetID:\"' + req.params.id +'\") { author_data { id, username, name }, content, created_time }, assistants, interested } }';
-    graphql.graphql(schema, query).then( function(result) {
-
-		console.log(result); // { data: oneEvent: null }
-		if(result.data.oneEvent == null){ //No sé si esto está bien así o habría que mandar el error desde graphql
-			res.json({
-				success: false,
-				error: "No se ha encontrado ningún evento con esa ID"
-			});
-		}else{
-			res.json({
-				success: true,
-				data: result.data
-			});
-		}
-
-    });
-});
+app.get('/events/:id', middleware.ensureAuthorised, eventController.oneEvent);
 //Ver asistentes de un evento
-app.get('/events/:id/assist', middleware.ensureAuthorised, function(req,res){});
+app.get('/events/:id/assist', middleware.ensureAuthorised, eventController.assistantsEvent);
 //Ver interesados de un evento
-app.get('/events/:id/interested', middleware.ensureAuthorised, function(req,res){});
+app.get('/events/:id/interested', middleware.ensureAuthorised, eventController.interestedEvent);
 //Asistir a un evento
-app.post('/events/:id/assist', middleware.ensureAuthorised, function(req,res){
-  var mutation = 'mutation { assistEvent(userID: \"'+ req.body.user_id +'\", eventID: \"'+ req.params.id +'\") { assistants, interested } }';
-  graphql.graphql(schema, mutation).then( function(result) {
-      //console.log(JSON.stringify(result,null," "));
-      res.json({
-      	success: true,
-      	data: result.data.assistEvent
-      });
-  });
-});
+app.post('/events/:id/assist', middleware.ensureAuthorised, eventController.assistEvent);
 //Me interesa un evento
-app.post('/events/:id/interested', middleware.ensureAuthorised,function(req,res){
-  var mutation = 'mutation { interestEvent(userID: \"'+ req.body.user_id +'\", eventID: \"'+ req.params.id +'\") { assistants, interested } }';
-  graphql.graphql(schema, mutation).then( function(result) {
-      //console.log(JSON.stringify(result,null," "));
-      res.json({
-      	success: true,
-      	data: result.data.interestEvent
-      });
-  });
-});
+app.post('/events/:id/interested', middleware.ensureAuthorised, eventController.interestEvent);
 //Comentar un evento
-app.post('/events/:id/comments', middleware.ensureAuthorised, function(req,res){});
+app.post('/events/:id/comments', middleware.ensureAuthorised, eventController.commentEvent);
 
 
 /******* RUTAS DE USUARIO *******/

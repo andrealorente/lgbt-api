@@ -112,8 +112,6 @@ module.exports.oneChannel = function(req,res) {
 
 	var query = 'query { oneChannel(channelID:\"' + req.params.id + '\"){ data{title, description, author, susc},error{code,message} } }';
 	graphql.graphql(schema, query).then( function(result) {
-
-		console.log(result); // { data: oneEvent: null }
 		if(result.data.oneChannel.error != null){
 			res.json({
 				success: false,

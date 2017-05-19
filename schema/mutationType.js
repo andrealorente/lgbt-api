@@ -417,7 +417,9 @@ var mutationType = new graphql.GraphQLObjectType({
         });
       }
     },
-
+      
+    /**POSTS**/
+      
     createPost: {
       type: new graphql.GraphQLObjectType({
         name: 'createPostResult',
@@ -691,82 +693,8 @@ var mutationType = new graphql.GraphQLObjectType({
       }
     },
 
-    assistEvent: {
-      type: eventType,
-      description: 'Asistir (o dejar de asistir) a un evento',
-      args: {
-        userID: { type: graphql.GraphQLString },
-        eventID: { type: graphql.GraphQLString }
-      },
-      resolve: function(_,args) {
-        return new Promise((resolve, reject) => {
-          //Buscar evento
-          Event.findById(args.eventID, function(err,ev){
-            if(err) reject(err);
-            else{
-              var index = ev.assistants.indexOf(args.userID);
-              if(index==-1){
-                ev.assistants.push(args.userID);
-                //Hay que quitarlo de interesados
-                var index2 = ev.interested.indexOf(args.userID);
-                if(index2 != -1)
-                  ev.interested.splice(index2,1);
-              }else{
-                ev.assistants.splice(index,1);
-              }
-
-              //Guardar evento
-              ev.save(function(err){
-                if(err) reject(err);
-                else{
-                  //Registrar actividad
-
-                  resolve(ev);
-                }
-              });
-            }//Fin else
-          });
-        });
-      }
-    },
-
-    interestEvent: {
-      type: eventType,
-      description: 'Marcar si te interesa o no un evento.',
-      args: {
-        userID: { type: graphql.GraphQLString },
-        eventID: { type: graphql.GraphQLString }
-      },
-      resolve: function(_,args) {
-        return new Promise((resolve, reject) => {
-          //Buscar evento
-          Event.findById(args.eventID, function(err,ev){
-            if(err) reject(err);
-            else{
-              var index = ev.interested.indexOf(args.userID);
-              if(index == -1){
-                ev.interested.push(args.userID);
-                //Hay que quitarlo de asistentes si está
-                var index2 = ev.assistants.indexOf(args.userID);
-                if(index2 != -1)
-                  ev.assistants.splice(index2,1);
-              }else
-                ev.interested.splice(index,1);
-
-              ev.save(function(err){
-                if(err) reject(err);
-                else{
-                  //Registrar actividad
-
-                  resolve(ev);
-                }
-              });
-            }
-          });
-        });
-      }
-    },
-
+    /**CANALES**/
+      
     createChannel: {
       type: new graphql.GraphQLObjectType({
         name: 'createChannelResult',
@@ -1058,7 +986,86 @@ var mutationType = new graphql.GraphQLObjectType({
           });
         });
       }
+    },
+      
+    /**EVENTOS**/
+      
+    assistEvent: {
+      type: eventType,
+      description: 'Asistir (o dejar de asistir) a un evento',
+      args: {
+        userID: { type: graphql.GraphQLString },
+        eventID: { type: graphql.GraphQLString }
+      },
+      resolve: function(_,args) {
+        return new Promise((resolve, reject) => {
+          //Buscar evento
+          Event.findById(args.eventID, function(err,ev){
+            if(err) reject(err);
+            else{
+              var index = ev.assistants.indexOf(args.userID);
+              if(index==-1){
+                ev.assistants.push(args.userID);
+                //Hay que quitarlo de interesados
+                var index2 = ev.interested.indexOf(args.userID);
+                if(index2 != -1)
+                  ev.interested.splice(index2,1);
+              }else{
+                ev.assistants.splice(index,1);
+              }
+
+              //Guardar evento
+              ev.save(function(err){
+                if(err) reject(err);
+                else{
+                  //Registrar actividad
+
+                  resolve(ev);
+                }
+              });
+            }//Fin else
+          });
+        });
+      }
+    },
+
+    interestEvent: {
+      type: eventType,
+      description: 'Marcar si te interesa o no un evento.',
+      args: {
+        userID: { type: graphql.GraphQLString },
+        eventID: { type: graphql.GraphQLString }
+      },
+      resolve: function(_,args) {
+        return new Promise((resolve, reject) => {
+          //Buscar evento
+          Event.findById(args.eventID, function(err,ev){
+            if(err) reject(err);
+            else{
+              var index = ev.interested.indexOf(args.userID);
+              if(index == -1){
+                ev.interested.push(args.userID);
+                //Hay que quitarlo de asistentes si está
+                var index2 = ev.assistants.indexOf(args.userID);
+                if(index2 != -1)
+                  ev.assistants.splice(index2,1);
+              }else
+                ev.interested.splice(index,1);
+
+              ev.save(function(err){
+                if(err) reject(err);
+                else{
+                  //Registrar actividad
+
+                  resolve(ev);
+                }
+              });
+            }
+          });
+        });
+      }
     }
+    
 
   })
 });
