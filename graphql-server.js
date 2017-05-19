@@ -229,8 +229,9 @@ app.get('/users/:id/followed-by', middleware.ensureAuthorised, function(req,res)
 });
 //Obtiene la relación entre el usuario y otro usuario
 app.get('/users/:id/relationship', middleware.ensureAuthorised, function(req,res){
-	var query = ' query { relationship(originID:\"'+req.user+'\" ,targetID: \"'+req.params.id+'\",) { status { outgoing, incoming }, error { code, message } } }';
+	var query = ' query { relationship(originID:\"'+req.user+'\" ,targetID: \"'+req.params.id+'\") { status { outgoing, incoming }, error { code, message } } }';
   graphql.graphql(schema, query).then( function(result) {
+    console.log(result.data.relationship.status);
     if(result.data.relationship.error == null){
       res.json({
   			success: true,
@@ -259,7 +260,7 @@ app.post('/users/:id/relationship', middleware.ensureAuthorised, function(req,re
 });
 //Cargar peticiones de seguimiento
 app.get('/requests', middleware.ensureAuthorised, function(req,res){
-  var query = ' query { user(userID:\"' + req.params.id + '\") { relationships { id, user_data {username, bio }, outgoing_status, incoming_status } } }';
+  var query = ' query { user(userID:\"' + req.user + '\") { relationships { id, user_data {username, bio }, outgoing_status, incoming_status } } }';
 	graphql.graphql(schema, query).then( function(result) {
 		//console.log(JSON.stringify(result,null," "));
     var relationships = [];
