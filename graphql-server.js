@@ -28,6 +28,7 @@ mongoose.connect('mongodb://admin:admin@ds145868.mlab.com:45868/lgbt-app');
 var postController = require('./controllers/postController');
 var channelController = require('./controllers/channelController');
 var eventController = require('./controllers/eventController');
+var adminController = require('./controllers/adminController');
 
 /****/
 var createToken = function(user) {
@@ -112,6 +113,9 @@ app.post('/events/:id/interested', middleware.ensureAuthorised, eventController.
 //Comentar un evento
 app.post('/events/:id/comments', middleware.ensureAuthorised, eventController.commentEvent);
 
+/******* RUTAS DE ADMINISTRACION ********/
+//Obtener usuarios reportados
+app.get('/admin/users', middleware.ensureAuthorised, adminController.usersReported);
 
 /******* RUTAS DE USUARIO *******/
 

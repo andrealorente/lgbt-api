@@ -446,7 +446,34 @@ var queryType = new graphql.GraphQLObjectType({
 					});
 				});
 			}
-		}
+		},
+        /**ADMINISTRACION**/
+        usersReported: {
+            type: new graphql.GraphQLObjectType({
+                name: 'usersReportedResult',
+                fields: {
+                    data: { type: new graphql.GraphQLList(userType) },
+                    error: { type: errorType }
+                }
+            }),
+            args: {
+                userID: { type: graphql.GraphQLString }
+            },
+            resolve: function( _, {userID} ) {
+                return new Promise((resolve,reject) => {
+                    User.findOne({ _id: userID}, function(err, user) {
+                        if (err) reject(err);
+                        else{
+                            resolve({
+                                data: user,
+                                error: null
+                            });
+                        }
+                    });
+                }); //Fin Promise
+
+            } //Fin resolve
+        }
     }
 });
 

@@ -59,7 +59,7 @@ module.exports.createPost = function(req,res){
                             crop: 'limit',
                             width: 300,
                             height: 300,
-                            format: "png",
+                            format: "jpg",
                             folder: "posts",
                             tags: ['posts', fields.id, fields.title/*, fields.author*/]
                         }
