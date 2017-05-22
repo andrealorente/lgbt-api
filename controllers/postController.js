@@ -245,7 +245,7 @@ module.exports.getLikes = function(req,res){
 
   var query = 'query { getUsersLikes(postID:\"'+req.params.id+'\") { id, username, name, bio, public } }';
   graphql.graphql(schema, query).then( function(result) {
-        console.log(result);
+    console.log(result);
 		if(result.data.getUsersLikes == null){
 			res.json({
 				success: false,

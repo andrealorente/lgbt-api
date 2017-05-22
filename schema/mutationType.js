@@ -194,6 +194,40 @@ var mutationType = new graphql.GraphQLObjectType({
       }
     },
 
+    confirmAccount: {
+      type: new graphql.GraphQLObjectType({
+        name: 'confirmAccountResult',
+        fields: {
+          data: { type: userType },
+          error: { type: errorType}
+        }
+      }),
+      description: 'Confirmar correo de la cuenta.',
+      args: {
+        userID: { type: graphql.GraphQLString }
+      },
+      resolve: function(_,args) {
+        //Cambiar campo 'confirm' en el usuario a true
+        return new Promise((resolve, reject) => {
+          User.findById(args.userID, function(err, user){
+            if(err) reject(err);
+            else{
+              user.confirm = true;
+              user.save(function(err){
+                if(err) reject(err);
+                else{
+                  resolve({
+                    data: user,
+                    error: null
+                  });
+                }
+              });
+            }
+          });
+        });
+      }
+    },
+
     editUser: {
       type: userType,
       description: 'Editar datos de un usuario existente',
@@ -417,9 +451,9 @@ var mutationType = new graphql.GraphQLObjectType({
         });
       }
     },
-      
+
     /**POSTS**/
-      
+
     createPost: {
       type: new graphql.GraphQLObjectType({
         name: 'createPostResult',
@@ -694,7 +728,7 @@ var mutationType = new graphql.GraphQLObjectType({
     },
 
     /**CANALES**/
-      
+
     createChannel: {
       type: new graphql.GraphQLObjectType({
         name: 'createChannelResult',
@@ -753,7 +787,7 @@ var mutationType = new graphql.GraphQLObjectType({
         });
       }
     },
-    
+
     updateChannel: {
       type: new graphql.GraphQLObjectType({
         name: 'updateChannelResult',
@@ -817,7 +851,7 @@ var mutationType = new graphql.GraphQLObjectType({
         });
       }
     },
-    
+
     deleteChannel: {
       type: channelType,
       description: 'Eliminar un canal ya existente',
@@ -987,9 +1021,9 @@ var mutationType = new graphql.GraphQLObjectType({
         });
       }
     },
-      
+
     /**EVENTOS**/
-      
+
     assistEvent: {
       type: eventType,
       description: 'Asistir (o dejar de asistir) a un evento',
@@ -1064,9 +1098,55 @@ var mutationType = new graphql.GraphQLObjectType({
           });
         });
       }
-    }
-    
+    },
 
+    report: {
+      description: 'Reportar usuario, comentario o canal.',
+      type: new graphql.GraphQLObjectType({
+        name: 'reportResult',
+        fields: {
+          data: { type: graphql.GraphQLBoolean },
+          error: { type: errorType }
+        }      
+      }),
+      args: {
+        originID: { type: graphql.GraphQLString },
+        targetID: { type: graphql.GraphQLString },
+        targetType: {
+          type: graphql.GraphQLInt,
+          description: 'Tipo de objeto que se está reportando. 1: Usuario, 2: Comentario, 3: Canal.' },
+        reason: { type: graphql.GraphQLString }
+      },
+      resolve: function(_,args) {
+        return new Promise((resolve, reject) => {
+          if(args.targetType == 1){
+            //Reportar usuario
+            User.findById(args.targetID, function(err, user){
+              if(err) reject(err);
+              else{
+                if(user == null){
+                  resolve({
+                    data: null,
+                    error: {
+                      code: 1,
+                      message: 'No existe el usuario con ese identificador.'
+                    }
+                  });
+                }else{
+                  //Guardar el reporte no sé dónde
+
+                }
+              }
+            });
+          }else if(args.targetType == 2){
+            //Reportar comentario (en post o evento)
+          }else if(args.targetType == 3){
+            //Reportar canal
+
+          }
+        }); //Fin Promise
+      }//Fin resolve
+    }
   })
 });
 

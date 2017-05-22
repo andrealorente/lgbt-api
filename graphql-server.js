@@ -271,9 +271,20 @@ app.get('/requests', middleware.ensureAuthorised, function(req,res){
 	});
 });
 //Carga la actividad de los seguidos del usuario
-app.get('/activity', middleware.ensureAuthorised, function(req,res){});
-//Reportar usuario
-app.post('/report', middleware.ensureAuthorised, function(req,res){});
+app.get('/activity', middleware.ensureAuthorised, function(req,res){
+  
+});
+//Confirmar correo
+app.post('/users/confirm', middleware.ensureAuthorised, function(req,res){
+  var mutation = ' mutation { confirmAccount(userID: \"'+ req.user +'\") { data{ id, confirm }, error { code, message } } }';
+  graphql.graphql(schema, mutation).then( function(result) {
+
+  });
+});
+//Reportar usuario/comentario/canal
+app.post('/report', middleware.ensureAuthorised, function(req,res){
+
+});
 //Solicitar rango de editor-request
 app.post('/editor', middleware.ensureAuthorised, function(req,res){});
 

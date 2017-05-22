@@ -22,6 +22,7 @@ var Post = require('./../models/postModel');
 var Channel = require('./../models/channelModel');
 var Event = require('./../models/eventModel');
 var Comment = require('./../models/commentModel');
+var Activity = require('./../models/activityModel');
 
 //Custom types
 var userType = require('./../types/userType');
@@ -138,6 +139,13 @@ var queryType = new graphql.GraphQLObjectType({
                       follows.push(me.relationships[i]);
                     }
                   }//Fin for
+
+                  Activity.find({
+                    'origin_id': { $in: follows }
+                  },function(err,activities){
+                    console.log(activities);
+                    resolve(activities);
+                  });
                 }
               });
             });
