@@ -6,7 +6,8 @@ var CommentSchema = new Schema({
   author_id: String,
   content: String,
   created_time: String,
-  state: String
+  state: String,
+  reports: [String]
 });
 
 var Comment = mongoose.model('comments', CommentSchema); //nombre de la colecci�n en la bd

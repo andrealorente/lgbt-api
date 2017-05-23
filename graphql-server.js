@@ -272,21 +272,50 @@ app.get('/requests', middleware.ensureAuthorised, function(req,res){
 });
 //Carga la actividad de los seguidos del usuario
 app.get('/activity', middleware.ensureAuthorised, function(req,res){
-  
+  var query = ` query { activity (userID: \"`+ req.user +`\"){
+    origin_id, target_id, action, created_time
+  } }`;
+  graphql.graphql(schema, query).then( function(result) {
+    res.json({
+      success: true,
+      data: result
+    });
+  });
 });
 //Confirmar correo
 app.post('/users/confirm', middleware.ensureAuthorised, function(req,res){
   var mutation = ' mutation { confirmAccount(userID: \"'+ req.user +'\") { data{ id, confirm }, error { code, message } } }';
   graphql.graphql(schema, mutation).then( function(result) {
-
+    if(result.data.confirmAccount.error == null){
+      res.json({
+        success: true,
+        data: result.data.confirmAccount.data
+      });
+    }else{
+      res.json({
+        success: false,
+        error: result.data.confirmAccount.error
+      });
+    }
   });
 });
 //Reportar usuario/comentario/canal
 app.post('/report', middleware.ensureAuthorised, function(req,res){
-
+  var mutation = ` mutation {
+    report(originID:\"`+req.user+`\", targetID: \"`+req.body.target_id+`\",
+    targetType: `req.body.target_type` , reason: \"`+ req.body.reason+`\") {
+    data, error { code, message } } }`;
+  graphql.graphql(schema, mutation).then( function(result) {
+    res.json({
+      success: result.data.report.data
+    });
+  });
 });
 //Solicitar rango de editor-request
-app.post('/editor', middleware.ensureAuthorised, function(req,res){});
+app.post('/editor', middleware.ensureAuthorised, function(req,res){
+  var mutation = ` mutation { editRequest(){} }`;
+
+});
 
 /*********************************************************************************************/
 

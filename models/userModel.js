@@ -16,7 +16,8 @@ var UserSchema = new Schema({
   place: String,
   public: Boolean,
   relationships: [RelationshipSchema],
-  channels: [MinChannel]
+  channels: [MinChannel],
+  reports: [String]
 });
 
 var User = mongoose.model('users', UserSchema); //nombre de la colección en la bd

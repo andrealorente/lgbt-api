@@ -21,6 +21,7 @@ const commentType = new graphql.GraphQLObjectType({
 		},
 		content: { type: graphql.GraphQLString },
 		created_time: { type: graphql.GraphQLString },
+		reports: { type: new graphql.GraphQLList(graphql.GraphQLString) },
 		state: { type: graphql.GraphQLString }
 	}
 });

@@ -23,6 +23,7 @@ var Channel = require('./../models/channelModel');
 var Event = require('./../models/eventModel');
 var Comment = require('./../models/commentModel');
 var Activity = require('./../models/activityModel');
+var Request = require('./../models/requestModel');
 
 //Custom types
 var userType = require('./../types/userType');
@@ -447,6 +448,50 @@ var mutationType = new graphql.GraphQLObjectType({
                 }
               });
             } //Fin else res==null
+          });
+        });
+      }
+    },
+
+    editRequest: {
+      type: new graphql.GraphQLObjectType({
+        name: 'editRequestResult',
+        fields: {
+          data: {
+            type: userType
+          },
+          error: {
+            type: errorType
+          }
+        }
+      }),
+      description: 'Enviar solicitud para ser editor.',
+      args: {
+        userID: { type: graphql.GraphQLString },
+        email: { type: graphql.GraphQLString },
+        reason: { type: graphql.GraphQLString }
+      },
+      resolve: function(_,args) {
+        return new Promise((resolve,reject) => {
+          User.findById(args.userID, function(err,user){
+            if(err) reject(err);
+            else{
+              if(user.role != 'editor'){
+                Request.create({
+                  userID: args.userID,
+                  email: args.email,
+                  reason: reason
+                }, function(err,res){
+                  if(err) reject(err);
+                  else{
+                    resolve({
+                      data: user,
+                      error: null
+                    });
+                  }
+                });
+              }
+            }
           });
         });
       }
@@ -1107,7 +1152,7 @@ var mutationType = new graphql.GraphQLObjectType({
         fields: {
           data: { type: graphql.GraphQLBoolean },
           error: { type: errorType }
-        }      
+        }
       }),
       args: {
         originID: { type: graphql.GraphQLString },
@@ -1126,23 +1171,78 @@ var mutationType = new graphql.GraphQLObjectType({
               else{
                 if(user == null){
                   resolve({
-                    data: null,
+                    data: false,
                     error: {
                       code: 1,
                       message: 'No existe el usuario con ese identificador.'
                     }
                   });
                 }else{
-                  //Guardar el reporte no sé dónde
+                  //Guardar el reporte con qué datos?? el motivo y el usuario que ha hecho el reporte?
+                  user.reports.push(args.reason);
 
-                }
+                  user.save(function(err){
+                    if(err) reject(err);
+                    else{
+                      resolve({
+                        data: true,
+                        error: null
+                      })
+                    }
+                  });
+                }//Fin else
               }
             });
           }else if(args.targetType == 2){
             //Reportar comentario (en post o evento)
+            Comment.findById(args.targetID, function(err, comm){
+              if(err) reject(err);
+              else if(comm == null){
+                resolve({
+                  data: false,
+                  error: {
+                    code: 2,
+                    message: 'No existe el comentario a reportar.'
+                  }
+                });
+              }else{
+                comm.reports.push(args.reason);
+                comm.save(function(err){
+                  if(err) reject(err);
+                  else{
+                    resolve({
+                      data: true,
+                      error: null
+                    });
+                  }
+                });
+              }
+            });
           }else if(args.targetType == 3){
             //Reportar canal
-
+            Channel.findById(args.targetID, function(err,chan){
+              if(err) reject(err);
+              else if(chan==null){
+                resolve({
+                  data: false,
+                  error: {
+                    code: 3,
+                    message: 'No existe el canal a reportar.'
+                  }
+                });
+              }else{
+                chan.reports.push(args.reason);
+                chan.save(function(err){
+                  if(err) reject(err);
+                  else{
+                    resolve({
+                      data: true,
+                      error: null
+                    });
+                  }
+                });
+              }
+            });
           }
         }); //Fin Promise
       }//Fin resolve

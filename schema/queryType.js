@@ -198,10 +198,10 @@ var queryType = new graphql.GraphQLObjectType({
 					Post.findById(postID, function(err, post) {
 						if(err) reject(err);
 						else if(post!=null){
-                            resolve({
-                                data: post,
-                                error: null
-                            });
+                resolve({
+                    data: post,
+                    error: null
+                });
 						}else{
 							resolve({
 								data: null,
@@ -409,22 +409,22 @@ var queryType = new graphql.GraphQLObjectType({
 					Event.find(function(err, res) {
 						if(err) reject(err);
 						else{
-                            var events = [];
-                            //Guardar solo los eventos que sean del mes y año que se pasarle
-                            console.log(res);
-                            for(i in res) {
-                                var date = new Date(res[i].start_time);
-                                console.log(date);
-                                if(date.getMonth() == args.month && date.getFullYear() == args.year){
-                                    events.push(res[i]);
-                                }
-                            }
-                            //Faltaría ordenar por días
-                            resolve({
-                                data: events,
-                                error: null
-                            });
-                        }
+                var events = [];
+                //Guardar solo los eventos que sean del mes y año que se pasarle
+                console.log(res);
+                for(i in res) {
+                    var date = new Date(res[i].start_time);
+                    console.log(date);
+                    if(date.getMonth() == args.month && date.getFullYear() == args.year){
+                        events.push(res[i]);
+                    }
+                }
+                //Faltaría ordenar por días
+                resolve({
+                    data: events,
+                    error: null
+                });
+            }
 					});
 				});
 			}
@@ -446,11 +446,11 @@ var queryType = new graphql.GraphQLObjectType({
 					Event.findById(eventID, function(err, event){
 						if(err) reject(err);
 						else{
-                            resolve({
-                                data: event,
-                                error: null
-                            });
-                        }
+                resolve({
+                    data: event,
+                    error: null
+                });
+            }
 					});
 				});
 			}

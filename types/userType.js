@@ -37,7 +37,8 @@ var userType = new graphql.GraphQLObjectType({
             notifications: { type: graphql.GraphQLBoolean }
           }
         })
-      )}
+      )},
+        reports: { type: new graphql.GraphQLList(graphql.GraphQLString) }
     }
 });
 
