@@ -307,7 +307,7 @@ app.post('/users/confirm', middleware.ensureAuthorised, function(req,res){
 app.post('/report', middleware.ensureAuthorised, function(req,res){
   var mutation = ` mutation {
     report(originID:\"`+req.user+`\", targetID: \"`+req.body.target_id+`\",
-    targetType: `req.body.target_type` , reason: \"`+ req.body.reason+`\") {
+    targetType: `+req.body.target_type+` , reason: \"`+ req.body.reason+`\") {
     data, error { code, message } } }`;
   graphql.graphql(schema, mutation).then( function(result) {
     res.json({
@@ -317,7 +317,7 @@ app.post('/report', middleware.ensureAuthorised, function(req,res){
 });
 //Solicitar rango de editor-request
 app.post('/editor', middleware.ensureAuthorised, function(req,res){
-  var mutation = ` mutation { editRequest(){} }`;
+  var mutation = ` mutation { editRequest(userID, email, reason){ data { username }, error { code, message }} }`;
 
 });
 

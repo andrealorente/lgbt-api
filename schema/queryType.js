@@ -154,33 +154,33 @@ var queryType = new graphql.GraphQLObjectType({
         /**POSTS**/
         allPosts: {
             type: new graphql.GraphQLObjectType({
-				name: 'allPostsResult',
-				fields: {
-					data: { type: new graphql.GraphQLList(postType) },
-					error: { type: errorType }
-				}
-			}),
-            resolve: function(_){
-                return new Promise((resolve,reject) => {
-                    Post.find(function(err, post){
-                        if(err) reject(err);
-						else if(post!=null){
-                            resolve({
-                                data: post,
-                                error: null
-                            });
-						}else{
-							resolve({
-								data: null,
-								error: {
-									code: 1,
-									message: "No hay ningún post creado."
-								}
-							});
-						}
-                    });
-                });
-            }
+    				name: 'allPostsResult',
+    				fields: {
+    					data: { type: new graphql.GraphQLList(postType) },
+    					error: { type: errorType }
+    				}
+    			}),
+          resolve: function(_){
+              return new Promise((resolve,reject) => {
+                  Post.find(function(err, post){
+                      if(err) reject(err);
+					else if(post!=null){
+                          resolve({
+                              data: post,
+                              error: null
+                          });
+					}else{
+						resolve({
+							data: null,
+							error: {
+								code: 1,
+								message: "No hay ningún post creado."
+							}
+						});
+					}
+                  });
+              });
+          }
         },
 		onePost: {
 			type: new graphql.GraphQLObjectType({
