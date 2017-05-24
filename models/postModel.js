@@ -8,7 +8,8 @@ var postSchema = new Schema({
     tags: [String],
     image: String,
     state: String,
-    likes: [String]
+    likes: [String],
+    created_time: String
 });
 
 var Post = mongoose.model('posts', postSchema); //nombre de la colección en la bd

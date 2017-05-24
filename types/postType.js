@@ -39,7 +39,8 @@ var postType = new graphql.GraphQLObjectType({
 			}
 		},
         state: { type: graphql.GraphQLString },
-        likes: { type: new graphql.GraphQLList(graphql.GraphQLString) }
+        likes: { type: new graphql.GraphQLList(graphql.GraphQLString) },
+        created_time: { type: graphql.GraphQLString }
     }
 });
 
