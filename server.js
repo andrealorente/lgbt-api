@@ -30,7 +30,7 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 app.use(bodyParser.json());
-app.use(cors());
+//app.use(cors());
 app.use('/graphql', graphqlHTTP(async () => ({
   schema: Schema,
   graphiql: true,
@@ -127,4 +127,4 @@ app.post('/editor', middleware.ensureAuthorised, function(req,res){
 //Obtener usuarios reportados
 app.get('/admin/users', middleware.ensureAuthorised, adminController.usersReported);
 
-//app.listen(3000);
+app.listen(3000);
