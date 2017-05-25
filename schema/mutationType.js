@@ -1,20 +1,11 @@
-var express = require('express');
-var mongoose = require('mongoose');
-var graphqlHTTP = require('express-graphql');
-var graphql = require('graphql');
-var bodyParser = require('body-parser');
-var cors = require('cors');
-var formidable = require('formidable');
-var cloudinary = require('cloudinary');
-cloudinary.config({
-  cloud_name: 'tfg-lgbt-cloud',
-  api_key: '479641643612759',
-  api_secret: 'VAv1oL4JL36U8Fwe9Edix4wj4as'
-});
-var jwt = require('jwt-simple');
-var moment = require('moment');
-var middleware = require('./../middleware');
-var config = require('./../config');
+import {
+  GraphQLObjectType,
+  GraphQLString,
+  GraphQLNonNull,
+  GraphQLList,
+  GraphQLBoolean,
+  GraphQLInt,
+} from 'graphql';
 
 //Models
 var User = require('./../models/userModel');
@@ -26,33 +17,22 @@ var Activity = require('./../models/activityModel');
 var Request = require('./../models/requestModel');
 
 //Custom types
-var userType = require('./../types/userType');
-var channelType = require('./../types/channelType');
-var commentType = require('./../types/commentType');
-var eventType = require('./../types/eventType');
-var postType = require('./../types/postType');
-var activityType = require('./../types/activityType');
-var errorType = require('./../types/errorType');
-var messageType = require('./../types/messageType');
-
-var createToken = function(user) {
-  console.log(user);
-  var payload = {
-    sub: user._id,
-    iat: moment().unix(),
-    exp: moment().add(14, "days").unix()
-  };
-
-  return jwt.encode(payload, config.TOKEN_SECRET);
-};
+import userType from './../types/userType';
+import channelType from './../types/channelType';
+import commentType from './../types/commentType';
+import eventType from './../types/eventType';
+import postType from './../types/postType';
+import errorType from './../types/errorType';
+import activityType from './../types/activityType';
+import messageType from './../types/messageType';
 
 //Definir mutation type
-var mutationType = new graphql.GraphQLObjectType({
+const mutationType = new GraphQLObjectType({
   name: 'Mutation',
   fields: () => ({
 
     loginUser: {
-      type: new graphql.GraphQLObjectType({
+      type: new GraphQLObjectType({
         name: 'loginUserResult',
         fields: {
           user: {
@@ -66,10 +46,10 @@ var mutationType = new graphql.GraphQLObjectType({
       description: 'Loguear usuario',
       args: {
         username: {
-          type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+          type: new GraphQLNonNull(GraphQLString)
         },
         password: {
-          type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+          type: new GraphQLNonNull(GraphQLString)
         }
       },
       resolve: function(_, args) {
@@ -117,7 +97,7 @@ var mutationType = new graphql.GraphQLObjectType({
     },
 
     createUser: {
-      type: new graphql.GraphQLObjectType({
+      type: new GraphQLObjectType({
         name: 'createUserResult',
         fields: {
           user: {
@@ -131,13 +111,13 @@ var mutationType = new graphql.GraphQLObjectType({
       description: 'Crear un nuevo usuario',
       args: {
         username: {
-          type: graphql.GraphQLString
+          type: GraphQLString
         },
         email: {
-          type: graphql.GraphQLString
+          type: GraphQLString
         },
         pswd: {
-          type: graphql.GraphQLString
+          type: GraphQLString
         }
       },
       resolve: function(_, args) {
@@ -196,7 +176,7 @@ var mutationType = new graphql.GraphQLObjectType({
     },
 
     confirmAccount: {
-      type: new graphql.GraphQLObjectType({
+      type: new GraphQLObjectType({
         name: 'confirmAccountResult',
         fields: {
           data: { type: userType },
@@ -205,7 +185,7 @@ var mutationType = new graphql.GraphQLObjectType({
       }),
       description: 'Confirmar correo de la cuenta.',
       args: {
-        userID: { type: graphql.GraphQLString }
+        userID: { type: GraphQLString }
       },
       resolve: function(_,args) {
         //Cambiar campo 'confirm' en el usuario a true
@@ -234,16 +214,16 @@ var mutationType = new graphql.GraphQLObjectType({
       description: 'Editar datos de un usuario existente',
       args: {
         userID: {
-          type: graphql.GraphQLString
+          type: GraphQLString
         },
         username: {
-          type: graphql.GraphQLString
+          type: GraphQLString
         },
         name: {
-          type: graphql.GraphQLString
+          type: GraphQLString
         },
         email: {
-          type: graphql.GraphQLString
+          type: GraphQLString
         },
       },
       resolve: function(_, args) {
@@ -263,11 +243,11 @@ var mutationType = new graphql.GraphQLObjectType({
     },
     /** Modificar la relación entre dos usuarios **/
     relationship: {
-      type: new graphql.GraphQLObjectType({
+      type: new GraphQLObjectType({
         name: 'relationshipResult',
         fields: {
           status: {
-            type: graphql.GraphQLString
+            type: GraphQLString
           },
           error: {
             type: errorType
@@ -277,13 +257,13 @@ var mutationType = new graphql.GraphQLObjectType({
       description: 'Modificar la relación con un usuario',
       args: {
         originID: {
-          type: graphql.GraphQLString
+          type: GraphQLString
         },
         targetID: {
-          type: graphql.GraphQLString
+          type: GraphQLString
         },
         action: {
-          type: graphql.GraphQLString
+          type: GraphQLString
         } //valores: follow || request || unfollow || approve || ignore
       },
       resolve: function(_, args) {
@@ -454,7 +434,7 @@ var mutationType = new graphql.GraphQLObjectType({
     },
 
     editRequest: {
-      type: new graphql.GraphQLObjectType({
+      type: new GraphQLObjectType({
         name: 'editRequestResult',
         fields: {
           data: {
@@ -467,9 +447,9 @@ var mutationType = new graphql.GraphQLObjectType({
       }),
       description: 'Enviar solicitud para ser editor.',
       args: {
-        userID: { type: graphql.GraphQLString },
-        email: { type: graphql.GraphQLString },
-        reason: { type: graphql.GraphQLString }
+        userID: { type: GraphQLString },
+        email: { type: GraphQLString },
+        reason: { type: GraphQLString }
       },
       resolve: function(_,args) {
         return new Promise((resolve,reject) => {
@@ -500,7 +480,7 @@ var mutationType = new graphql.GraphQLObjectType({
     /**POSTS**/
 
     createPost: {
-      type: new graphql.GraphQLObjectType({
+      type: new GraphQLObjectType({
         name: 'createPostResult',
         fields: {
           data: {
@@ -514,22 +494,22 @@ var mutationType = new graphql.GraphQLObjectType({
       description: 'Crear un nuevo post',
       args: {
         title: {
-            type: graphql.GraphQLString
+            type: GraphQLString
         },
         content: {
-            type: graphql.GraphQLString
+            type: GraphQLString
         },
         tags: {
-          type: new graphql.GraphQLList(graphql.GraphQLString)
+          type: new GraphQLList(GraphQLString)
         },
         image: {
-          type: graphql.GraphQLString
+          type: GraphQLString
         },
         state: {
-          type: graphql.GraphQLString
+          type: GraphQLString
         },
         author_id: {
-            type: graphql.GraphQLString
+            type: GraphQLString
         },
       },
       resolve: function(root, args) {
@@ -563,7 +543,7 @@ var mutationType = new graphql.GraphQLObjectType({
     },
 
     updatePost: {
-      type: new graphql.GraphQLObjectType({
+      type: new GraphQLObjectType({
         name: 'updatePostResult',
         fields: {
           data: {
@@ -577,22 +557,22 @@ var mutationType = new graphql.GraphQLObjectType({
       description: 'Editar un post ya existente',
       args: {
         postID: {
-          type: graphql.GraphQLString
+          type: GraphQLString
         },
         title: {
-          type: graphql.GraphQLString
+          type: GraphQLString
         },
         content: {
-          type: graphql.GraphQLString
+          type: GraphQLString
         },
         tags: {
-          type: new graphql.GraphQLList(graphql.GraphQLString)
+          type: new GraphQLList(GraphQLString)
         },
         image: {
-          type: graphql.GraphQLString
+          type: GraphQLString
         },
         state: {
-          type: graphql.GraphQLString
+          type: GraphQLString
         }
       },
       resolve: function(root, args) {
@@ -639,7 +619,7 @@ var mutationType = new graphql.GraphQLObjectType({
       description: 'Eliminar un post ya existente',
       args: {
         postID: {
-          type: graphql.GraphQLString
+          type: GraphQLString
         }
       },
       resolve: function(root, args) {
@@ -657,7 +637,7 @@ var mutationType = new graphql.GraphQLObjectType({
     },
 
     commentPost: {
-      type: new graphql.GraphQLObjectType({
+      type: new GraphQLObjectType({
         name: 'commentPostResult',
         fields: {
           data: {
@@ -671,13 +651,13 @@ var mutationType = new graphql.GraphQLObjectType({
       description: 'Enviar un comentario en un post.',
       args: {
         userID: {
-          type: graphql.GraphQLString
+          type: GraphQLString
         },
         postID: {
-          type: graphql.GraphQLString
+          type: GraphQLString
         },
         content: {
-          type: graphql.GraphQLString
+          type: GraphQLString
         }
       },
       resolve: function(root,args) {
@@ -715,11 +695,11 @@ var mutationType = new graphql.GraphQLObjectType({
     },
 
     likePost: {
-      type: new graphql.GraphQLObjectType({
+      type: new GraphQLObjectType({
         name: 'likePostResult',
         fields: {
           data: {
-            type: graphql.GraphQLInt
+            type: GraphQLInt
           },
           error: {
             type: errorType
@@ -728,8 +708,8 @@ var mutationType = new graphql.GraphQLObjectType({
       }),
       description: 'Dar o quitar like de un post',
       args: {
-        userID: { type: graphql.GraphQLString },
-        postID: { type: graphql.GraphQLString }
+        userID: { type: GraphQLString },
+        postID: { type: GraphQLString }
       },
       resolve: function(_,args) {
         return new Promise((resolve, reject) => {
@@ -775,7 +755,7 @@ var mutationType = new graphql.GraphQLObjectType({
     /**CANALES**/
 
     createChannel: {
-      type: new graphql.GraphQLObjectType({
+      type: new GraphQLObjectType({
         name: 'createChannelResult',
         fields: {
           data: {
@@ -789,19 +769,19 @@ var mutationType = new graphql.GraphQLObjectType({
       description: 'Crear un nuevo canal',
       args: {
         title: {
-            type: graphql.GraphQLString
+            type: GraphQLString
         },
         description: {
-            type: graphql.GraphQLString
+            type: GraphQLString
         },
         created_time: {
-          type: graphql.GraphQLString
+          type: GraphQLString
         },
         image: {
-          type: graphql.GraphQLString
+          type: GraphQLString
         },
         author_id: {
-            type: graphql.GraphQLString
+            type: GraphQLString
         },
       },
       resolve: function(root, args) {
@@ -834,7 +814,7 @@ var mutationType = new graphql.GraphQLObjectType({
     },
 
     updateChannel: {
-      type: new graphql.GraphQLObjectType({
+      type: new GraphQLObjectType({
         name: 'updateChannelResult',
         fields: {
           data: {
@@ -848,16 +828,16 @@ var mutationType = new graphql.GraphQLObjectType({
       description: 'Editar un canal ya existente',
       args: {
         channelID: {
-          type: graphql.GraphQLString
+          type: GraphQLString
         },
         title: {
-          type: graphql.GraphQLString
+          type: GraphQLString
         },
         description: {
-          type: graphql.GraphQLString
+          type: GraphQLString
         },
         image: {
-          type: graphql.GraphQLString
+          type: GraphQLString
         }
       },
       resolve: function(root, args) {
@@ -902,7 +882,7 @@ var mutationType = new graphql.GraphQLObjectType({
       description: 'Eliminar un canal ya existente',
       args: {
         channelID: {
-          type: graphql.GraphQLString
+          type: GraphQLString
         }
       },
       resolve: function(root, args) {
@@ -920,7 +900,7 @@ var mutationType = new graphql.GraphQLObjectType({
     },
 
     sendMessage: {
-       type: new graphql.GraphQLObjectType({
+       type: new GraphQLObjectType({
         name: 'sendMessageResult',
         fields: {
           data: {
@@ -934,10 +914,10 @@ var mutationType = new graphql.GraphQLObjectType({
       description: 'Enviar un mensaje a un canal',
       args: {
         channelID: {
-          type: graphql.GraphQLString
+          type: GraphQLString
         },
         content:{
-           type: graphql.GraphQLString
+           type: GraphQLString
         }
       },
       resolve: function(root, args) {
@@ -984,8 +964,8 @@ var mutationType = new graphql.GraphQLObjectType({
       type: userType,
       description: 'Suscribirte o desuscribirte de un canal.',
       args: {
-        userID: { type: graphql.GraphQLString },
-        channelID: { type: graphql.GraphQLString }
+        userID: { type: GraphQLString },
+        channelID: { type: GraphQLString }
       },
       resolve: function(_,args){
         return new Promise((resolve, reject) => {
@@ -1046,8 +1026,8 @@ var mutationType = new graphql.GraphQLObjectType({
       type: userType,
       description: 'Activar/desactivar notificaciones de un canal',
       args: {
-        userID: { type: graphql.GraphQLString },
-        channelID: { type: graphql.GraphQLString }
+        userID: { type: GraphQLString },
+        channelID: { type: GraphQLString }
       },
       resolve: function(_,args) {
         return new Promise((resolve, reject) => {
@@ -1073,8 +1053,8 @@ var mutationType = new graphql.GraphQLObjectType({
       type: eventType,
       description: 'Asistir (o dejar de asistir) a un evento',
       args: {
-        userID: { type: graphql.GraphQLString },
-        eventID: { type: graphql.GraphQLString }
+        userID: { type: GraphQLString },
+        eventID: { type: GraphQLString }
       },
       resolve: function(_,args) {
         return new Promise((resolve, reject) => {
@@ -1112,8 +1092,8 @@ var mutationType = new graphql.GraphQLObjectType({
       type: eventType,
       description: 'Marcar si te interesa o no un evento.',
       args: {
-        userID: { type: graphql.GraphQLString },
-        eventID: { type: graphql.GraphQLString }
+        userID: { type: GraphQLString },
+        eventID: { type: GraphQLString }
       },
       resolve: function(_,args) {
         return new Promise((resolve, reject) => {
@@ -1147,20 +1127,20 @@ var mutationType = new graphql.GraphQLObjectType({
 
     report: {
       description: 'Reportar usuario, comentario o canal.',
-      type: new graphql.GraphQLObjectType({
+      type: new GraphQLObjectType({
         name: 'reportResult',
         fields: {
-          data: { type: graphql.GraphQLBoolean },
+          data: { type: GraphQLBoolean },
           error: { type: errorType }
         }
       }),
       args: {
-        originID: { type: graphql.GraphQLString },
-        targetID: { type: graphql.GraphQLString },
+        originID: { type: GraphQLString },
+        targetID: { type: GraphQLString },
         targetType: {
-          type: graphql.GraphQLInt,
+          type: GraphQLInt,
           description: 'Tipo de objeto que se está reportando. 1: Usuario, 2: Comentario, 3: Canal.' },
-        reason: { type: graphql.GraphQLString }
+        reason: { type: GraphQLString }
       },
       resolve: function(_,args) {
         return new Promise((resolve, reject) => {
@@ -1250,4 +1230,4 @@ var mutationType = new graphql.GraphQLObjectType({
   })
 });
 
-module.exports = mutationType;
+export default mutationType;

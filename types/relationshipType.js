@@ -1,19 +1,23 @@
-var graphql = require('graphql');
+import {
+  GraphQLObjectType,
+  GraphQLString,
+  GraphQLNonNull,
+} from 'graphql';
 var User = require('./../models/userModel');
 
-var relationshipType = new graphql.GraphQLObjectType({
+const relationshipType = new GraphQLObjectType({
     name: 'Relationship',
 	  description: 'Relación entre dos usuarios',
     fields: {
-      id: { type: graphql.GraphQLString },
-      incoming_status: { type: graphql.GraphQLString },
-  		outgoing_status: { type: graphql.GraphQLString },
+      id: { type: GraphQLString },
+      incoming_status: { type: GraphQLString },
+  		outgoing_status: { type: GraphQLString },
       user_data: {
-        type: new graphql.GraphQLObjectType({
+        type: new GraphQLObjectType({
           name: 'userdataType',
           fields: {
-            username: { type: graphql.GraphQLString },
-            bio: { type: graphql.GraphQLString }
+            username: { type: GraphQLString },
+            bio: { type: GraphQLString }
           }
         }),
         resolve: (rel) => {
@@ -33,4 +37,4 @@ var relationshipType = new graphql.GraphQLObjectType({
     }
 });
 
-module.exports = relationshipType;
+export default relationshipType;

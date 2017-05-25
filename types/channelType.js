@@ -1,17 +1,24 @@
-var graphql = require('graphql');
-var messageType = require('./messageType');
+import {
+  GraphQLObjectType,
+  GraphQLString,
+  GraphQLNonNull,
+  GraphQLList,
+  GraphQLBoolean,
+  GraphQLInt,
+} from 'graphql';
+import messageType from './messageType';
 
-var channelType = new graphql.GraphQLObjectType({
+const channelType = new GraphQLObjectType({
     name: 'channelType',
     fields: {
-        id: { type: graphql.GraphQLString },
-        title: { type: graphql.GraphQLString },
-        description: { type: graphql.GraphQLString },
-        author: { type: graphql.GraphQLString },
-        messages: { type: new graphql.GraphQLList(messageType)},
-        susc: { type: new graphql.GraphQLList(graphql.GraphQLString)},
-        reports: { type: new graphql.GraphQLList(graphql.GraphQLString) }
+        id: { type: GraphQLString },
+        title: { type: GraphQLString },
+        description: { type: GraphQLString },
+        author: { type: GraphQLString },
+        messages: { type: new GraphQLList(messageType)},
+        susc: { type: new GraphQLList(GraphQLString)},
+        reports: { type: new GraphQLList(GraphQLString) }
     }
 });
 
-module.exports = channelType;
+export default channelType;

@@ -1,13 +1,17 @@
-var graphql = require('graphql');
+import {
+  GraphQLObjectType,
+  GraphQLString,
+  GraphQLNonNull,
+} from 'graphql';
 
-var messageType = new graphql.GraphQLObjectType({
+var messageType = new GraphQLObjectType({
     name: 'Message',
     fields: {
-        id: { type: graphql.GraphQLString },
-		content: { type: graphql.GraphQLString },
-		created_time: { type: graphql.GraphQLString },
-		channel: { type: graphql.GraphQLString }
+      id: { type: GraphQLString },
+  		content: { type: GraphQLString },
+  		created_time: { type: GraphQLString },
+  		channel: { type: GraphQLString }
     }
 });
 
-module.exports = messageType;
+export default messageType;

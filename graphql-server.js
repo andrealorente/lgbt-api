@@ -1,9 +1,22 @@
 //Graphql API server
 
-var express = require('express');
+/*var express = require('express');
 var mongoose = require('mongoose');
 var graphqlHTTP = require('express-graphql');
-var graphql = require('graphql');
+var graphql = require('graphql');*/
+import express from 'express';
+import mongoose from 'mongoose';
+import graphqlHTTP from 'express-graphql';
+import {
+  GraphQLSchema,
+  GraphQLObjectType,
+  GraphQLInt,
+  GraphQLString,
+  GraphQLList,
+  GraphQLNonNull,
+  GraphQLBoolean,
+  } from 'graphql';
+
 var bodyParser = require('body-parser');
 var cors = require('cors');
 var formidable = require('formidable');
@@ -42,7 +55,7 @@ var createToken = function(user) {
 	return jwt.encode(payload, config.TOKEN_SECRET);
 };
 
-var schema = new graphql.GraphQLSchema({query: queryType, mutation: mutationType});
+var schema = new GraphQLSchema({query: queryType, mutation: mutationType});
 
 //Inicializar el objeto de express
 var app = express();

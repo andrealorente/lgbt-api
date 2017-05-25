@@ -1,11 +1,15 @@
-var graphql = require('graphql');
+import {
+  GraphQLObjectType,
+  GraphQLString,
+  GraphQLInt,
+} from 'graphql';
 
-var errorType = new graphql.GraphQLObjectType({
+const errorType = new GraphQLObjectType({
 	name: 'errorType',
 	fields: {
-		code: { type: graphql.GraphQLInt },
-		message: { type: graphql.GraphQLString }
+		code: { type: GraphQLInt },
+		message: { type: GraphQLString }
 	}
 });
 
-module.exports = errorType;
+export default errorType;

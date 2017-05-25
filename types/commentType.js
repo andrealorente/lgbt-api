@@ -1,13 +1,18 @@
-var graphql = require('graphql');
-var userType = require('./userType');
+import {
+  GraphQLObjectType,
+  GraphQLString,
+  GraphQLNonNull,
+  GraphQLList,
+} from 'graphql';
+import userType from './userType';
 var User = require('./../models/userModel');
 
-const commentType = new graphql.GraphQLObjectType({
+const commentType = new GraphQLObjectType({
 	name: 'commentType',
 	fields: {
-		id: { type: graphql.GraphQLString },
-		target_id: { type: graphql.GraphQLString }, //Id del post, evento o lo que sea
-		author_id: { type: graphql.GraphQLString },
+		id: { type: GraphQLString },
+		target_id: { type: GraphQLString }, //Id del post, evento o lo que sea
+		author_id: { type: GraphQLString },
 		author_data: {
 			type: userType,
 			resolve: function(root){
@@ -19,11 +24,11 @@ const commentType = new graphql.GraphQLObjectType({
 				});
 			}
 		},
-		content: { type: graphql.GraphQLString },
-		created_time: { type: graphql.GraphQLString },
-		reports: { type: new graphql.GraphQLList(graphql.GraphQLString) },
-		state: { type: graphql.GraphQLString }
+		content: { type: GraphQLString },
+		created_time: { type: GraphQLString },
+		reports: { type: new GraphQLList(GraphQLString) },
+		state: { type: GraphQLString }
 	}
 });
 
-module.exports = commentType;
+export default commentType;

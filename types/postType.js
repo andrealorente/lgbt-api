@@ -1,16 +1,23 @@
-var graphql = require('graphql');
-var commentType = require('./commentType');
+
+import commentType from './commentType';
 var Comment = require('./../models/commentModel');
-var userType = require('./userType');
+import userType from './userType';
 var User = require('./../models/userModel');
 
-var postType = new graphql.GraphQLObjectType({
+import {
+  graphql,
+  GraphQLObjectType,
+  GraphQLList,
+  GraphQLString
+} from 'graphql';
+
+var postType = new GraphQLObjectType({
     name: 'postType',
     fields: {
-        id: { type: graphql.GraphQLString },
-        title: { type: graphql.GraphQLString },
-        content: { type: graphql.GraphQLString },
-        author_id: { type: graphql.GraphQLString },
+        id: { type: GraphQLString },
+        title: { type: GraphQLString },
+        content: { type: GraphQLString },
+        author_id: { type: GraphQLString },
         author_data: {
           type: userType,
           resolve: function(root){
@@ -22,12 +29,12 @@ var postType = new graphql.GraphQLObjectType({
             });
           }
         },
-        tags: { type: new graphql.GraphQLList(graphql.GraphQLString)},
-        image: { type: graphql.GraphQLString },
+        tags: { type: new GraphQLList(GraphQLString)},
+        image: { type: GraphQLString },
 		    comments: {
-			      type: new graphql.GraphQLList(commentType),
+			      type: new GraphQLList(commentType),
 			      args: {
-				          targetID: { type: graphql.GraphQLString }
+				          targetID: { type: GraphQLString }
 			      },
             resolve: function(_, { targetID }) {
 				    return new Promise((resolve,reject) => {
@@ -38,10 +45,10 @@ var postType = new graphql.GraphQLObjectType({
             });
 			}
 		},
-        state: { type: graphql.GraphQLString },
-        likes: { type: new graphql.GraphQLList(graphql.GraphQLString) },
-        created_time: { type: graphql.GraphQLString }
+        state: { type: GraphQLString },
+        likes: { type: new GraphQLList(GraphQLString) },
+        created_time: { type: GraphQLString }
     }
 });
 
-module.exports = postType;
+export default postType;

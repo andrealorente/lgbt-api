@@ -1,22 +1,29 @@
-var graphql = require('graphql');
-var relationshipType = require('./relationshipType');
-var activityType = require('./activityType');
-var Activity = require('./../models/activityModel');
+import {
+  GraphQLObjectType,
+  GraphQLString,
+  GraphQLNonNull,
+  GraphQLList,
+  GraphQLBoolean,
+  GraphQLInt,
+} from 'graphql';
+import relationshipType from './relationshipType';
+import activityType from './activityType';
+import Activity from './../models/activityModel';
 
 //Definir User type
-var userType = new graphql.GraphQLObjectType({
+const userType = new GraphQLObjectType({
     name: 'User',
     fields: {
-        id: { type: graphql.GraphQLString }, //Cada campo puede tener un resolve
-        username: { type: graphql.GraphQLString },
-    		name: { type: graphql.GraphQLString },
-    		pswd: { type: graphql.GraphQLString },
-    		bio: { type: graphql.GraphQLString },
-        email: { type: graphql.GraphQLString },
-    		place: { type: graphql.GraphQLString },
-    		relationships: { type: new graphql.GraphQLList(relationshipType) },
+        id: { type: GraphQLString }, //Cada campo puede tener un resolve
+        username: { type: GraphQLString },
+    		name: { type: GraphQLString },
+    		pswd: { type: GraphQLString },
+    		bio: { type: GraphQLString },
+        email: { type: GraphQLString },
+    		place: { type: GraphQLString },
+    		relationships: { type: new GraphQLList(relationshipType) },
     		activity: {
-          type: new graphql.GraphQLList(activityType),
+          type: new GraphQLList(activityType),
           resolve: (user) => {
             return new Promise((resolve,reject) => {
               Activity.find({ origin_id: user.id}, function(err, act){
@@ -28,18 +35,18 @@ var userType = new graphql.GraphQLObjectType({
             });
           }
         },
-    		public: { type: graphql.GraphQLBoolean },
-    		token: { type: graphql.GraphQLString },
-        channels: { type: new graphql.GraphQLList(new graphql.GraphQLObjectType({
+    		public: { type: GraphQLBoolean },
+    		token: { type: GraphQLString },
+        channels: { type: new GraphQLList(new GraphQLObjectType({
           name: 'minChannel',
           fields: {
-            channel_id: { type: graphql.GraphQLString },
-            notifications: { type: graphql.GraphQLBoolean }
+            channel_id: { type: GraphQLString },
+            notifications: { type: GraphQLBoolean }
           }
         })
       )},
-        reports: { type: new graphql.GraphQLList(graphql.GraphQLString) }
+        reports: { type: new GraphQLList(GraphQLString) }
     }
 });
 
-module.exports = userType;
+export default userType;

@@ -1,20 +1,11 @@
-var express = require('express');
-var mongoose = require('mongoose');
-var graphqlHTTP = require('express-graphql');
-var graphql = require('graphql');
-var bodyParser = require('body-parser');
-var cors = require('cors');
-var formidable = require('formidable');
-var cloudinary = require('cloudinary');
-cloudinary.config({
-    cloud_name: 'tfg-lgbt-cloud',
-    api_key: '479641643612759',
-    api_secret: 'VAv1oL4JL36U8Fwe9Edix4wj4as'
-});
-var jwt = require('jwt-simple');
-var moment = require('moment');
-var middleware = require('./../middleware');
-var config = require('./../config');
+import {
+  GraphQLObjectType,
+  GraphQLString,
+  GraphQLNonNull,
+  GraphQLList,
+  GraphQLBoolean,
+  GraphQLInt,
+} from 'graphql';
 
 //Models
 var User = require('./../models/userModel');
@@ -25,26 +16,26 @@ var Comment = require('./../models/commentModel');
 var Activity = require('./../models/activityModel');
 
 //Custom types
-var userType = require('./../types/userType');
-var channelType = require('./../types/channelType');
-var commentType = require('./../types/commentType');
-var eventType = require('./../types/eventType');
-var postType = require('./../types/postType');
-var errorType = require('./../types/errorType');
-var activityType = require('./../types/activityType');
+import userType from './../types/userType';
+import channelType from './../types/channelType';
+import commentType from './../types/commentType';
+import eventType from './../types/eventType';
+import postType from './../types/postType';
+import errorType from './../types/errorType';
+import activityType from './../types/activityType';
 
-var statusType = new graphql.GraphQLObjectType({
+const statusType = new GraphQLObjectType({
 	name: 'statusType',
 	description: 'Status of the relationship',
 	fields: {
-		incoming: {type: graphql.GraphQLString},
-		outgoing: { type: graphql.GraphQLString }
+		incoming: {type: GraphQLString},
+		outgoing: { type: GraphQLString }
 	}
 });
 
 
 /** QUERIES **/
-var queryType = new graphql.GraphQLObjectType({
+const queryType = new GraphQLObjectType({
     name: 'Query',
     fields: {
         /**USUARIOS**/
@@ -52,7 +43,7 @@ var queryType = new graphql.GraphQLObjectType({
             type: userType,
             //args son los argumentos que acepta la query User
             args: {
-                userID: { type: graphql.GraphQLString }
+                userID: { type: GraphQLString }
             },
             resolve: function( _, {userID} ) {
 
@@ -68,7 +59,7 @@ var queryType = new graphql.GraphQLObjectType({
         }, //Fin consultar user
 		//Consultar relación entre dos usuarios
 		relationship: {
-			type: new graphql.GraphQLObjectType({
+			type: new GraphQLObjectType({
 				name: 'getrelationshipResult',
 				fields: {
 					status: { type: statusType },
@@ -76,8 +67,8 @@ var queryType = new graphql.GraphQLObjectType({
 				}
 			}),
 			args: {
-				originID: { type: graphql.GraphQLString },
-				targetID: { type: graphql.GraphQLString },
+				originID: { type: GraphQLString },
+				targetID: { type: GraphQLString },
 			},
 			resolve: function(_, args){
 				return new Promise((resolve,reject) => {
@@ -121,10 +112,10 @@ var queryType = new graphql.GraphQLObjectType({
 			}
 		},
         activity: {
-          type: new graphql.GraphQLList(activityType),
+          type: new GraphQLList(activityType),
           description: 'Cargar la actividad de mis seguidos.',
           args: {
-            userID: { type: graphql.GraphQLString } //Mi id
+            userID: { type: GraphQLString } //Mi id
           },
           resolve: function(_,args) {
             //Buscar mi usuario en la bd
@@ -153,10 +144,10 @@ var queryType = new graphql.GraphQLObjectType({
         },
         /**POSTS**/
         allPosts: {
-            type: new graphql.GraphQLObjectType({
+            type: new GraphQLObjectType({
     				name: 'allPostsResult',
     				fields: {
-    					data: { type: new graphql.GraphQLList(postType) },
+    					data: { type: new GraphQLList(postType) },
     					error: { type: errorType }
     				}
     			}),
@@ -183,7 +174,7 @@ var queryType = new graphql.GraphQLObjectType({
           }
         },
 		onePost: {
-			type: new graphql.GraphQLObjectType({
+			type: new GraphQLObjectType({
 				name: 'onePostResult',
 				fields: {
 					data: { type: postType },
@@ -191,7 +182,7 @@ var queryType = new graphql.GraphQLObjectType({
 				}
 			}),
 			args: {
-				postID: { type: graphql.GraphQLString }
+				postID: { type: GraphQLString }
 			},
 			resolve: function(_, {postID}) {
 				return new Promise((resolve,reject) => {
@@ -216,9 +207,9 @@ var queryType = new graphql.GraphQLObjectType({
 			}
 		},
         getUsersLikes: {
-      type: new graphql.GraphQLList(userType),
+      type: new GraphQLList(userType),
       args: {
-        postID: { type: graphql.GraphQLString }
+        postID: { type: GraphQLString }
       },
       resolve: function(_,args){
         return new Promise((resolve,reject) => {
@@ -241,17 +232,17 @@ var queryType = new graphql.GraphQLObjectType({
     }
     },
         searchPost: {
-            type: new graphql.GraphQLObjectType({
+            type: new GraphQLObjectType({
 				name: 'searchPostResult',
 				fields: {
-					data: { type: new graphql.GraphQLList(postType) },
+					data: { type: new GraphQLList(postType) },
 					error: { type: errorType }
 				}
 			}),
             description: 'Buscar un post ya existente',
             args: {
-                searchparams: {type: graphql.GraphQLString},
-                type: {type: graphql.GraphQLString}
+                searchparams: {type: GraphQLString},
+                type: {type: GraphQLString}
             },
             resolve: function(_, {searchparams}){
                 console.log(searchparams);
@@ -292,15 +283,15 @@ var queryType = new graphql.GraphQLObjectType({
         },
         /**CANALES**/
 		allChannels: { //Esto sería más bien para la página de Explorar canales (que muestra todos)
-      type: new graphql.GraphQLObjectType({
+      type: new GraphQLObjectType({
         name: 'allChannelsResult',
         fields: {
-          data: { type: new graphql.GraphQLList(channelType) },
+          data: { type: new GraphQLList(channelType) },
           error: { type: errorType }
         }
       }),
         args: {
-          userSusc: { type: graphql.GraphQLString }
+          userSusc: { type: GraphQLString }
         },
 			resolve: function(_,args) {
 				return new Promise((resolve, reject) => {
@@ -346,7 +337,7 @@ var queryType = new graphql.GraphQLObjectType({
 			}
 		},
 		oneChannel: {
-			type: new graphql.GraphQLObjectType({
+			type: new GraphQLObjectType({
                 name: 'oneChannelResult',
                 fields: {
                   data: { type: channelType },
@@ -354,7 +345,7 @@ var queryType = new graphql.GraphQLObjectType({
                 }
             }),
             args: {
-                channelID: { type: graphql.GraphQLString }
+                channelID: { type: GraphQLString }
             },
             resolve: function(_, {channelID}) {
                 return new Promise((resolve,reject) => {
@@ -393,16 +384,16 @@ var queryType = new graphql.GraphQLObjectType({
         //searchChannel: {},
         /**EVENTOS**/
 		allEvents: { //En el futuro esto va por meses
-			type: new graphql.GraphQLObjectType({
+			type: new GraphQLObjectType({
                 name: 'allEventsResult',
                 fields: {
-                    data: { type: new graphql.GraphQLList(eventType) },
+                    data: { type: new GraphQLList(eventType) },
                     error: { type: errorType }
                 }
             }),
             args: {
-                month: { type: graphql.GraphQLInt },
-                year: { type: graphql.GraphQLInt }
+                month: { type: GraphQLInt },
+                year: { type: GraphQLInt }
             },
 			resolve: function(_, args) {
 				return new Promise((resolve, reject) => {
@@ -430,15 +421,15 @@ var queryType = new graphql.GraphQLObjectType({
 			}
 		},
 		oneEvent: {
-			type: new graphql.GraphQLObjectType({
+			type: new GraphQLObjectType({
                 name: 'oneEventResult',
                 fields: {
-                    data: { type: new graphql.GraphQLList(eventType) },
+                    data: { type: new GraphQLList(eventType) },
                     error: { type: errorType }
                 }
             }),
 			args: {
-				eventID: { type: graphql.GraphQLString }
+				eventID: { type: GraphQLString }
 			},
 			resolve: function(_, { eventID }) {
 				return new Promise((resolve, reject) => {
@@ -457,15 +448,15 @@ var queryType = new graphql.GraphQLObjectType({
 		},
         /**ADMINISTRACION**/
         usersReported: {
-            type: new graphql.GraphQLObjectType({
+            type: new GraphQLObjectType({
                 name: 'usersReportedResult',
                 fields: {
-                    data: { type: new graphql.GraphQLList(userType) },
+                    data: { type: new GraphQLList(userType) },
                     error: { type: errorType }
                 }
             }),
             args: {
-                userID: { type: graphql.GraphQLString }
+                userID: { type: GraphQLString }
             },
             resolve: function( _, {userID} ) {
                 return new Promise((resolve,reject) => {
@@ -485,4 +476,5 @@ var queryType = new graphql.GraphQLObjectType({
     }
 });
 
-module.exports = queryType;
+//module.exports = queryType;
+export default queryType;

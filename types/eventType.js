@@ -1,22 +1,27 @@
-var graphql = require('graphql');
-var commentType = require('./commentType');
+import {
+  GraphQLObjectType,
+  GraphQLString,
+  GraphQLNonNull,
+  GraphQLList,
+} from 'graphql';
+import commentType from './commentType';
 var Comment = require('./../models/commentModel');
 
-const eventType = new graphql.GraphQLObjectType({
+const eventType = new GraphQLObjectType({
     name: 'eventType',
     fields: {
-        id: { type: graphql.GraphQLString },
-        title: { type: graphql.GraphQLString },
-        image: { type: graphql.GraphQLString },
-        description: { type: graphql.GraphQLString },
-        author: { type: graphql.GraphQLString },
-        place: { type: graphql.GraphQLString },
-    		start_time: { type: graphql.GraphQLString },
-        end_time: { type: graphql.GraphQLString },
+        id: { type: GraphQLString },
+        title: { type: GraphQLString },
+        image: { type: GraphQLString },
+        description: { type: GraphQLString },
+        author: { type: GraphQLString },
+        place: { type: GraphQLString },
+    		start_time: { type: GraphQLString },
+        end_time: { type: GraphQLString },
     		comments: {
-    			type: new graphql.GraphQLList(commentType),
+    			type: new GraphQLList(commentType),
     			args: {
-    				targetID: { type: graphql.GraphQLString }
+    				targetID: { type: GraphQLString }
     			},
     			resolve: function(root, { targetID }) {
     				return new Promise((resolve,reject) => {
@@ -27,10 +32,10 @@ const eventType = new graphql.GraphQLObjectType({
             });
     			}
     		},
-        assistants: { type: new graphql.GraphQLList(graphql.GraphQLString) },
-        interested: { type: new graphql.GraphQLList(graphql.GraphQLString) },
-        
+        assistants: { type: new GraphQLList(GraphQLString) },
+        interested: { type: new GraphQLList(GraphQLString) },
+
     }
 });
 
-module.exports = eventType;
+export default eventType;
