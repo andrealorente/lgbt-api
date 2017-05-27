@@ -61,14 +61,14 @@ var userController = {
   				error: result.data.createUser.error
   			});
   		}else{
-
+        let url = 'https://lgbt-api.herokuapp.com/users/confirm?id='+result.data.createUser.user.id;
         // setup email data with unicode symbols
         let mailOptions = {
-            from: '"Admin" <admin@lgbtcast.com>', // sender address
+            from: '"Admin" <lgbtcast.tfg@lgbtcast.com>', // sender address
             to: email, // list of receivers
-            subject: 'Bienvenido a LGBTcast', // Subject line
+            subject: '¡Bienvenidx a LGBTcast!', // Subject line
             text: 'Confirma tu correo electrónico para empezar a conocer las novedades del colectivo LGBT.', // plain text body
-            html: '<b>Hello world ?</b>' // html body
+            html: '<p>Haz click en el enlace siguiente para confirmar tu correo electrónico: </p><p><a href=\"'+url+'\">Confirmar correo</a></p><p>Si no has sido tú no sé qué hay que hacer.</p>' // html body
         };
 
         // send mail with defined transport object
@@ -184,7 +184,7 @@ var userController = {
     });
   },
   confirmAccount: function(req,res) {
-    var mutation = ' mutation { confirmAccount(userID: \"'+ req.user +'\") { data{ id, confirm }, error { code, message } } }';
+    var mutation = ' mutation { confirmAccount(userID: \"'+ req.query.id +'\") { data{ id, confirm }, error { code, message } } }';
     graphql(Schema, mutation).then( function(result) {
       if(result.data.confirmAccount.error == null){
         res.json({

@@ -114,7 +114,7 @@ app.get('/requests', middleware.ensureAuthorised, userController.getRequests);
 //Carga la actividad de los seguidos del usuario
 app.get('/activity', middleware.ensureAuthorised, userController.getActivity);
 //Confirmar correo
-app.post('/users/confirm', middleware.ensureAuthorised, userController.confirmAccount);
+app.post('/users/confirm', userController.confirmAccount);
 //Reportar usuario/comentario/canal
 app.post('/report', middleware.ensureAuthorised, userController.report);
 //Solicitar rango de editor-request
