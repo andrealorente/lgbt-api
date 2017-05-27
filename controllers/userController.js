@@ -1,5 +1,6 @@
 import { graphql } from 'graphql';
 import Schema from './../schema/schema';
+import nodemailer from 'nodemailer';
 
 var createToken = function(user) {
   console.log(user);
@@ -11,6 +12,15 @@ var createToken = function(user) {
 
   return jwt.encode(payload, config.TOKEN_SECRET);
 };
+
+// create reusable transporter object using the default SMTP transport
+var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'admin@lgbtcast.com',
+        pass: 'tfgandreaycons'
+    }
+});
 
 var userController = {
   loginUser: function(req,res) {
@@ -51,6 +61,23 @@ var userController = {
   				error: result.data.createUser.error
   			});
   		}else{
+
+        // setup email data with unicode symbols
+        let mailOptions = {
+            from: '"Admin" <admin@lgbtcast.com>', // sender address
+            to: email, // list of receivers
+            subject: 'Bienvenido a LGBTcast', // Subject line
+            text: 'Confirma tu correo electrónico para empezar a conocer las novedades del colectivo LGBT.', // plain text body
+            html: '<b>Hello world ?</b>' // html body
+        };
+
+        // send mail with defined transport object
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                return console.log(error);
+            }
+            console.log('Message %s sent: %s', info.messageId, info.response);
+        });
   			res.json({
   				success: true,
   				data: result.data.createUser.user

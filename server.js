@@ -96,7 +96,7 @@ app.post('/users/login', userController.loginUser);
 //Obtiene un usuario
 app.get('/users/:id', middleware.ensureAuthorised, userController.getUser);
 //Crea un usuario
-app.post('/users', middleware.ensureAuthorised, userController.createUser);
+app.post('/users', userController.createUser);
 //Actualiza datos de un usuario
 app.put('/users/:id', middleware.ensureAuthorised, function(req,res){
 	var query = ' query { editUser(userID:\"' + ') }';
