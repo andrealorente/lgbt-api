@@ -127,4 +127,7 @@ app.post('/editor', middleware.ensureAuthorised, function(req,res){
 //Obtener usuarios reportados
 app.get('/admin/users', middleware.ensureAuthorised, adminController.usersReported);
 
-app.listen(3000);
+var server = app.listen(process.env.PORT || 8080, function () {
+  var port = server.address().port;
+  console.log("App now running on port", port);
+});
