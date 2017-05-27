@@ -1,5 +1,5 @@
 import { graphql } from 'graphql';
-import Schema from './../Schema/Schema';
+import Schema from './../schema/schema';
 
 var createToken = function(user) {
   console.log(user);

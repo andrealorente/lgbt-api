@@ -1,5 +1,5 @@
 import { graphql } from 'graphql';
-import Schema from './../Schema/Schema';
+import Schema from './../schema/schema';
 import formidable from 'formidable';
 import cloudinary from 'cloudinary';
 cloudinary.config({ //No sé si hace falta poner esto
