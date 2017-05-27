@@ -12,12 +12,15 @@ var UserSchema = new Schema({
   name: String,
   pswd: String,
   bio: String,
+  gender: String,
   email: String,
   place: String,
   public: Boolean,
   relationships: [RelationshipSchema],
   channels: [MinChannel],
-  reports: [String]
+  reports: [String],
+  role: String,
+  confirm: Boolean
 });
 
 var User = mongoose.model('users', UserSchema); //nombre de la colección en la bd

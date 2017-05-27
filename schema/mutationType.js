@@ -155,7 +155,10 @@ const mutationType = new GraphQLObjectType({
                     username: args.username,
                     name: args.username,
                     email: args.email,
-                    pswd: args.pswd
+                    pswd: args.pswd,
+                    public: true,
+                    role: "user",
+                    confirm: false
                   }, function(err, res) {
                     if (err) reject(err);
                     else {

@@ -19,6 +19,7 @@ const userType = new GraphQLObjectType({
     		name: { type: GraphQLString },
     		pswd: { type: GraphQLString },
     		bio: { type: GraphQLString },
+        gender: { type: GraphQLString },
         email: { type: GraphQLString },
     		place: { type: GraphQLString },
     		relationships: { type: new GraphQLList(relationshipType) },
@@ -45,7 +46,9 @@ const userType = new GraphQLObjectType({
           }
         })
       )},
-        reports: { type: new GraphQLList(GraphQLString) }
+        reports: { type: new GraphQLList(GraphQLString) },
+        role: { type: GraphQLString },
+        confirm: { type: GraphQLBoolean }
     }
 });
 

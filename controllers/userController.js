@@ -15,10 +15,10 @@ var createToken = function(user) {
 
 // create reusable transporter object using the default SMTP transport
 var transporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: 'Gmail',
     auth: {
-        user: 'admin@lgbtcast.com',
-        pass: 'tfgandreaycons'
+      user: 'lgbtcast.tfg@gmail.com',
+      pass: 'ayc1994tfgua'
     }
 });
 
