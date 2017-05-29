@@ -99,6 +99,29 @@ var userController = {
   		});
   	});
   },
+  editUser: function(req,res) { //Editar usuario
+    var username = req.body.user_username;
+    var name = req.body.user_name;
+    var bio = req.body.user_bio;
+    var gender = req.body.user_gender;
+    
+    var mutation = ` mutation { editUser(userID: \"`+req.user+`\", ) {
+      data { username, name, bio, email, gender },
+      error{code, message} } }`;
+    graphql(Schema,mutation).then(function(result){
+      if(result.data.editUser.error==null) {
+        res.json({
+          success: true,
+          data: result.data.editUser.data
+        });
+      }else{
+        res.json({
+          success: false,
+          error: result.data.editUser.error
+        });
+      }
+    });
+  },
   getFollows: function(req,res) {
     var query = ' query { user(userID:\"' + req.params.id + '\") { relationships { id, user_data {username, bio }, outgoing_status, incoming_status } } }';
   	graphql(Schema, query).then( function(result) {

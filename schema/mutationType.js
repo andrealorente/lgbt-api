@@ -225,23 +225,49 @@ const mutationType = new GraphQLObjectType({
         name: {
           type: GraphQLString
         },
-        email: {
+        bio: {
           type: GraphQLString
         },
+        gender: {
+          type: GraphQLString
+        }
       },
       resolve: function(_, args) {
 
-        //Primero buscar al usuario a partir de la id
-        //Luego actualizar datos
-        /*
-        var query = { name: 'borne' };
-        Model.update(query, { name: 'jason borne' }, options, callback)
+        return new Promise((resolve, reject) => {
 
-        // is sent as
+          //Si quiere cambiar el username se debe comprobar primero que este no está ya registrado en la bd
+          User.findOneAndUpdate({
+              _id: args.userID
+            },
+            {
+              $set: {
+                name: args.name,
+                bio: args.bio,
+                gender: args.gender
+              }
+            }, {
+              new: true
+            },
+            function(err, user) {
+              if (err) reject(err);
+              else if (user != null) {
+                resolve({
+                  data: user,
+                  error: null
+                });
 
-        Model.update(query, { $set: { name: 'jason borne' }}, options, callback)
-
-        */
+              } else {
+                resolve({
+                  data: null,
+                  error: {
+                    code: 1,
+                    message: "No se han podido actualizar los datos del usuario."
+                  }
+                });
+              }
+            });
+        });
       }
     },
     /** Modificar la relación entre dos usuarios **/

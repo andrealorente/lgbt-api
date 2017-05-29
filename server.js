@@ -98,9 +98,7 @@ app.get('/users/:id', middleware.ensureAuthorised, userController.getUser);
 //Crea un usuario
 app.post('/users', userController.createUser);
 //Actualiza datos de un usuario
-app.put('/users/:id', middleware.ensureAuthorised, function(req,res){
-	var query = ' query { editUser(userID:\"' + ') }';
-});
+app.post('/users/:id', middleware.ensureAuthorised, userController.editUser);
 //Obtiene lista de follows de un usuario
 app.get('/users/:id/follows', middleware.ensureAuthorised, userController.getFollows);
 //Obtiene lista de followed-by de un usuario
