@@ -48,7 +48,8 @@ const userType = new GraphQLObjectType({
       )},
         reports: { type: new GraphQLList(GraphQLString) },
         role: { type: GraphQLString },
-        confirm: { type: GraphQLBoolean }
+        confirm: { type: GraphQLBoolean },
+        firebase_token: { type: GraphQLString }
     }
 });
 

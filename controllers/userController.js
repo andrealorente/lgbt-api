@@ -104,7 +104,7 @@ var userController = {
     var name = req.body.user_name;
     var bio = req.body.user_bio;
     var gender = req.body.user_gender;
-    
+
     var mutation = ` mutation { editUser(userID: \"`+req.user+`\", ) {
       data { username, name, bio, email, gender },
       error{code, message} } }`;
@@ -232,8 +232,19 @@ var userController = {
         success: result.data.report.data
       });
     });
-  }
+  },
+  saveFirebase: function(req,res) {
+      var mutation = ` mutation {
+          saveFirebase(userID: \"`+req.user+`\", token: \"`+req.body.firebase_token+`\") {
+          data, error { code, message } } }`;
 
+      graphql(Schema,mutation).then(function(result) {
+        res.json({
+          success: true,
+          data: result.data.saveFirebase.data
+        });
+      });
+  }
 
 };
 

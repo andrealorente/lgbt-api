@@ -68,10 +68,10 @@ const mutationType = new GraphQLObjectType({
             else if (user != null) {
               //Comprobar que la contraseña coincide con la que es
               if (user.pswd == args.password) {
-                resolve({
-                  user: user,
-                  error: null
-                });
+                    resolve({
+                      user: user,
+                      error: null
+                    });
               } else {
                 resolve({
                   user: null,
@@ -1254,6 +1254,34 @@ const mutationType = new GraphQLObjectType({
             });
           }
         }); //Fin Promise
+      }//Fin resolve
+    },
+    saveFirebase: {
+      description: 'Guardar token que recibe el usuario en su dispositivo al Iniciar sesión para recibir notificaciones.',
+      type: new GraphQLObjectType({
+        data: { type: GraphQLString },
+        error: { type: errorType }
+      }),
+      args: {
+        userID: { type: GraphQLString },
+        token: { type: GraphQLString }
+      },
+      resolve: function(root,args){
+        return new Promise((resolve,reject) =>{
+          User.findById(args.userID, function(err,user){
+            if(err) reject(err);
+            else{
+              user.firebase_token = args.token;
+              user.save(function(err){
+                if(err) reject(err);
+                resolve({
+                  data: args.token,
+                  error: null
+                });
+              });
+            }
+          });
+        });
       }//Fin resolve
     }
   })

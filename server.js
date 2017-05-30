@@ -1,4 +1,5 @@
 import express from 'express';
+import http from 'http';
 import mongoose from 'mongoose';
 import graphqlHTTP from 'express-graphql';
 import bodyParser from 'body-parser';
@@ -120,6 +121,7 @@ app.post('/editor', middleware.ensureAuthorised, function(req,res){
   var mutation = ` mutation { editRequest(userID, email, reason){ data { username }, error { code, message }} }`;
 
 });
+app.post('/users/firebase', middleware.ensureAuthorised, userController.saveFirebase);
 
 /******* RUTAS DE ADMINISTRACION ********/
 //Obtener usuarios reportados

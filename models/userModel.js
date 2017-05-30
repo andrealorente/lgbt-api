@@ -20,7 +20,8 @@ var UserSchema = new Schema({
   channels: [MinChannel],
   reports: [String],
   role: String,
-  confirm: Boolean
+  confirm: Boolean,
+  firebase_token: String
 });
 
 var User = mongoose.model('users', UserSchema); //nombre de la colección en la bd
