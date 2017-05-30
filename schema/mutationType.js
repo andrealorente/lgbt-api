@@ -1259,8 +1259,11 @@ const mutationType = new GraphQLObjectType({
     saveFirebase: {
       description: 'Guardar token que recibe el usuario en su dispositivo al Iniciar sesión para recibir notificaciones.',
       type: new GraphQLObjectType({
-        data: { type: GraphQLString },
-        error: { type: errorType }
+        name: 'FirebaseResult',
+        fields: {
+          data: { type: GraphQLString },
+          error: { type: errorType }
+        }
       }),
       args: {
         userID: { type: GraphQLString },
