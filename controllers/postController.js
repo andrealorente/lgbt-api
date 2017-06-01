@@ -187,7 +187,7 @@ var postController = {
   },
   //Comentar en un post
   commentPost: function(req,res){
-    var userid = req.body.user_id;
+    var userid = req.user;
   	var content = req.body.content;
   	var targetid = req.body.target_id;
 
