@@ -2,6 +2,8 @@ import { graphql } from 'graphql';
 import Schema from './../schema/schema';
 import formidable from 'formidable';
 import cloudinary from 'cloudinary';
+import middleware from './../middleware';
+
 cloudinary.config({ //No sé si hace falta poner esto
     cloud_name: 'tfg-lgbt-cloud',
     api_key: '479641643612759',

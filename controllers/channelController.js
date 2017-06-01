@@ -1,5 +1,6 @@
 import { graphql } from 'graphql';
 import Schema from './../schema/schema';
+import middleware from './../middleware';
 import formidable from 'formidable';
 var cloudinary = require('cloudinary');
 cloudinary.config({
