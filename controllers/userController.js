@@ -3,12 +3,13 @@ import Schema from './../schema/schema';
 import moment from 'moment';
 import jwt from 'jwt-simple';
 import config from './../config';
+import middleware from './../middleware';
 import nodemailer from 'nodemailer';
 
 var createToken = function(user) {
   console.log(user);
   var payload = {
-    sub: user._id,
+    sub: user.id,
     iat: moment().unix(),
     exp: moment().add(14, "days").unix()
   };
@@ -238,11 +239,14 @@ var userController = {
     });
   },
   saveFirebase: function(req,res) {
+    console.log(req.user);
       var mutation = ` mutation {
           saveFirebase(userID: \"`+req.user+`\", token: \"`+req.body.firebase_token+`\") {
           data, error { code, message } } }`;
 
       graphql(Schema,mutation).then(function(result) {
+        console.log("Result: ");
+        console.log(result);
         res.json({
           success: true,
           data: result.data.saveFirebase.data
