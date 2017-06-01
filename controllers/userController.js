@@ -1,5 +1,8 @@
 import { graphql } from 'graphql';
 import Schema from './../schema/schema';
+import moment from 'moment';
+import jwt from 'jwt-simple';
+import config from './../config';
 import nodemailer from 'nodemailer';
 
 var createToken = function(user) {
@@ -26,8 +29,9 @@ var userController = {
   loginUser: function(req,res) {
     var user = req.body.user_name;
   	var pswd = req.body.user_pswd;
-
-  	var mutation = 'mutation { loginUser(username: \"' + user + '\", password: \"'+pswd +'\"){ user { id, username, bio }, error { code, message } }}';
+    console.log(user);
+    console.log(pswd);
+  	var mutation = 'mutation { loginUser(username: \"' + user + '\", password: \"'+pswd +'\"){ user { id, username, bio }, error { code, message } } }';
 
   	graphql(Schema, mutation).then( function(result) {
   		//console.log(JSON.stringify(result));
