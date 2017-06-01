@@ -94,7 +94,7 @@ const queryType = new GraphQLObjectType({
 							else
 								user = res[1];
 
-							for(i in user.relationships){
+							for(var i in user.relationships){
 								if(user.relationships[i].id == args.targetID){
 									console.log(user.relationships[i]);
 									resolve({
@@ -125,7 +125,7 @@ const queryType = new GraphQLObjectType({
                 else{
                   //Buscar a mis seguidos y obtener su actividad reciente
                   var follows = [];
-                  for(i in me.relationships) {
+                  for(var i in me.relationships) {
                     if(me.relationships[i].outgoing_status == "follows"){
                       follows.push(me.relationships[i]);
                     }
@@ -403,7 +403,7 @@ const queryType = new GraphQLObjectType({
                 var events = [];
                 //Guardar solo los eventos que sean del mes y año que se pasarle
                 console.log(res);
-                for(i in res) {
+                for(var i in res) {
                     var date = new Date(res[i].start_time);
                     console.log(date);
                     if(date.getMonth() == args.month && date.getFullYear() == args.year){

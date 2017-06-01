@@ -193,11 +193,13 @@ var postController = {
   	var content = req.body.content;
   	var targetid = req.body.target_id;
 
-  	var mutation = ' mutation { commentPost(userID:\"' + userid + '\", postID:\"'+ targetid +'\", content:\"'+ content +'\" ) { data { id, content }, error{ code, message } } }';
+    console.log(userid);
+
+  	var mutation = ' mutation { commentPost(userID:\"' + userid + '\", postID:\"'+ targetid +'\", content:\"'+ content +'\" ) { data { id, content, author_id, created_time }, error{ code, message } } }';
     graphql(Schema, mutation).then( function(result) {
       res.json({
        success: true,
-       data: result
+       data: result.data.commentPost.data
       });
     });
   },
