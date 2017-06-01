@@ -36,6 +36,30 @@ const userType = new GraphQLObjectType({
             });
           }
         },
+        counts: {
+          type: new GraphQLObjectType({
+            name: 'UserCounts',
+            fields: {
+              followedby: { type: GraphQLInt },
+              following: { type: GraphQLInt }
+            }
+          }),
+          resolve: (user) => {
+            var fby = 0;
+            var f = 0;
+            for(var i in user.relationships){
+              if(user.relationships[i].outgoing_status == "follows"){
+                console.log("Un follows");
+                  f++;
+              }else if(user.relationships[i].incoming_status == "followed-by")
+                fby++;
+            }//Fin for
+            return({
+              followedby: fby,
+              following: f
+            });
+          }
+        },
     		public: { type: GraphQLBoolean },
     		token: { type: GraphQLString },
         channels: { type: new GraphQLList(new GraphQLObjectType({
