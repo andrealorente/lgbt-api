@@ -207,7 +207,7 @@ var userController = {
     graphql(Schema, query).then( function(result) {
       res.json({
         success: true,
-        data: result
+        data: result.data.activity
       });
     });
   },
