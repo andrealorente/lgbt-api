@@ -692,11 +692,11 @@ const mutationType = new GraphQLObjectType({
       resolve: function(root,args) {
         return new Promise((resolve, reject) => {
           //Igual antes habría que comprobar si existe ese post o evento
-          var date = new Date(); 
+          var date = new Date();
           Comment.create({
             target_id: args.postID,
             content: args.content,
-            author: args.userID,
+            author_id: args.userID,
             created_time: date,
           }, function(err, res) {
             if (err) reject(err);
