@@ -121,7 +121,7 @@ app.post('/editor', middleware.ensureAuthorised, function(req,res){
   var mutation = ` mutation { editRequest(userID, email, reason){ data { username }, error { code, message }} }`;
 
 });
-app.post('/users/firebase', middleware.ensureAuthorised, userController.saveFirebase);
+app.post('/firebase', middleware.ensureAuthorised, userController.saveFirebase);
 
 /******* RUTAS DE ADMINISTRACION ********/
 //Obtener usuarios reportados
