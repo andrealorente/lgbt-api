@@ -99,7 +99,7 @@ var postController = {
   //Obtener un post
   onePost: function(req,res) {
 
-  	var query = 'query { onePost(postID:\"' + req.params.id + '\") {data{ title, author_id, author_data { username, name }, content, tags, image, likes, comments( targetID: \"' + req.params.id +'\") { content, author_id, author_data { username, name }, created_time } },error{code,message}} }';
+  	var query = 'query { onePost(postID:\"' + req.params.id + '\") {data{ title, author_id, author_data { username, name }, content, created_time, tags, image, likes, comments( targetID: \"' + req.params.id +'\") { content, author_id, author_data { username, name }, created_time } },error{code,message}} }';
   	graphql(Schema, query).then( function(result) {
           console.log(result);
   		if(result.data.onePost == null){
