@@ -2,6 +2,7 @@ import {
   GraphQLObjectType,
   GraphQLString,
   GraphQLNonNull,
+  GraphQLBoolean,
 } from 'graphql';
 var User = require('./../models/userModel');
 
@@ -17,7 +18,8 @@ const relationshipType = new GraphQLObjectType({
           name: 'userdataType',
           fields: {
             username: { type: GraphQLString },
-            bio: { type: GraphQLString }
+            bio: { type: GraphQLString },
+            public: { type: GraphQLBoolean }
           }
         }),
         resolve: (rel) => {

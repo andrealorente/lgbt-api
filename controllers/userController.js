@@ -191,6 +191,7 @@ var userController = {
   	graphql(Schema, query).then( function(result) {
   		//console.log(JSON.stringify(result,null," "));
       var relationships = [];
+      console.log(result);
       for(var i in result.data.user.relationships ){
           if(result.data.user.relationships[i].incoming_status=="requested-by")
             relationships.push(result.data.user.relationships[i]);
