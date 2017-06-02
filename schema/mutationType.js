@@ -421,7 +421,7 @@ const mutationType = new GraphQLObjectType({
               }
 
               //Buscar el doc en el usuario origin
-              for (i in user1.relationships) {
+              for (var i in user1.relationships) {
 
                 if (user1.relationships[i].id == args.targetID) {
                   if (outgoing_status != '')
@@ -435,7 +435,7 @@ const mutationType = new GraphQLObjectType({
                 if (err) reject(err);
                 else {
                   //Buscar el doc en el usuario target
-                  for (j in user2.relationships) {
+                  for (var j in user2.relationships) {
 
                     if (user2.relationships[j].id == args.originID) {
                       if (outgoing_status2 != '')
@@ -1029,7 +1029,7 @@ const mutationType = new GraphQLObjectType({
                 });
               }else{ //Si está suscrito
                 //Buscar el canal que es
-                for(i in res[0].channels){
+                for(var i in res[0].channels){
                   if(res[0].channels[i].channel_id == args.channelID){
                     res[0].channels.splice(i, 1);
                     res[0].save(function(err){
@@ -1065,7 +1065,7 @@ const mutationType = new GraphQLObjectType({
             'channels.channel_id': args.channelID
           },function(err, res){
             if(err) reject(err);
-            for(i in res.channels){
+            for(var i in res.channels){
               if(res.channels[i].channel_id == args.channelID){
                 res.channels[i].notifications = (!res.channels[i].notifications);
                 resolve(res);
