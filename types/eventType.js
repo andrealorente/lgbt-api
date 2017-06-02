@@ -4,8 +4,10 @@ import {
   GraphQLNonNull,
   GraphQLList,
 } from 'graphql';
+import userType from './userType';
 import commentType from './commentType';
 var Comment = require('./../models/commentModel');
+var User = require('./../models/userModel');
 
 const eventType = new GraphQLObjectType({
     name: 'eventType',
