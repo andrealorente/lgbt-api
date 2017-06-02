@@ -132,7 +132,7 @@ var userController = {
   	graphql(Schema, query).then( function(result) {
   		//console.log(JSON.stringify(result,null," "));
       var relationships = [];
-  
+
       for(var i in result.data.user.relationships ){
           if(result.data.user.relationships[i].outgoing_status=="follows")
             relationships.push(result.data.user.relationships[i]);
@@ -191,7 +191,7 @@ var userController = {
   	graphql(Schema, query).then( function(result) {
   		//console.log(JSON.stringify(result,null," "));
       var relationships = [];
-      for(i in result.data.user.relationships ){
+      for(var i in result.data.user.relationships ){
           if(result.data.user.relationships[i].incoming_status=="requested-by")
             relationships.push(result.data.user.relationships[i]);
       }
