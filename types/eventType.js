@@ -14,8 +14,20 @@ const eventType = new GraphQLObjectType({
         title: { type: GraphQLString },
         image: { type: GraphQLString },
         description: { type: GraphQLString },
-        author: { type: GraphQLString },
+        author_id: { type: GraphQLString },
+        author_data: {
+          type: userType,
+          resolve: function(root){
+            return new Promise((resolve,reject) => {
+                User.findById(root.author_id, function(err, user){
+                    if(err) reject(err);
+                    else resolve(user);
+                });
+            });
+          }
+        },
         place: { type: GraphQLString },
+        created_time: { type: GraphQLString },
     		start_time: { type: GraphQLString },
         end_time: { type: GraphQLString },
     		comments: {
