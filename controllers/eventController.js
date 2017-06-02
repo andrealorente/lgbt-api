@@ -100,9 +100,8 @@ var eventController = {
   },
   //Obtener un evento concreto
   oneEvent: function(req,res) {
-      var query = 'query { oneEvent(eventID:\"' + req.params.id + '\") { title, description, place, start_time, author, comments(targetID:\"' + req.params.id +'\") { author_data { id, username, name }, content, created_time }, assistants, interested } }';
+      var query = 'query { oneEvent(eventID:\"' + req.params.id + '\") { data {title, description, place, start_time, author, comments(targetID:\"' + req.params.id +'\") { author_data { id, username, name }, content, created_time }, assistants, interested }} }';
       graphql(Schema, query).then( function(result) {
-
   		console.log(result); // { data: oneEvent: null }
   		if(result.data.oneEvent == null){ //No sé si esto está bien así o habría que mandar el error desde graphql
   			res.json({

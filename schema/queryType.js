@@ -424,7 +424,7 @@ const queryType = new GraphQLObjectType({
 			type: new GraphQLObjectType({
                 name: 'oneEventResult',
                 fields: {
-                    data: { type: new GraphQLList(eventType) },
+                    data: { type: eventType },
                     error: { type: errorType }
                 }
             }),
