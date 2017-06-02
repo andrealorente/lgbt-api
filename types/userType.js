@@ -48,11 +48,11 @@ const userType = new GraphQLObjectType({
             var fby = 0;
             var f = 0;
             for(var i in user.relationships){
-              if(user.relationships[i].outgoing_status == "follows"){
-                console.log("Un follows");
-                  f++;
-              }else if(user.relationships[i].incoming_status == "followed-by")
+              if(user.relationships[i].outgoing_status == "follows")
+                f++;
+              if(user.relationships[i].incoming_status == "followed-by")
                 fby++;
+
             }//Fin for
             return({
               followedby: fby,
