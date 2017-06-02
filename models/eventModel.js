@@ -5,7 +5,7 @@ var EventSchema = new Schema({
   title: String,
   description: String,
   image: String,
-  author: String,
+  author_id: String,
   place: String,
   created_time: String,
   start_time: String,
