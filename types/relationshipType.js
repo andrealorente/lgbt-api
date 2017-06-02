@@ -27,7 +27,8 @@ const relationshipType = new GraphQLObjectType({
               else{
                 resolve({
                   username: user.username,
-                  bio: user.bio
+                  bio: user.bio,
+                  public: user.public
                 });
               }
             });
