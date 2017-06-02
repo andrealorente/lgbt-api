@@ -128,10 +128,11 @@ var userController = {
     });
   },
   getFollows: function(req,res) {
-    var query = ' query { user(userID:\"' + req.params.id + '\") { relationships { id, user_data { id, username, bio }, outgoing_status, incoming_status } } }';
+    var query = ' query { user(userID:\"' + req.params.id + '\") { relationships { id, user_data { username, bio }, outgoing_status, incoming_status } } }';
   	graphql(Schema, query).then( function(result) {
   		//console.log(JSON.stringify(result,null," "));
       var relationships = [];
+  
       for(var i in result.data.user.relationships ){
           if(result.data.user.relationships[i].outgoing_status=="follows")
             relationships.push(result.data.user.relationships[i]);
