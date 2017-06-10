@@ -11,6 +11,8 @@ import {
   GraphQLString
 } from 'graphql';
 
+import { GraphQLDateTime } from 'graphql-iso-date';
+
 var postType = new GraphQLObjectType({
     name: 'postType',
     fields: {
@@ -47,7 +49,7 @@ var postType = new GraphQLObjectType({
 		},
         state: { type: GraphQLString },
         likes: { type: new GraphQLList(GraphQLString) },
-        created_time: { type: GraphQLString }
+        created_time: { type: GraphQLDateTime }
     }
 });
 

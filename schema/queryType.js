@@ -6,7 +6,7 @@ import {
   GraphQLBoolean,
   GraphQLInt,
 } from 'graphql';
-
+import { GraphQLDateTime } from 'graphql-iso-date';
 //Models
 var User = require('./../models/userModel');
 var Post = require('./../models/postModel');
@@ -151,25 +151,30 @@ const queryType = new GraphQLObjectType({
     					error: { type: errorType }
     				}
     			}),
-          resolve: function(_){
+          args: {
+            after: { type: GraphQLDateTime }
+          },
+          resolve: function(_, {after}){
               return new Promise((resolve,reject) => {
-                  Post.find(function(err, post){
+                console.log(after);
+                //{ created_time: { $gte: new Date(after) }},
+                  Post.find({ created_time: { $lt: after }}, function(err, post){
                       if(err) reject(err);
-					else if(post!=null){
-                          resolve({
-                              data: post,
-                              error: null
-                          });
-					}else{
-						resolve({
-							data: null,
-							error: {
-								code: 1,
-								message: "No hay ningún post creado."
-							}
-						});
-					}
-                  });
+            					else if(post!=null){
+                        resolve({
+                            data: post,
+                            error: null
+                        });
+            					}else{
+            						resolve({
+            							data: null,
+            							error: {
+            								code: 1,
+            								message: "No hay ningún post creado."
+            							}
+            						});
+            					}
+                  }).sort('-created_time').limit( 3 );
               });
           }
         },

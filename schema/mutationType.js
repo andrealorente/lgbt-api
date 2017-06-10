@@ -6,6 +6,7 @@ import {
   GraphQLBoolean,
   GraphQLInt,
 } from 'graphql';
+import { GraphQLDateTime } from 'graphql-iso-date';
 
 //Models
 var User = require('./../models/userModel');
@@ -549,7 +550,8 @@ const mutationType = new GraphQLObjectType({
               tags: args.tags,
               image: args.image,
               state: args.state,
-              author_id: args.author_id
+              author_id: args.author_id,
+              created_time: new Date()
           }, function(err, post) {
               if (err) reject(err);
               else if (post != null) {

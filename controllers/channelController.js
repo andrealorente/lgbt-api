@@ -83,7 +83,7 @@ var channelController = {
   //Obtener todos los canales
   allChannels: function(req, res) {
 
-      var query = 'query { allChannels(userSusc:"") { data{id, title, description},error{code,message} } }';
+      var query = 'query { allChannels(userSusc:"") { data{id, title, description, author, susc},error{code,message} } }';
       graphql(Schema, query).then( function(result) {
           if(result.data.allChannels == null){
   			res.json({

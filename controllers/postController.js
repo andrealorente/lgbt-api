@@ -83,7 +83,7 @@ var postController = {
   },
   //Obtener todos los posts
   allPosts: function(req, res) {
-      var query = 'query { allPosts { data { id, title, content, author_id, author_data { username, name },tags, created_time, likes },error{code,message}} }';
+      var query = 'query { allPosts(after: \"'+ req.query.after +'\") { data { id, title, content, author_id, author_data { username, name },tags, created_time, likes },error{code,message}} }';
       graphql(Schema, query).then( function(result) {
           if(result.data.allPosts == null){
               res.json({
