@@ -157,7 +157,7 @@ const queryType = new GraphQLObjectType({
           resolve: function(_, {after}){
               return new Promise((resolve,reject) => {
                 console.log(after);
-                //{ created_time: { $gte: new Date(after) }},
+                
                   Post.find({ created_time: { $lt: after }}, function(err, post){
                       if(err) reject(err);
             					else if(post!=null){
