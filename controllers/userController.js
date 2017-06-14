@@ -148,9 +148,15 @@ var userController = {
   	graphql(Schema, query).then( function(result) {
   		//console.log(JSON.stringify(result,null," "));
       var relationships = [];
+      var relation = {};
       for(var i in result.data.user.relationships ){
-          if(result.data.user.relationships[i].incoming_status=="followed-by")
+          if(result.data.user.relationships[i].incoming_status=="followed-by"){
+            relation = {
+              user: result.data.user.relationships[i],
+              outgoing: result.data.user.relationships[i].outgoing_status
+            };
             relationships.push(result.data.user.relationships[i]);
+          }
       }
   		res.json({
   			success: true,
