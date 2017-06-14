@@ -7,7 +7,8 @@ var RelationshipSchema = new Schema({
 	outgoing_status: String,
 	user_data: {
 		username: String,
-		bio: String
+		bio: String,
+		public: Boolean
 	}
 });
 

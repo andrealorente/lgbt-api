@@ -128,7 +128,7 @@ var userController = {
     });
   },
   getFollows: function(req,res) {
-    var query = ' query { user(userID:\"' + req.params.id + '\") { relationships { id, user_data { username, bio }, outgoing_status, incoming_status } } }';
+    var query = ' query { user(userID:\"' + req.params.id + '\") { relationships { id, user_data { username, bio, public }, outgoing_status, incoming_status } } }';
   	graphql(Schema, query).then( function(result) {
   		//console.log(JSON.stringify(result,null," "));
       var relationships = [];
@@ -144,7 +144,7 @@ var userController = {
   	});
   },
   getFollowedby: function(req,res){
-    var query = ' query { user(userID:\"' + req.params.id + '\") { relationships { id, user_data {username, bio }, outgoing_status, incoming_status } } }';
+    var query = ' query { user(userID:\"' + req.params.id + '\") { relationships { id, user_data {username, bio, public }, outgoing_status, incoming_status } } }';
   	graphql(Schema, query).then( function(result) {
   		//console.log(JSON.stringify(result,null," "));
       var relationships = [];
