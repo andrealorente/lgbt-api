@@ -551,7 +551,7 @@ const mutationType = new GraphQLObjectType({
               image: args.image,
               state: args.state,
               author_id: args.author_id,
-              created_time: new Date()
+              created_time: new Date().toISOString()
           }, function(err, post) {
               if (err) reject(err);
               else if (post != null) {
@@ -805,9 +805,6 @@ const mutationType = new GraphQLObjectType({
         description: {
             type: GraphQLString
         },
-        created_time: {
-          type: GraphQLString
-        },
         image: {
           type: GraphQLString
         },
@@ -820,7 +817,7 @@ const mutationType = new GraphQLObjectType({
           Channel.create({
               title: args.title,
               description: args.description,
-              created_time: new Date(),
+              created_time: new Date().toISOString(),
               image: args.image,
               author_id: args.author_id
           }, function(err, channel) {
@@ -960,7 +957,7 @@ const mutationType = new GraphQLObjectType({
             else if(channel!=null){
               channel.messages.push({
                 content: args.content,
-                created_time: new Date(),
+                created_time: new Date().toISOString(),
                 channel: args.channelID
               });
 

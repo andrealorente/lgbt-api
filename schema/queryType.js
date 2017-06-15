@@ -127,9 +127,10 @@ const queryType = new GraphQLObjectType({
                   var follows = [];
                   for(var i in me.relationships) {
                     if(me.relationships[i].outgoing_status == "follows"){
-                      follows.push(me.relationships[i]);
+                      follows.push(me.relationships[i].id);
                     }
                   }//Fin for
+                  console.log(follows);
 
                   Activity.find({
                     'origin_id': { $in: follows }
@@ -157,7 +158,7 @@ const queryType = new GraphQLObjectType({
           resolve: function(_, {after}){
               return new Promise((resolve,reject) => {
                 console.log(after);
-                
+
                   Post.find({ created_time: { $lt: after }}, function(err, post){
                       if(err) reject(err);
             					else if(post!=null){
@@ -343,52 +344,52 @@ const queryType = new GraphQLObjectType({
 		},
 		oneChannel: {
 			type: new GraphQLObjectType({
-                name: 'oneChannelResult',
-                fields: {
-                  data: { type: channelType },
-                  error: { type: errorType }
+              name: 'oneChannelResult',
+              fields: {
+                data: { type: channelType },
+                error: { type: errorType }
+              }
+          }),
+          args: {
+              channelID: { type: GraphQLString }
+          },
+          resolve: function(_, {channelID}) {
+              return new Promise((resolve,reject) => {
+                if (channelID.match(/^[0-9a-fA-F]{24}$/)) {
+                  // Yes, it's a valid ObjectId, proceed with `findById` call.
+                  Channel.findById(channelID, function(err, channel) {
+                      if (err) reject(err);
+                      else if(channel != null) {
+                          resolve({
+                              data: channel,
+                              error: null
+                          });
+                      }else{
+                          resolve({
+                              data: null,
+                              error: {
+                                  code: 2,
+                                  message: 'No se ha encontrado un canal con esa ID'
+                              }
+                          });
+                      }
+                  });
+                }else{
+                  //No es una ID válida para hacer la llamada a la bd
+                  resolve({
+                      data: null,
+                      error: {
+                          code: 1,
+                          message: 'No es una ID válida'
+                      }
+                  });
                 }
-            }),
-            args: {
-                channelID: { type: GraphQLString }
-            },
-            resolve: function(_, {channelID}) {
-                return new Promise((resolve,reject) => {
-                  if (channelID.match(/^[0-9a-fA-F]{24}$/)) {
-                    // Yes, it's a valid ObjectId, proceed with `findById` call.
-                    Channel.findById(channelID, function(err, channel) {
-                        if (err) reject(err);
-                        else if(channel != null) {
-                            resolve({
-                                data: channel,
-                                error: null
-                            });
-                        }else{
-                            resolve({
-                                data: null,
-                                error: {
-                                    code: 2,
-                                    message: 'No se ha encontrado un canal con esa ID'
-                                }
-                            });
-                        }
-                    });
-                  }else{
-                    //No es una ID válida para hacer la llamada a la bd
-                    resolve({
-                        data: null,
-                        error: {
-                            code: 1,
-                            message: 'No es una ID válida'
-                        }
-                    });
-                  }
-                });
+              });
             }
         },
         //searchChannel: {},
         /**EVENTOS**/
-		allEvents: { //En el futuro esto va por meses
+		allEvents: {
 			type: new GraphQLObjectType({
                 name: 'allEventsResult',
                 fields: {
