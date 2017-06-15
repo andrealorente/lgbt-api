@@ -2,10 +2,10 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var ActivitySchema = new Schema({
-  origin_id: String, 
+  origin_id: String,
   target_id: String,
   action: String,
-  created_time: String
+  created_time: Date
 });
 
 var Activity = mongoose.model('activities', ActivitySchema); //nombre de la colección en la bd

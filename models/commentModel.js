@@ -5,7 +5,7 @@ var CommentSchema = new Schema({
   target_id: String,
   author_id: String,
   content: String,
-  created_time: String,
+  created_time: Date,
   state: String,
   reports: [String]
 });
