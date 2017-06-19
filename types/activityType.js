@@ -1,13 +1,21 @@
-var graphql = require('graphql');
+import userType from './userType';
+var User = require('./../models/userModel');
+import { GraphQLDateTime } from 'graphql-iso-date';
 
-var activityType = new graphql.GraphQLObjectType({
+import {
+  graphql,
+  GraphQLObjectType,
+  GraphQLString
+} from 'graphql';
+
+var activityType = new GraphQLObjectType({
     name: 'Activity',
     fields: {
-        origin_id: { type: graphql.GraphQLString }, //Cada campo puede tener un resolve
-    		target_id: { type: graphql.GraphQLString },
-    		action: { type: graphql.GraphQLString },
-    		created_time: { type: graphql.GraphQLString },
+        origin_id: { type: GraphQLString }, //Cada campo puede tener un resolve
+    		target_id: { type: GraphQLString },
+    		action: { type: GraphQLString },
+    		created_time: { type: GraphQLDateTime }
+        //Devolver datos del usuario
     }
 });
-
-module.exports = activityType;
+export default activityType;

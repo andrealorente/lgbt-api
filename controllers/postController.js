@@ -103,7 +103,7 @@ var postController = {
 
   	var query = 'query { onePost(postID:\"' + req.params.id + '\") {data{ title, author_id, author_data { username, name }, content, created_time, tags, image, likes, comments( targetID: \"' + req.params.id +'\") { content, author_id, author_data { username, name }, created_time } },error{code,message}} }';
   	graphql(Schema, query).then( function(result) {
-          console.log(result);
+      console.log(result);
   		if(result.data.onePost == null){
   			res.json({
   				success: false,
@@ -236,7 +236,7 @@ var postController = {
   //Obtener los usuarios que han dado like a un post
   getLikes: function(req,res){
 
-    var query = 'query { getUsersLikes(postID:\"'+req.params.id+'\") { id, username, name, bio, public } }';
+    var query = 'query { getUsersLikes(postID:\"'+req.params.id+'\", after: \"'+req.query.after+'\") { id, username, name, bio, public } }';
     graphql(Schema, query).then( function(result) {
       console.log(result);
   		if(result.data.getUsersLikes == null){

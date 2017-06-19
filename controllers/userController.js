@@ -203,7 +203,7 @@ var userController = {
   	});
   },
   getActivity: function(req,res) {
-    var query = ` query { activity (userID: \"`+ req.user +`\"){
+    var query = ` query { activity (userID: \"`+ req.user +`\", after: \"`+req.query.after+`\"){
       origin_id, target_id, action, created_time
     } }`;
     graphql(Schema, query).then( function(result) {

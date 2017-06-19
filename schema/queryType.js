@@ -115,7 +115,8 @@ const queryType = new GraphQLObjectType({
           type: new GraphQLList(activityType),
           description: 'Cargar la actividad de mis seguidos.',
           args: {
-            userID: { type: GraphQLString } //Mi id
+            userID: { type: GraphQLString }, //Mi id
+            after: { type: GraphQLDateTime }
           },
           resolve: function(_,args) {
             //Buscar mi usuario en la bd
@@ -132,12 +133,14 @@ const queryType = new GraphQLObjectType({
                   }//Fin for
                   console.log(follows);
 
-                  Activity.find({
-                    'origin_id': { $in: follows }
-                  },function(err,activities){
-                    console.log(activities);
-                    resolve(activities);
-                  });
+                    Activity.find({
+                      origin_id: { $in: follows },
+                      created_time: { $lt: args.after }
+                    },function(err,activities){
+                      console.log(activities);
+                      resolve(activities);
+                    }).sort('-created_time').limit(5);
+
                 }
               });
             });
@@ -215,7 +218,8 @@ const queryType = new GraphQLObjectType({
         getUsersLikes: {
       type: new GraphQLList(userType),
       args: {
-        postID: { type: GraphQLString }
+        postID: { type: GraphQLString },
+        after: { type: GraphQLString }
       },
       resolve: function(_,args){
         return new Promise((resolve,reject) => {
@@ -223,12 +227,22 @@ const queryType = new GraphQLObjectType({
             if(err) reject(err);
             else{
               if(post!=null){
-                User.find({
-                  '_id': { $in: post.likes }
-                  }, function(err, docs){
-                       console.log(docs);
-                       resolve(docs);
-                  });
+                if(args.after==""){ //Si son los primeros
+                  User.find({
+                    '_id': { $in: post.likes }
+                    }, function(err, docs){
+                         console.log(docs);
+                         resolve(docs);
+                    }).sort('-_id').limit(10);
+                }else{ //los siguientes
+                  User.find({
+                    '_id': { $in: post.likes, $lt: args.after }
+                    }, function(err, docs){
+                         console.log(docs);
+                         resolve(docs);
+                    }).sort('-_id').limit(10);
+                }
+
               }
             }
 
