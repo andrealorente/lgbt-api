@@ -153,6 +153,6 @@ io.on('connection', function(socket){
   var port = server.address().port;
   console.log("App now running on port", port);
 });*/
-server.listen(3000, function(){
+server.listen(process.env.PORT || 3000, function(){
   console.log('listening on *:3000');
 });
