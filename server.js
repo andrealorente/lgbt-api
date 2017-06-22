@@ -1,5 +1,6 @@
 import express from 'express';
-import http from 'http';
+var http = require('http');
+
 import mongoose from 'mongoose';
 import graphqlHTTP from 'express-graphql';
 import bodyParser from 'body-parser';
@@ -27,9 +28,13 @@ import adminController from './controllers/adminController';
 mongoose.connect('mongodb://admin:admin@ds145868.mlab.com:45868/lgbt-app');
 
 const app = express();
+var server = http.Server(app);
+var io = require('socket.io')(server);
+
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+
 app.use(bodyParser.json());
 app.use(cors());
 app.use('/graphql', graphqlHTTP(async () => ({
@@ -127,7 +132,27 @@ app.post('/firebase', middleware.ensureAuthorised, userController.saveFirebase);
 //Obtener usuarios reportados
 app.get('/admin/users', middleware.ensureAuthorised, adminController.usersReported);
 
-var server = app.listen(process.env.PORT || 8080, function () {
+
+app.get('/', function(req, res){
+  res.sendFile(__dirname + '/index.html');
+});
+
+io.on('connection', function(socket){
+  console.log('a user connected');
+  socket.on('chat message', function(msg){
+    console.log('message: ' + msg);
+    io.emit('chat message', msg);
+  });
+  socket.on('disconnect', function(){
+    console.log('user disconnected');
+    io.emit('chat message', 'A user disconnected');
+  });
+});
+
+/*var server = app.listen(process.env.PORT || 8080, function () {
   var port = server.address().port;
   console.log("App now running on port", port);
+});*/
+server.listen(3000, function(){
+  console.log('listening on *:3000');
 });
