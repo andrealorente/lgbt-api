@@ -45,92 +45,92 @@ app.use('/graphql', graphqlHTTP(async () => ({
 /******** RUTAS DE POSTS *******/
 
 //Crear un post
-app.post('/create/post', middleware.ensureAuthorised, postController.createPost);
+app.post('/v1/create/post', middleware.ensureAuthorised, postController.createPost);
 //Obtener todos los posts
-app.get('/posts', middleware.ensureAuthorised, postController.allPosts);
+app.get('/v1/posts', middleware.ensureAuthorised, postController.allPosts);
 //Obtener un post concreto
-app.get('/posts/:id', middleware.ensureAuthorised, postController.onePost);
+app.get('/v1/posts/:id', middleware.ensureAuthorised, postController.onePost);
 //Ver likes de un post
-app.get('/posts/:id/likes', middleware.ensureAuthorised, postController.getLikes);
+app.get('/v1/posts/:id/likes', middleware.ensureAuthorised, postController.getLikes);
 //Modificar un post concreto
-app.post('/posts/:id/update',middleware.ensureAuthorised, postController.updatePost);
+app.post('/v1/posts/:id/update',middleware.ensureAuthorised, postController.updatePost);
 //Comentar en un post
-app.post('/posts/:id/comments', middleware.ensureAuthorised, postController.commentPost);
+app.post('/v1/posts/:id/comments', middleware.ensureAuthorised, postController.commentPost);
 //Dar like a un post
-app.post('/posts/:id/likes', middleware.ensureAuthorised, postController.likePost);
+app.post('/v1/posts/:id/likes', middleware.ensureAuthorised, postController.likePost);
 //Buscar un post por titulo
-app.get('/search/post',middleware.ensureAuthorised, postController.searchPost);
+app.get('/v1/search/post',middleware.ensureAuthorised, postController.searchPost);
 
 /******* RUTAS DE CANALES ******/
 
 //Crear un canal
-app.post('/create/channel', middleware.ensureAuthorised, channelController.createChannel);
+app.post('/v1/create/channel', middleware.ensureAuthorised, channelController.createChannel);
 //Obtener todos los canales
-app.get('/channels', middleware.ensureAuthorised, channelController.allChannels);
+app.get('/v1/channels', middleware.ensureAuthorised, channelController.allChannels);
 //Obtener los canales a los que estoy suscrito
-app.get('/me/channels', middleware.ensureAuthorised, channelController.myChannels);
+app.get('/v1/me/channels', middleware.ensureAuthorised, channelController.myChannels);
 //Obtener un canal concreto
-app.get('/channels/:id', middleware.ensureAuthorised, channelController.oneChannel);
+app.get('/v1/channels/:id', middleware.ensureAuthorised, channelController.oneChannel);
 //Enviar mensaje al canal
-app.post('/channels/:id/message', middleware.ensureAuthorised, channelController.sendMessage);
+app.post('/v1/channels/:id/message', middleware.ensureAuthorised, channelController.sendMessage);
 //Suscribirse a un canal
-app.post('/channels/:id/suscribe', middleware.ensureAuthorised, channelController.suscribeChannel);
+app.post('/v1/channels/:id/suscribe', middleware.ensureAuthorised, channelController.suscribeChannel);
 //Silenciar notificaciones de un canal
-app.post('/channels/:id/notifications', middleware.ensureAuthorised, channelController.notifChannel);
+app.post('/v1/channels/:id/notifications', middleware.ensureAuthorised, channelController.notifChannel);
 
 /******* RUTAS DE EVENTOS ********/
 
 //Obtener los eventos de un mes
-app.get('/events', middleware.ensureAuthorised, eventController.allEvents);
+app.get('/v1/events', middleware.ensureAuthorised, eventController.allEvents);
 //Obtener un evento
-app.get('/events/:id', middleware.ensureAuthorised, eventController.oneEvent);
+app.get('/v1/events/:id', middleware.ensureAuthorised, eventController.oneEvent);
 //Ver asistentes de un evento
-app.get('/events/:id/assist', middleware.ensureAuthorised, eventController.assistantsEvent);
+app.get('/v1/events/:id/assist', middleware.ensureAuthorised, eventController.assistantsEvent);
 //Ver interesados de un evento
-app.get('/events/:id/interested', middleware.ensureAuthorised, eventController.interestedEvent);
+app.get('/v1/events/:id/interested', middleware.ensureAuthorised, eventController.interestedEvent);
 //Asistir a un evento
-app.post('/events/:id/assist', middleware.ensureAuthorised, eventController.assistEvent);
+app.post('/v1/events/:id/assist', middleware.ensureAuthorised, eventController.assistEvent);
 //Me interesa un evento
-app.post('/events/:id/interested', middleware.ensureAuthorised, eventController.interestEvent);
+app.post('/v1/events/:id/interested', middleware.ensureAuthorised, eventController.interestEvent);
 //Comentar un evento
-app.post('/events/:id/comments', middleware.ensureAuthorised, eventController.commentEvent);
+app.post('/v1/events/:id/comments', middleware.ensureAuthorised, eventController.commentEvent);
 
 /******* RUTAS DE USUARIO ********/
 
 //Loguear un usuario
-app.post('/users/login', userController.loginUser);
+app.post('/v1/users/login', userController.loginUser);
 //Obtiene un usuario
-app.get('/users/:id', middleware.ensureAuthorised, userController.getUser);
+app.get('/v1/users/:id', middleware.ensureAuthorised, userController.getUser);
 //Crea un usuario
-app.post('/users', userController.createUser);
+app.post('/v1/users', userController.createUser);
 //Actualiza datos de un usuario
-app.post('/users/:id', middleware.ensureAuthorised, userController.editUser);
+app.post('/v1/users/:id', middleware.ensureAuthorised, userController.editUser);
 //Obtiene lista de follows de un usuario
-app.get('/users/:id/follows', middleware.ensureAuthorised, userController.getFollows);
+app.get('/v1/users/:id/follows', middleware.ensureAuthorised, userController.getFollows);
 //Obtiene lista de followed-by de un usuario
-app.get('/users/:id/followed-by', middleware.ensureAuthorised, userController.getFollowedby);
+app.get('/v1/users/:id/followed-by', middleware.ensureAuthorised, userController.getFollowedby);
 //Obtiene la relación entre el usuario y otro usuario
-app.get('/users/:id/relationship', middleware.ensureAuthorised, userController.getRelationship);
+app.get('/v1/users/:id/relationship', middleware.ensureAuthorised, userController.getRelationship);
 //Modifica la relación entre el usuario y otro usuario
-app.post('/users/:id/relationship', middleware.ensureAuthorised, userController.setRelationship);
+app.post('/v1/users/:id/relationship', middleware.ensureAuthorised, userController.setRelationship);
 //Cargar peticiones de seguimiento
-app.get('/requests', middleware.ensureAuthorised, userController.getRequests);
+app.get('/v1/requests', middleware.ensureAuthorised, userController.getRequests);
 //Carga la actividad de los seguidos del usuario
-app.get('/activity', middleware.ensureAuthorised, userController.getActivity);
+app.get('/v1/activity', middleware.ensureAuthorised, userController.getActivity);
 //Confirmar correo
-app.post('/users/confirm', userController.confirmAccount);
+app.post('/v1/users/confirm', userController.confirmAccount);
 //Reportar usuario/comentario/canal
-app.post('/report', middleware.ensureAuthorised, userController.report);
+app.post('/v1/report', middleware.ensureAuthorised, userController.report);
 //Solicitar rango de editor-request
-app.post('/editor', middleware.ensureAuthorised, function(req,res){
+app.post('/v1/editor', middleware.ensureAuthorised, function(req,res){
   var mutation = ` mutation { editRequest(userID, email, reason){ data { username }, error { code, message }} }`;
 
 });
-app.post('/firebase', middleware.ensureAuthorised, userController.saveFirebase);
+app.post('/v1/firebase', middleware.ensureAuthorised, userController.saveFirebase);
 
 /******* RUTAS DE ADMINISTRACION ********/
 //Obtener usuarios reportados
-app.get('/admin/users', middleware.ensureAuthorised, adminController.usersReported);
+app.get('/v1/admin/users', middleware.ensureAuthorised, adminController.usersReported);
 
 
 app.get('/', function(req, res){
