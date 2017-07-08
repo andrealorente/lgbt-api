@@ -147,6 +147,10 @@ io.on('connection', function(socket){
     console.log('user disconnected');
     io.emit('chat message', 'A user disconnected');
   });
+  var rooms = [];
+  socket.on('join', function(roomId){
+    socket.join(roomId);
+  });
 });
 
 /*var server = app.listen(process.env.PORT || 8080, function () {

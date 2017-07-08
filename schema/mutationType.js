@@ -214,7 +214,13 @@ const mutationType = new GraphQLObjectType({
     },
 
     editUser: {
-      type: userType,
+      type: new GraphQLObjectType({
+        name: 'editUserResult',
+        fields: {
+          data: { type: userType },
+          error: { type: errorType }
+        }
+      }),
       description: 'Editar datos de un usuario existente',
       args: {
         userID: {
@@ -238,37 +244,50 @@ const mutationType = new GraphQLObjectType({
         return new Promise((resolve, reject) => {
 
           //Si quiere cambiar el username se debe comprobar primero que este no está ya registrado en la bd
-          User.findOneAndUpdate({
-              _id: args.userID
-            },
-            {
-              $set: {
-                name: args.name,
-                bio: args.bio,
-                gender: args.gender
-              }
-            }, {
-              new: true
-            },
-            function(err, user) {
-              if (err) reject(err);
-              else if (user != null) {
-                resolve({
-                  data: user,
-                  error: null
-                });
+          User.findOne({username: args.username}, function(err, res){
+            if(res==null || args.userID == res._id){ //No existe ese nombre de usuario en la bd o ha dejado el mismo nombre de usuario
+              User.findOneAndUpdate({
+                  _id: args.userID
+                },
+                {
+                  $set: {
+                    username: args.username
+                    name: args.name,
+                    bio: args.bio,
+                    gender: args.gender
+                  }
+                }, {
+                  new: true
+                },
+                function(err, user) {
+                  if (err) reject(err);
+                  else if (user != null) {
+                    resolve({
+                      data: user,
+                      error: null
+                    });
 
-              } else {
-                resolve({
-                  data: null,
-                  error: {
-                    code: 1,
-                    message: "No se han podido actualizar los datos del usuario."
+                  } else {
+                    resolve({
+                      data: null,
+                      error: {
+                        code: 2,
+                        message: "No se han podido actualizar los datos del usuario."
+                      }
+                    });
                   }
                 });
-              }
-            });
-        });
+            }else{
+              resolve({
+                data: null,
+                error: {
+                  code: 1,
+                  message: "Ese nombre de usuario está ya en uso."
+                }
+              });
+            }
+          }); //Fin findOne
+        });//Fin Promise
       }
     },
     /** Modificar la relación entre dos usuarios **/

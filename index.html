@@ -15,15 +15,20 @@
   </head>
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
   <script>
   $(function () {
     var socket = io();
-
+    var users = [];
     var nickname = prompt("Introduce tu nick:", "Harry Potter");
     if (nickname == null || nickname == "") {
-
+      nickname = 'Usuario' + Math.random(2000);
     } else {
       socket.emit('chat message', nickname + ' se ha conectado al chat.');
+      users.push(nickname);
     }
 
     $('form').submit(function(){
@@ -36,11 +41,28 @@
       $('#messages').append($('<li>').text(msg));
     });
   });
+
   </script>
   <body>
-    <ul id="messages"></ul>
-    <form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
-    </form>
+    <ul class="nav nav-tabs">
+      <li role="presentation" class="active"><a data-toggle="tab" href="#home">Home</a></li>
+      <li role="presentation"><a data-toggle="tab" href="#profile">Profile</a></li>
+      <li role="presentation"><a data-toggle="tab" href="#messages">Messages</a></li>
+    </ul>
+
+    <div class="tab-content">
+      <div class="tab-pane active" id="home">
+        <ul id="messages"></ul>
+        <form action="">
+          <input id="m" autocomplete="off" /><button>Send</button>
+        </form>
+      </div>
+
+      <div class="tab-pane" id="profile">
+        <ul id="users"></ul>
+      </div>
+
+    </div>
+
   </body>
 </html>

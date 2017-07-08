@@ -95,7 +95,7 @@ var userController = {
     if(req.params.id == "me"){
       user = req.user; //En req.user está la id que coge del token de la cabecera
     }
-  	var query = ' query { user(userID:\"' + user + '\") { id, username, name, bio, place, counts { followedby, following }, public, activity { action, target_id, created_time } } }';
+  	var query = ' query { user(userID:\"' + user + '\") { id, username, name, bio, image, place, counts { followedby, following }, public, activity { action, target_id, created_time } } }';
   	graphql(Schema, query).then( function(result) {
   		//console.log(JSON.stringify(result,null," "));
   		res.json({
@@ -109,6 +109,7 @@ var userController = {
     var name = req.body.user_name;
     var bio = req.body.user_bio;
     var gender = req.body.user_gender;
+    var image = req.body.user_image;
 
     var mutation = ` mutation { editUser(userID: \"`+req.user+`\", ) {
       data { username, name, bio, email, gender },

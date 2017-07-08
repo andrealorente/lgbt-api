@@ -12,6 +12,7 @@ var UserSchema = new Schema({
   name: String,
   pswd: String,
   bio: String,
+  image: String,
   gender: String,
   email: String,
   place: String,
