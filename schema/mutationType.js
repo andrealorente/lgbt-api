@@ -251,7 +251,7 @@ const mutationType = new GraphQLObjectType({
                 },
                 {
                   $set: {
-                    username: args.username
+                    username: args.username,
                     name: args.name,
                     bio: args.bio,
                     gender: args.gender
