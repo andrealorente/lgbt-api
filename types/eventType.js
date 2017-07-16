@@ -4,6 +4,7 @@ import {
   GraphQLNonNull,
   GraphQLList,
 } from 'graphql';
+import { GraphQLDateTime } from 'graphql-iso-date';
 import userType from './userType';
 import commentType from './commentType';
 var Comment = require('./../models/commentModel');
@@ -29,9 +30,9 @@ const eventType = new GraphQLObjectType({
           }
         },
         place: { type: GraphQLString },
-        created_time: { type: GraphQLString },
-    		start_time: { type: GraphQLString },
-        end_time: { type: GraphQLString },
+        created_time: { type: GraphQLDateTime },
+    		start_time: { type: GraphQLDateTime },
+        end_time: { type: GraphQLDateTime },
     		comments: {
     			type: new GraphQLList(commentType),
     			args: {

@@ -80,6 +80,8 @@ app.post('/v1/channels/:id/notifications', middleware.ensureAuthorised, channelC
 
 /******* RUTAS DE EVENTOS ********/
 
+//Crear un evento
+app.post('/v1/create/event', middleware.ensureAuthorised, eventController.createEvent);
 //Obtener los eventos de un mes
 app.get('/v1/events', middleware.ensureAuthorised, eventController.allEvents);
 //Obtener un evento

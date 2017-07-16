@@ -1096,6 +1096,56 @@ const mutationType = new GraphQLObjectType({
 
     /**EVENTOS**/
 
+    createEvent: {
+      type: new GraphQLObjectType({
+        name: 'createEventResult',
+        fields: {
+          data: { type: eventType },
+          error: { type: errorType }
+        }
+      }),
+      description: 'Crear un evento.',
+      args: {
+        title: { type: GraphQLString },
+        image: { type: GraphQLString },
+        description: { type: GraphQLString },
+        place: { type: GraphQLString },
+        author_id: { type: GraphQLString },
+        start_time: { type: GraphQLDateTime },
+        end_time: { type: GraphQLDateTime },
+      },
+      resolve: function(_,args) {
+        return new Promise((resolve,reject) => {
+          Event.create({
+            title: args.title,
+            image: args.image,
+            description: args.description,
+            place: args.place,
+            author_id: args.author_id,
+            created_time: new Date().toISOString(),
+            start_time: args.start_time,
+            end_time: args.end_time
+          }, function(err, ev){
+            if(err) reject(err);
+            else if(ev != null){
+              resolve({
+                data: ev,
+                error: null
+              });
+            } else {
+              resolve({
+                data: null,
+                error: {
+                  code: 1,
+                  message: 'No se ha podido crear el evento.'
+                }
+              });
+            }
+          });
+        });
+      }
+    },
+
     assistEvent: {
       type: eventType,
       description: 'Asistir (o dejar de asistir) a un evento',
