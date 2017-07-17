@@ -7,6 +7,7 @@
     "start": "./node_modules/.bin/babel-node ./server.js"
   },
   "dependencies": {
+    "angular-md5": "^0.1.10",
     "babel-core": "latest",
     "body-parser": "~1.13.2",
     "cloudinary": "^1.8.0",

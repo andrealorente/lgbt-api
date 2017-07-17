@@ -101,6 +101,8 @@ app.post('/v1/events/:id/comments', middleware.ensureAuthorised, eventController
 
 //Loguear un usuario
 app.post('/v1/users/login', userController.loginUser);
+//Loguear/registrar con fb
+app.post('/v1/users/login/facebook', userController.loginFB);
 //Obtiene un usuario
 app.get('/v1/users/:id', middleware.ensureAuthorised, userController.getUser);
 //Crea un usuario

@@ -27,6 +27,8 @@ import errorType from './../types/errorType';
 import activityType from './../types/activityType';
 import messageType from './../types/messageType';
 
+import md5 from 'angular-md5';
+
 //Definir mutation type
 const mutationType = new GraphQLObjectType({
   name: 'Mutation',
@@ -95,6 +97,59 @@ const mutationType = new GraphQLObjectType({
           });
         });
       }
+    },
+
+    loginFB: {
+      type: new GraphQLObjectType({
+        name: 'loginFBResult',
+        fields: {
+          user: { type: userType },
+          error: { type: errorType }
+        }
+      }),
+      description: 'Iniciar sesión o registrar usuario con Facebook.',
+      args: {
+          email: { type: GraphQLString },
+          name: { type: GraphQLString }
+      },
+      resolve: function(_,args) {
+        return new Promise((resolve,reject) => {
+          User.findOne({'email': args.email}, function(err, user) {
+            if(err) reject(err);
+            else{
+              if(user==null){
+                //Registrar usuario
+                var password = Math.random().toString(36).slice(-8);
+                var hashpswd = md5.createHash(password || '');
+                var parts = args.name.split(" ");
+                var username = parts[0]+"_"+parts[1];
+                User.create({
+                  username: username,
+                  name: args.name,
+                  email: args.email,
+                  pswd: hashpswd,
+                  public: true,
+                  role: "user",
+                  confirm: false
+                }, function(err, res) {
+                  resolve({
+                    user: res,
+                    error: null
+                  })
+                });
+
+              }else{
+                //Loguear
+                resolve({
+                  user: user,
+                  error: null
+                });
+              }
+            }
+          });
+        });
+      }
+
     },
 
     createUser: {
@@ -1128,6 +1183,7 @@ const mutationType = new GraphQLObjectType({
           }, function(err, ev){
             if(err) reject(err);
             else if(ev != null){
+              //Registrar actividad
               resolve({
                 data: ev,
                 error: null

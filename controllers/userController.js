@@ -51,6 +51,31 @@ var userController = {
   		}
   	});
   },
+
+  loginFB: function(req,res) {
+    var email = req.body.email;
+    var name = req.body.name;
+
+    var mutation = 'mutation { loginFB(email: \"' + email + '\", name: \"'+name +'\"){ user { id, username, bio }, error { code, message } } }';
+
+  	graphql(Schema, mutation).then( function(result) {
+  		//console.log(JSON.stringify(result));
+  		console.log(result);
+  		if(result.data.loginFB.user==null){
+  			res.json({
+  				success: false,
+  				error: result.data.loginFB.error
+  			});
+  		}else{
+  			res.json({
+  				success: true,
+  				data: result.data.loginFB.user,
+  				token: createToken(result.data.loginFB.user)
+  			});
+  		}
+  	});
+  },
+
   createUser: function(req,res) {
     var username = req.body.user_name;
   	var email = req.body.user_email;
