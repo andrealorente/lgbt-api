@@ -27,8 +27,6 @@ import errorType from './../types/errorType';
 import activityType from './../types/activityType';
 import messageType from './../types/messageType';
 
-import md5 from 'angular-md5';
-
 //Definir mutation type
 const mutationType = new GraphQLObjectType({
   name: 'Mutation',
@@ -120,14 +118,13 @@ const mutationType = new GraphQLObjectType({
               if(user==null){
                 //Registrar usuario
                 var password = Math.random().toString(36).slice(-8);
-                var hashpswd = md5.createHash(password || '');
                 var parts = args.name.split(" ");
                 var username = parts[0]+"_"+parts[1];
                 User.create({
                   username: username,
                   name: args.name,
                   email: args.email,
-                  pswd: hashpswd,
+                  pswd: password,
                   public: true,
                   role: "user",
                   confirm: false
