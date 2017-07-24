@@ -56,7 +56,7 @@ var userController = {
     var email = req.body.email;
     var name = req.body.name;
 
-    var mutation = 'mutation { loginFB(email: \"' + email + '\", name: \"'+name +'\"){ user { id, username, bio }, error { code, message } } }';
+    var mutation = 'mutation { loginFB(email: \"' + email + '\", name: \"'+name +'\"){ user { id, username, name, public }, error { code, message } } }';
 
   	graphql(Schema, mutation).then( function(result) {
   		//console.log(JSON.stringify(result));

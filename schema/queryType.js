@@ -72,9 +72,11 @@ const queryType = new GraphQLObjectType({
 			},
 			resolve: function(_, args){
 				return new Promise((resolve,reject) => {
+
 					User.find({_id: {
 					$in: [args.originID, args.targetID ]}, 'relationships.id':{$in: [args.originID, args.targetID ]}},function(err, res){ //obtiene los dos usuarios
 
+            if(err) reject(err);
 						console.log(res);
 
 						if(res.length == 0){ //No hay relación
