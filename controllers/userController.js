@@ -32,7 +32,7 @@ var userController = {
   	var pswd = req.body.user_pswd;
     console.log(user);
     console.log(pswd);
-  	var mutation = 'mutation { loginUser(username: \"' + user + '\", password: \"'+pswd +'\"){ user { id, username, bio }, error { code, message } } }';
+  	var mutation = 'mutation { loginUser(username: \"' + user + '\", password: \"'+pswd +'\"){ user { id, username, name, public }, error { code, message } } }';
 
   	graphql(Schema, mutation).then( function(result) {
   		//console.log(JSON.stringify(result));
