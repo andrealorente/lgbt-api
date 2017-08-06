@@ -214,17 +214,29 @@ var eventController = {
   },
   //Me interesa un evento
   interestEvent: function(req,res){
-      var mutation = 'mutation { interestEvent(userID: \"'+ req.body.user_id +'\", eventID: \"'+ req.params.id +'\") { assistants, interested } }';
-      graphql(Schema, mutation).then( function(result) {
-        res.json({
-        	success: true,
-        	data: result.data.interestEvent
-        });
+    var mutation = 'mutation { interestEvent(userID: \"'+ req.body.user_id +'\", eventID: \"'+ req.params.id +'\") { assistants, interested } }';
+    graphql(Schema, mutation).then( function(result) {
+      res.json({
+      	success: true,
+      	data: result.data.interestEvent
+      });
     });
   },
   //Comentar un evento
   commentEvent: function(req,res){
+    var userid = req.user;
+    var content = req.body.content;
+    var targetid = req.body.target_id;
 
+    console.log(userid);
+
+    var mutation = ' mutation { commentEvent(userID:\"' + userid + '\", eventID:\"'+ targetid +'\", content:\"'+ content +'\" ) { data { id, content, author_id, created_time }, error{ code, message } } }';
+    graphql(Schema, mutation).then( function(result) {
+      res.json({
+       success: true,
+       data: result.data.commentEvent.data
+      });
+    });
   }
 };
 

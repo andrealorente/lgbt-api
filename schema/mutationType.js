@@ -1275,6 +1275,60 @@ const mutationType = new GraphQLObjectType({
       }
     },
 
+    commentEvent: {
+      description: 'Enviar un comentario a un evento.',
+      type: new GraphQLObjectType({
+        name: 'commentEventResult',
+        fields: {
+          data: { type: commentType },
+          error: { type: errorType }
+        }
+      }),
+      args: {
+        userID: {
+          type: GraphQLString
+        },
+        eventID: {
+          type: GraphQLString
+        },
+        content: {
+          type: GraphQLString
+        }
+      },
+      resolve: function(root,args) {
+        return new Promise((resolve, reject) => {
+          //Igual antes habría que comprobar si existe ese post o evento
+          var date = new Date().toISOString();
+          Comment.create({
+            target_id: args.eventID,
+            content: args.content,
+            author_id: args.userID,
+            created_time: date,
+          }, function(err, res) {
+            if (err) reject(err);
+            else {
+              //Registrar actividad
+              Activity.create({
+                origin_id: args.userID,
+                target_id: args.eventID,
+                action: " ha comentado en ",
+                created_time: date
+              }, function(err,activity){
+                if(err) reject(err);
+                else{
+                  resolve({
+                    data: res,
+                    error: null
+                  });
+                }
+              });
+
+            }
+          });
+        });
+      }
+    },
+
     report: {
       description: 'Reportar usuario, comentario o canal.',
       type: new GraphQLObjectType({
