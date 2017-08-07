@@ -458,7 +458,8 @@ const mutationType = new GraphQLObjectType({
                               origin_id: args.originID,
                               target_id: args.targetID,
                               action: " ha seguido a ",
-                              created_time: new Date()
+                              created_time: new Date().toISOString(),
+                              type: 3
                             },function(err,act){
                               if(err) reject(err);
                               else{
@@ -779,7 +780,8 @@ const mutationType = new GraphQLObjectType({
                 origin_id: args.userID,
                 target_id: args.postID,
                 action: " ha comentado en ",
-                created_time: date
+                created_time: date,
+                type: 1
               }, function(err,activity){
                 if(err) reject(err);
                 else{
@@ -842,10 +844,21 @@ const mutationType = new GraphQLObjectType({
               });*/
               if(err) reject(err);
               else {
-                  resolve({
+
+                Activity.create({ //Si se quita el like no registrar la actividad (borrarla tb???)
+                origin_id: args.userID,
+                target_id: args.postID,
+                action: " ha dado me gusta a ",
+                created_time: new Date().toISOString(),
+                type: 1
+              },function(err,res){
+                if(err) reject(err);
+                resolve({
                     data: post.likes.length,
                     error: null
                   });
+              });
+                  
               }
             });
           }
@@ -1312,7 +1325,8 @@ const mutationType = new GraphQLObjectType({
                 origin_id: args.userID,
                 target_id: args.eventID,
                 action: " ha comentado en ",
-                created_time: date
+                created_time: date,
+                type: 2
               }, function(err,activity){
                 if(err) reject(err);
                 else{
