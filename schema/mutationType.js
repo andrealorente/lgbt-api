@@ -779,7 +779,7 @@ const mutationType = new GraphQLObjectType({
               Activity.create({
                 origin_id: args.userID,
                 target_id: args.postID,
-                action: " ha comentado en ",
+                action: " ha comentado en una ",
                 created_time: date,
                 type: 1
               }, function(err,activity){
@@ -834,31 +834,23 @@ const mutationType = new GraphQLObjectType({
 
             post.save(function(err){
               //Registrar actividad
-              /*Activity.create({ //Si se quita el like no registrar la actividad (borrarla tb???)
-                origin_id: args.userID,
-                target_id: args.postID,
-                action: " ha dado me gusta a ",
-                created_time: new Date()
-              },function(err,res){
-
-              });*/
               if(err) reject(err);
               else {
 
                 Activity.create({ //Si se quita el like no registrar la actividad (borrarla tb???)
-                origin_id: args.userID,
-                target_id: args.postID,
-                action: " ha dado me gusta a ",
-                created_time: new Date().toISOString(),
-                type: 1
-              },function(err,res){
-                if(err) reject(err);
-                resolve({
+                  origin_id: args.userID,
+                  target_id: args.postID,
+                  action: " ha dado me gusta a una ",
+                  created_time: new Date().toISOString(),
+                  type: 1
+                },function(err,res){
+                  if(err) reject(err);
+                  resolve({
                     data: post.likes.length,
                     error: null
                   });
-              });
-                  
+                });
+
               }
             });
           }
@@ -1105,7 +1097,18 @@ const mutationType = new GraphQLObjectType({
                         new: true
                         }, function(err, result){
                           if(err) reject(err);
-                          else resolve(user);
+                          //registrar actividad de suscribirte a un canal
+                          Activity.create({
+                            origin_id: args.userID,
+                            target_id: args.channelID,
+                            action: " se ha suscrito a un ",
+                            created_time: new Date().toISOString(),
+                            type: 4
+                          }, function(err,act){
+                            if(err) reject(err);
+                            resolve(user);
+                          });
+                          
                       });
                     }
                   });
@@ -1220,7 +1223,9 @@ const mutationType = new GraphQLObjectType({
         eventID: { type: GraphQLString }
       },
       resolve: function(_,args) {
+
         return new Promise((resolve, reject) => {
+          var assist = true;
           //Buscar evento
           Event.findById(args.eventID, function(err,ev){
             if(err) reject(err);
@@ -1234,6 +1239,7 @@ const mutationType = new GraphQLObjectType({
                   ev.interested.splice(index2,1);
               }else{
                 ev.assistants.splice(index,1);
+                assist = false;
               }
 
               //Guardar evento
@@ -1241,8 +1247,26 @@ const mutationType = new GraphQLObjectType({
                 if(err) reject(err);
                 else{
                   //Registrar actividad
-
-                  resolve(ev);
+                  if(assist){
+                    Activity.create({
+                      origin_id: args.userID,
+                      target_id: args.eventID,
+                      action: " asistirá a un ",
+                      created_time: new Date().toISOString(),
+                      type: 2
+                    }, function(err,activity){
+                      if(err) reject(err);
+                      resolve(ev);
+                    });
+                  }else{
+                    Activity.remove({
+                      origin_id: args.userID,
+                      target_id: args.eventID
+                    }, function(err,activity){
+                      if(err) reject(err);
+                      resolve(ev);
+                    });
+                  }
                 }
               });
             }//Fin else
