@@ -6,29 +6,40 @@ import {
   graphql,
   GraphQLObjectType,
   GraphQLString,
-  GraphQLInt
+  GraphQLInt,
+  GraphQLBoolean
 } from 'graphql';
 
 var activityType = new GraphQLObjectType({
-    name: 'Activity',
-    fields: {
-        origin_id: { type: GraphQLString }, //Cada campo puede tener un resolve
-        origin_data: { 
-          type: userType,
-          resolve: function(root){
-            return new Promise((resolve,reject) => {
-                User.findById(root.origin_id, function(err, user){
-                    if(err) reject(err);
-                    else resolve(user);
-                });
+  name: 'activityType',
+  fields: {
+    origin_id: { type: GraphQLString }, //Cada campo puede tener un resolve
+		target_id: { type: GraphQLString },
+		action: { type: GraphQLString },
+		created_time: { type: GraphQLDateTime },
+    type: { type: GraphQLInt },
+    origin_data: {
+      type: new GraphQLObjectType({
+        name: 'minUser',
+        fields: {
+          username: { type: GraphQLString },
+          image: { type: GraphQLString },
+          public: { type: GraphQLBoolean }
+        }
+      }),
+      resolve: function(root) {
+        return new Promise((resolve,reject) => {
+          User.findById(root.origin_id, function(err,res){
+            if(err) reject(err);
+            resolve({
+              username: res.username,
+              image: res.image,
+              public: res.public
             });
-          }
-        },
-    		target_id: { type: GraphQLString },
-    		action: { type: GraphQLString },
-    		created_time: { type: GraphQLDateTime },
-        type: { type: GraphQLInt }
-        //Devolver datos del usuario
+          });
+        });
+      }
     }
+  }
 });
 export default activityType;

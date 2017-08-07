@@ -230,9 +230,10 @@ var userController = {
   },
   getActivity: function(req,res) {
     var query = ` query { activity (userID: \"`+ req.user +`\", after: \"`+req.query.after+`\"){
-      origin_id, origin_data{ username, image, public }, target_id, action, created_time, type
+      origin_id, target_id, action, created_time, type, origin_data { username, name, public }
     } }`;
     graphql(Schema, query).then( function(result) {
+      for(var i in result.data.activity)
       res.json({
         success: true,
         data: result.data.activity
