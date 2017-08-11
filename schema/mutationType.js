@@ -27,6 +27,11 @@ import errorType from './../types/errorType';
 import activityType from './../types/activityType';
 import messageType from './../types/messageType';
 
+var FCM = require('fcm-push');
+
+var serverKey = 'AIzaSyCthSLMQ7tsBAC_j2KbRK-ppy1YdIctRyg';
+var fcm = new FCM(serverKey);
+
 //Definir mutation type
 const mutationType = new GraphQLObjectType({
   name: 'Mutation',
@@ -1040,15 +1045,33 @@ const mutationType = new GraphQLObjectType({
               channel.save(function(err){
                 if(err) reject(err);
                 else{
+                  //Enviar notificación
+                  var message = {
+                    'to': 'czS7HVkemRo:APA91bEwdLcUrkAU6D4QQoms92-JLBuqk1K0BIIPpOVu_6ZBh_LcRok0VYxpd7rQV77KUfStRfw9uaZJpc8V81nnhBnRKPYVzOLkhPEG9k2ykN5S35TiW6FUroWqUWqBTSEaPyd8nmA2',
+                    'notification': {
+                      'title': channel.title,
+                      'body': args.content }
+                  };
+
+                  fcm.send(message, function(err, response){
+                    if(err){
+                      console.log('Algo ha salido mal con la notificación.');
+                      console.log(err);
+                    }else{
+                      console.log('Notificación enviada correctamente');
+                      console.log(response);
+                    }
+                  });
+                  
                   resolve({
                     data: {
-                        content: args.content,
-                        created_time: new Date().toISOString(),
-                        channel: args.channelID
+                      content: args.content,
+                      created_time: new Date().toISOString(),
+                      channel: args.channelID
                     },
                     error: null
                   });
-                }
+              }
               });
             }else {
                 resolve({
