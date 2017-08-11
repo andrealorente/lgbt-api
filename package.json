@@ -15,6 +15,7 @@
     "debug": "~2.2.0",
     "express": "~4.13.1",
     "express-graphql": "^0.6.3",
+    "fcm-push": "^1.1.2",
     "formidable": "^1.1.1",
     "graphql": "^0.9.1",
     "graphql-iso-date": "^3.2.0",

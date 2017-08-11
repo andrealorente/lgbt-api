@@ -1043,7 +1043,7 @@ const mutationType = new GraphQLObjectType({
                   resolve({
                     data: {
                         content: args.content,
-                        created_time: new Date(),
+                        created_time: new Date().toISOString(),
                         channel: args.channelID
                     },
                     error: null
@@ -1261,7 +1261,8 @@ const mutationType = new GraphQLObjectType({
                   }else{
                     Activity.remove({
                       origin_id: args.userID,
-                      target_id: args.eventID
+                      target_id: args.eventID,
+                      action: " asistirá a un "
                     }, function(err,activity){
                       if(err) reject(err);
                       resolve(ev);
@@ -1284,6 +1285,7 @@ const mutationType = new GraphQLObjectType({
       },
       resolve: function(_,args) {
         return new Promise((resolve, reject) => {
+          var interest = true;
           //Buscar evento
           Event.findById(args.eventID, function(err,ev){
             if(err) reject(err);
@@ -1295,16 +1297,38 @@ const mutationType = new GraphQLObjectType({
                 var index2 = ev.assistants.indexOf(args.userID);
                 if(index2 != -1)
                   ev.assistants.splice(index2,1);
-              }else
+              }else{
                 ev.interested.splice(index,1);
+                interest = false;
+              }
 
               ev.save(function(err){
                 if(err) reject(err);
-                else{
-                  //Registrar actividad
-
-                  resolve(ev);
+                //Registrar actividad
+                if(interest){
+                  Activity.create({
+                    origin_id: args.userID,
+                    target_id: args.eventID,
+                    action: " ha marcado que le interesa un ",
+                    created_time: new Date().toISOString(),
+                    type: 2
+                  }, function(err,activity){
+                    if(err) reject(err);
+                    resolve(ev);
+                  });
+                }else{
+                  Activity.create({
+                    origin_id: args.userID,
+                    target_id: args.eventID,
+                    action: " ha marcado que le interesa un ",
+                    created_time: new Date().toISOString(),
+                    type: 2
+                  }, function(err,activity){
+                    if(err) reject(err);
+                    resolve(ev);
+                  });
                 }
+                
               });
             }
           });
@@ -1348,7 +1372,7 @@ const mutationType = new GraphQLObjectType({
               Activity.create({
                 origin_id: args.userID,
                 target_id: args.eventID,
-                action: " ha comentado en ",
+                action: " ha comentado en un ",
                 created_time: date,
                 type: 2
               }, function(err,activity){

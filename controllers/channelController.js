@@ -2,6 +2,11 @@ import { graphql } from 'graphql';
 import Schema from './../schema/schema';
 import middleware from './../middleware';
 import formidable from 'formidable';
+var FCM = require('fcm-push');
+
+var serverKey = 'AAAAIXbWVhM:APA91bEdc2wUBJsDlhxeVhhoVLOMujAjwCyP539m-qNKcO4oDanZvCgu6zoZbtqd2Cc9SPwS4w6m0VZtrtE3V7sOVaARP_SY_tht975GnQxIKtQNTYrxXSF8RGWYm62_LFIq_NrFRNwx';
+var fcm = new FCM(serverKey);
+
 var cloudinary = require('cloudinary');
 cloudinary.config({
     cloud_name: 'tfg-lgbt-cloud',
@@ -120,22 +125,40 @@ var channelController = {
   },
   //Enviar mensaje al canal
   sendMessage: function(req,res) {
-      console.log(req.body);
-      var mutation = "mutation { sendMessage(content:\""+ req.body.content +"\", channelID:\""+ req.body.channelID +"\") { message{ content, created_time, channel}, error{code,message} } }";
-      graphql(Schema, mutation).then( function(result) {
-          if(result.data == null){
-              console.log(result);
-               res.json({
-                  success: false,
-                  error: "No se ha podido enviar ningún mensaje."
-               });
-            }else{
-               res.json({
-                  success: true,
-                  data: result.data.sendMessage
-               });
-            }
-      });
+    console.log(req.body);
+    var mutation = "mutation { sendMessage(content:\""+ req.body.content +"\", channelID:\""+ req.body.channelID +"\") { message{ content, created_time, channel}, error{code,message} } }";
+    graphql(Schema, mutation).then( function(result) {
+      if(result.data == null){
+        console.log(result);
+        res.json({
+          success: false,
+          error: "No se ha podido enviar ningún mensaje."
+        });
+      }else{
+        //Enviar notificación
+        var message = {
+          'to': 'czS7HVkemRo:APA91bEwdLcUrkAU6D4QQoms92-JLBuqk1K0BIIPpOVu_6ZBh_LcRok0VYxpd7rQV77KUfStRfw9uaZJpc8V81nnhBnRKPYVzOLkhPEG9k2ykN5S35TiW6FUroWqUWqBTSEaPyd8nmA2',
+          'notification': {
+              'title': 'Hola',
+              'body': 'Tienes un mensaje nuevo'}
+          };
+
+        fcm.send(message, function(err, response){
+          if(err){
+            console.log('Algo ha salido mal con la notificación.');
+            console.log(err);
+          }else{
+            console.log('Notificación enviada correctamente');
+            console.log(response);
+          }
+          res.json({
+            success: true,
+            data: result.data.sendMessage
+          });
+        });
+
+      }
+    });
   },
   //Suscribirme a un canal
   suscribeChannel: function(req,res) {
