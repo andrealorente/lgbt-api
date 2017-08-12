@@ -1044,34 +1044,34 @@ const mutationType = new GraphQLObjectType({
 
               channel.save(function(err){
                 if(err) reject(err);
-                else{
-                  //Enviar notificación
-                  var message = {
-                    'to': 'czS7HVkemRo:APA91bEwdLcUrkAU6D4QQoms92-JLBuqk1K0BIIPpOVu_6ZBh_LcRok0VYxpd7rQV77KUfStRfw9uaZJpc8V81nnhBnRKPYVzOLkhPEG9k2ykN5S35TiW6FUroWqUWqBTSEaPyd8nmA2',
-                    'notification': {
-                      'title': channel.title,
-                      'body': args.content }
-                  };
+                
+                //Enviar notificación
+                var message = {
+                  'to': '/topics/'+channel.id,
+                  'notification': {
+                    'title': channel.title,
+                    'body': args.content }
+                };
 
-                  fcm.send(message, function(err, response){
-                    if(err){
-                      console.log('Algo ha salido mal con la notificación.');
-                      console.log(err);
-                    }else{
-                      console.log('Notificación enviada correctamente');
-                      console.log(response);
-                    }
-                  });
-                  
-                  resolve({
-                    data: {
-                      content: args.content,
-                      created_time: new Date().toISOString(),
-                      channel: args.channelID
-                    },
-                    error: null
-                  });
-              }
+                fcm.send(message, function(err, response){
+                  if(err){
+                    console.log('Algo ha salido mal con la notificación.');
+                    console.log(err);
+                  }else{
+                    console.log('Notificación enviada correctamente');
+                    console.log(response);
+                  }
+                });
+
+                resolve({
+                  data: {
+                    content: args.content,
+                    created_time: new Date().toISOString(),
+                    channel: args.channelID
+                  },
+                  error: null
+                });
+              
               });
             }else {
                 resolve({
@@ -1120,6 +1120,7 @@ const mutationType = new GraphQLObjectType({
                         new: true
                         }, function(err, result){
                           if(err) reject(err);
+
                           //registrar actividad de suscribirte a un canal
                           Activity.create({
                             origin_id: args.userID,
