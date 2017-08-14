@@ -472,12 +472,12 @@ const queryType = new GraphQLObjectType({
 		},
 		oneEvent: {
 			type: new GraphQLObjectType({
-                name: 'oneEventResult',
-                fields: {
-                    data: { type: eventType },
-                    error: { type: errorType }
-                }
-            }),
+        name: 'oneEventResult',
+        fields: {
+            data: { type: eventType },
+            error: { type: errorType }
+        }
+      }),
 			args: {
 				eventID: { type: GraphQLString }
 			},
@@ -487,15 +487,53 @@ const queryType = new GraphQLObjectType({
 					Event.findById(eventID, function(err, event){
 						if(err) reject(err);
 						else{
-                resolve({
-                    data: event,
-                    error: null
-                });
+              resolve({
+                data: event,
+                error: null
+              });
             }
 					});
 				});
 			}
 		},
+
+    getInterestedOrAssistants: {
+      type: new GraphQLObjectType({
+        name: 'getIntorAsResult',
+        fields: {
+          data: { type: new GraphQLList(userType)},
+          error: { type: errorType }
+        }
+      }),
+      args: {
+        eventID: { type: GraphQLString },
+        rel: { type: GraphQLInt } //si quiero los asistentes: 1, los interesados: 2
+      },
+      resolve: function(_, {eventID, rel}) {
+        return new Promise((resolve,reject) => {
+          Event.findById(eventID, function(err, event){
+            if(err) reject(err);
+            var result = [];
+            var array = [];
+            if(rel == 1)
+              array = event.assistants;
+            else
+              array = event.interested;
+
+            for(var i in array){
+              User.findById(array[i], function(err, user){
+                if(err) reject(err);
+                result.push(user);
+              });
+            }
+            resolve({
+              data: result,
+              error: null
+            });
+          });
+        });
+      }
+    },
         /**ADMINISTRACION**/
         usersReported: {
             type: new GraphQLObjectType({

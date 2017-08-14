@@ -171,7 +171,7 @@ var channelController = {
     });
   },
   getSuscribers: function(req,res) {
-    var query = 'query { getSuscribers(channelID:\"'+ req.params.id +'\"){ data { username, name, image, id }}}';
+    var query = 'query { getSuscribers(channelID:\"'+ req.params.id +'\"){ data { username, name, image, id, public }}}';
     graphql(Schema, query).then(function(result){
       res.json({
         success: true,

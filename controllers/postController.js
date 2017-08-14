@@ -236,7 +236,7 @@ var postController = {
   //Obtener los usuarios que han dado like a un post
   getLikes: function(req,res){
 
-    var query = 'query { getUsersLikes(postID:\"'+req.params.id+'\", after: \"'+req.query.after+'\") { id, username, name, bio, public } }';
+    var query = 'query { getUsersLikes(postID:\"'+req.params.id+'\", after: \"'+req.query.after+'\") { id, username, name, image, public } }';
     graphql(Schema, query).then( function(result) {
       console.log(result);
   		if(result.data.getUsersLikes == null){
