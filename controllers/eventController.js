@@ -193,7 +193,7 @@ var eventController = {
     graphql(Schema, query).then(function(result) {
       res.json({
         success: true,
-        data: result.data.getIntorAsResult.data
+        data: result.data.getInterestedOrAssistants.data
       })
     });
   },
