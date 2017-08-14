@@ -189,7 +189,7 @@ var eventController = {
   },
   //Ver asistentes de un evento
   assistantsEvent: function(req,res){
-    var query = ' query { getInterestedOrAssistants(eventID:\"'+ req.params.id +'\", rel: '+ 1 +'){ data{ id, username, name, image, public}, error {code, message}} }';
+    var query = ' query { getInterestedOrAssistants(eventID:\"'+ req.params.id +'\", rel: 1){ data{ id, username, name, image, public}, error {code, message}} }';
     graphql(Schema, query).then(function(result) {
       res.json({
         success: true,
@@ -199,11 +199,12 @@ var eventController = {
   },
   //Ver interesados en un evento
   interestedEvent: function(req,res){
-    var query = ' query { getInterestedOrAssistants(eventID:\"'+ req.params.id +'\", rel: '+ 2 +'){ data{ id, username, name, image, public}, error {code, message}} }';
+    var query = ' query { getInterestedOrAssistants(eventID:\"'+ req.params.id +'\", rel: 2){ data{ id, username, name, image, public}, error {code, message}} }';
     graphql(Schema, query).then(function(result) {
+      
       res.json({
         success: true,
-        data: result.data.getIntorAsResult.data
+        data: result.data.getInterestedOrAssistants.data
       })
     });
   },
