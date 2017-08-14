@@ -435,16 +435,16 @@ const queryType = new GraphQLObjectType({
         /**EVENTOS**/
 		allEvents: {
 			type: new GraphQLObjectType({
-                name: 'allEventsResult',
-                fields: {
-                    data: { type: new GraphQLList(eventType) },
-                    error: { type: errorType }
-                }
-            }),
-            args: {
-                month: { type: GraphQLInt },
-                year: { type: GraphQLInt }
-            },
+        name: 'allEventsResult',
+        fields: {
+            data: { type: new GraphQLList(eventType) },
+            error: { type: errorType }
+        }
+      }),
+      args: {
+          month: { type: GraphQLInt },
+          year: { type: GraphQLInt }
+      },
 			resolve: function(_, args) {
 				return new Promise((resolve, reject) => {
 					Event.find(function(err, res) {
@@ -520,16 +520,14 @@ const queryType = new GraphQLObjectType({
             else
               array = event.interested;
 
-            for(var i in array){
-              User.findById(array[i], function(err, user){
-                if(err) reject(err);
-                result.push(user);
+            User.find({'_id': { $in: array }}, function(err, users){
+              if(err) reject(err);
+              resolve({
+                data: users,
+                error: null
               });
-            }
-            resolve({
-              data: result,
-              error: null
             });
+               
           });
         });
       }
