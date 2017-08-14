@@ -427,6 +427,9 @@ const queryType = new GraphQLObjectType({
                 });
               }).sort('-_id');
           }
+        });
+        });
+      }
      },           
         //searchChannel: {},
         /**EVENTOS**/
