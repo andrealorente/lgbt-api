@@ -77,6 +77,8 @@ app.post('/v1/channels/:id/message', middleware.ensureAuthorised, channelControl
 app.post('/v1/channels/:id/suscribe', middleware.ensureAuthorised, channelController.suscribeChannel);
 //Silenciar notificaciones de un canal
 app.post('/v1/channels/:id/notifications', middleware.ensureAuthorised, channelController.notifChannel);
+//Obtener los suscriptores de un canal
+app.get('/v1/channels/:id/suscribers', middleware.ensureAuthorised, channelController.getSuscribers);
 
 /******* RUTAS DE EVENTOS ********/
 

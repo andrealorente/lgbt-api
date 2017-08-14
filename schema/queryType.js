@@ -36,27 +36,27 @@ const statusType = new GraphQLObjectType({
 
 /** QUERIES **/
 const queryType = new GraphQLObjectType({
-    name: 'Query',
-    fields: {
+  name: 'Query',
+  fields: {
       /**USUARIOS**/
-      user: {
-        type: userType,
-        //args son los argumentos que acepta la query User
-        args: {
-            userID: { type: GraphQLString }
-        },
-        resolve: function( _, {userID} ) {
+    user: {
+      type: userType,
+      //args son los argumentos que acepta la query User
+      args: {
+          userID: { type: GraphQLString }
+      },
+      resolve: function( _, {userID} ) {
 
-            return new Promise((resolve,reject) => {
-                //Aquí se recuperan los datos de la bd
-                User.findOne({ _id: userID}, function(err, res) {
-                    if (err) reject(err);
-                    else resolve(res);
-                });
-            }); //Fin Promise
+          return new Promise((resolve,reject) => {
+              //Aquí se recuperan los datos de la bd
+              User.findOne({ _id: userID}, function(err, res) {
+                  if (err) reject(err);
+                  else resolve(res);
+              });
+          }); //Fin Promise
 
-        } //Fin resolve
-      }, //Fin consultar user
+      } //Fin resolve
+    }, //Fin consultar user
 		//Consultar relación entre dos usuarios
 		relationship: {
 			type: new GraphQLObjectType({
@@ -113,77 +113,77 @@ const queryType = new GraphQLObjectType({
 				});
 			}
 		},
-        activity: {
-          type: new GraphQLList(activityType),
-          description: 'Cargar la actividad de mis seguidos.',
-          args: {
-            userID: { type: GraphQLString }, //Mi id
-            after: { type: GraphQLDateTime }
-          },
-          resolve: function(_,args) {
-            //Buscar mi usuario en la bd
-            return new Promise((resolve,reject) => {
-              User.findById(args.userID, function(err, me){
-                if(err) reject(err);
-                else{
-                  //Buscar a mis seguidos y obtener su actividad reciente
-                  var follows = [];
-                  for(var i in me.relationships) {
-                    if(me.relationships[i].outgoing_status == "follows"){
-                      follows.push(me.relationships[i].id);
-                    }
-                  }//Fin for
-                  
-
-                  Activity.find({
-                    origin_id: { $in: follows },
-                    created_time: { $lt: args.after }
-                  },function(err,activities){
-                    console.log(activities);
-                    resolve(activities);
-                  }).sort('-created_time').limit(5);
-
+    activity: {
+      type: new GraphQLList(activityType),
+      description: 'Cargar la actividad de mis seguidos.',
+      args: {
+        userID: { type: GraphQLString }, //Mi id
+        after: { type: GraphQLDateTime }
+      },
+      resolve: function(_,args) {
+        //Buscar mi usuario en la bd
+        return new Promise((resolve,reject) => {
+          User.findById(args.userID, function(err, me){
+            if(err) reject(err);
+            else{
+              //Buscar a mis seguidos y obtener su actividad reciente
+              var follows = [];
+              for(var i in me.relationships) {
+                if(me.relationships[i].outgoing_status == "follows"){
+                  follows.push(me.relationships[i].id);
                 }
-              });
-            });
-          }
-        },
-        /**POSTS**/
-        allPosts: {
-            type: new GraphQLObjectType({
-    				name: 'allPostsResult',
-    				fields: {
-    					data: { type: new GraphQLList(postType) },
-    					error: { type: errorType }
-    				}
-    			}),
-          args: {
-            after: { type: GraphQLDateTime }
-          },
-          resolve: function(_, {after}){
-              return new Promise((resolve,reject) => {
-                console.log(after);
+              }//Fin for
+              
 
-                Post.find({ created_time: { $lt: after }}, function(err, post){
-                  if(err) reject(err);
-        					else if(post!=null){
-                    resolve({
-                      data: post,
-                      error: null
-                    });
-        					}else{
-        						resolve({
-        							data: null,
-        							error: {
-        								code: 1,
-        								message: "No hay ningún post creado."
-        							}
-        						});
-        					}
-                }).sort('-created_time').limit( 5 );
-              });
-          }
-        },
+              Activity.find({
+                origin_id: { $in: follows },
+                created_time: { $lt: args.after }
+              },function(err,activities){
+                console.log(activities);
+                resolve(activities);
+              }).sort('-created_time').limit(5);
+
+            }
+          });
+        });
+      }
+    },
+    /**POSTS**/
+    allPosts: {
+      type: new GraphQLObjectType({
+			name: 'allPostsResult',
+			fields: {
+				data: { type: new GraphQLList(postType) },
+				error: { type: errorType }
+			 }
+		  }),
+      args: {
+        after: { type: GraphQLDateTime }
+      },
+      resolve: function(_, {after}){
+          return new Promise((resolve,reject) => {
+            console.log(after);
+
+            Post.find({ created_time: { $lt: after }}, function(err, post){
+              if(err) reject(err);
+    					else if(post!=null){
+                resolve({
+                  data: post,
+                  error: null
+                });
+    					}else{
+    						resolve({
+    							data: null,
+    							error: {
+    								code: 1,
+    								message: "No hay ningún post creado."
+    							}
+    						});
+    					}
+            }).sort('-created_time').limit( 5 );
+          });
+      }
+    },
 		onePost: {
 			type: new GraphQLObjectType({
 				name: 'onePostResult',
@@ -217,7 +217,7 @@ const queryType = new GraphQLObjectType({
 				});
 			}
 		},
-        getUsersLikes: {
+    getUsersLikes: {
       type: new GraphQLList(userType),
       args: {
         postID: { type: GraphQLString },
@@ -244,17 +244,14 @@ const queryType = new GraphQLObjectType({
                          resolve(docs);
                     }).sort('-_id').limit(10);
                 }
-
               }
             }
-
           });
-
       });
     }
     },
-        searchPost: {
-            type: new GraphQLObjectType({
+    searchPost: {
+        type: new GraphQLObjectType({
 				name: 'searchPostResult',
 				fields: {
 					data: { type: new GraphQLList(postType) },
@@ -403,6 +400,34 @@ const queryType = new GraphQLObjectType({
               });
             }
         },
+     getSuscribers: {
+      type: new GraphQLObjectType({
+        name: 'getSuscResult',
+        fields: {
+          data: { type: new GraphQLList(userType) },
+          error: { type: errorType }
+        }
+      }),
+      args: {
+        channelID: { type: GraphQLString }
+      },
+      resolve: function(_,args){
+        return new Promise((resolve,reject) => {
+          Channel.findById(args.channelID, function(err, channel){
+            if(err) reject(err);
+          
+            if(channel!=null){
+              User.find({
+                '_id': { $in: channel.susc }
+              }, function(err, docs){
+                console.log(docs);
+                resolve({
+                  data: docs,
+                  error: null
+                });
+              }).sort('-_id');
+          }
+     },           
         //searchChannel: {},
         /**EVENTOS**/
 		allEvents: {

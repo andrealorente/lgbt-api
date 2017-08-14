@@ -169,6 +169,15 @@ var channelController = {
           data: result.data.allChannels.data
         });
     });
+  },
+  getSuscribers: function(req,res) {
+    var query = 'query { getSuscribers(channelID:\"'+ req.params.id +'\"){ data { username, name, image, id }}}';
+    graphql(Schema, query).then(function(result){
+      res.json({
+        success: true,
+        data: result.data.getSuscribers.data
+      });
+    });
   }
 };
 
