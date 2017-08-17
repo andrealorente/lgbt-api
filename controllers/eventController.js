@@ -100,22 +100,22 @@ var eventController = {
   },
   //Obtener un evento concreto
   oneEvent: function(req,res) {
-      var query = 'query { oneEvent(eventID:\"' + req.params.id + '\") { data {title, description, place, created_time, start_time, end_time, author_id, author_data { username }, comments(targetID:\"' + req.params.id +'\") { author_data { id, username, name }, content, created_time }, assistants, interested }} }';
-      graphql(Schema, query).then( function(result) {
-  		console.log(result); // { data: oneEvent: null }
-  		if(result.data.oneEvent == null){ //No sé si esto está bien así o habría que mandar el error desde graphql
-  			res.json({
-  				success: false,
-  				error: "No se ha encontrado ningún evento con esa ID"
-  			});
-  		}else{
-  			res.json({
-  				success: true,
-  				data: result.data.oneEvent.data
-  			});
-  		}
+    var query = 'query { oneEvent(eventID:\"' + req.params.id + '\") { data {title, description, place, created_time, start_time, end_time, author_id, author_data { username }, comments(targetID:\"' + req.params.id +'\") { author_data { id, username, name }, content, created_time }, assistants, interested }} }';
+    graphql(Schema, query).then( function(result) {
+		console.log(result); // { data: oneEvent: null }
+		if(result.data.oneEvent == null){ //No sé si esto está bien así o habría que mandar el error desde graphql
+			res.json({
+				success: false,
+				error: "No se ha encontrado ningún evento con esa ID"
+			});
+		}else{
+			res.json({
+				success: true,
+				data: result.data.oneEvent.data
+			});
+		}
 
-      });
+    });
   },
   //Modificar un evento concreto
   updateEvent: function(req,res){

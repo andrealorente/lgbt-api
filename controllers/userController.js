@@ -136,8 +136,9 @@ var userController = {
     var gender = req.body.user_gender;
     var image = req.body.user_image;
 
-    var mutation = ` mutation { editUser(userID: \"`+req.user+`\", ) {
-      data { username, name, bio, email, gender },
+    var mutation = ` mutation { editUser(userID: \"`+req.user+`\", username: \"`+username+`\",
+      name: \"`+name+`\", bio: \"`+bio+`\", gender: \"`+gender+`\", image: \"`+image+`\" ) {
+      data { username, name, bio, email, gender, image },
       error{code, message} } }`;
     graphql(Schema,mutation).then(function(result){
       if(result.data.editUser.error==null) {

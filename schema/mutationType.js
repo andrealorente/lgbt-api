@@ -294,6 +294,9 @@ const mutationType = new GraphQLObjectType({
         },
         gender: {
           type: GraphQLString
+        },
+        image: {
+          type: GraphQLString
         }
       },
       resolve: function(_, args) {
@@ -311,7 +314,8 @@ const mutationType = new GraphQLObjectType({
                     username: args.username,
                     name: args.name,
                     bio: args.bio,
-                    gender: args.gender
+                    gender: args.gender,
+                    image: args.image
                   }
                 }, {
                   new: true
