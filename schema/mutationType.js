@@ -215,6 +215,7 @@ const mutationType = new GraphQLObjectType({
                     email: args.email,
                     pswd: args.pswd,
                     public: true,
+                    image: "http://res.cloudinary.com/tfg-lgbt-cloud/image/upload/v1502812240/users/default-user_fss0lr.png",
                     role: "user",
                     confirm: false
                   }, function(err, res) {
