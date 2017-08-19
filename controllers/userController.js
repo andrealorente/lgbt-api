@@ -32,7 +32,7 @@ var userController = {
   	var pswd = req.body.user_pswd;
     console.log(user);
     console.log(pswd);
-  	var mutation = 'mutation { loginUser(username: \"' + user + '\", password: \"'+pswd +'\"){ user { id, username, name, public }, error { code, message } } }';
+  	var mutation = 'mutation { loginUser(username: \"' + user + '\", password: \"'+pswd +'\"){ user { id, username, name, public, image }, error { code, message } } }';
 
   	graphql(Schema, mutation).then( function(result) {
   		//console.log(JSON.stringify(result));
@@ -56,7 +56,7 @@ var userController = {
     var email = req.body.email;
     var name = req.body.name;
 
-    var mutation = 'mutation { loginFB(email: \"' + email + '\", name: \"'+name +'\"){ user { id, username, name, public }, error { code, message } } }';
+    var mutation = 'mutation { loginFB(email: \"' + email + '\", name: \"'+name +'\"){ user { id, username, name, public, image }, error { code, message } } }';
 
   	graphql(Schema, mutation).then( function(result) {
   		//console.log(JSON.stringify(result));
@@ -135,6 +135,7 @@ var userController = {
     var bio = req.body.user_bio;
     var gender = req.body.user_gender;
     var image = req.body.user_image;
+    var place = req.body.user_place;
 
     var mutation = ` mutation { editUser(userID: \"`+req.user+`\", username: \"`+username+`\",
       name: \"`+name+`\", bio: \"`+bio+`\", gender: \"`+gender+`\", image: \"`+image+`\" ) {
@@ -214,7 +215,7 @@ var userController = {
   	});
   },
   getRequests: function(req,res) {
-    var query = ' query { user(userID:\"' + req.user + '\") { relationships { id, user_data {username, bio, public }, outgoing_status, incoming_status } } }';
+    var query = ' query { user(userID:\"' + req.user + '\") { relationships { id, user_data { username, bio, public, image }, outgoing_status, incoming_status } } }';
   	graphql(Schema, query).then( function(result) {
   		//console.log(JSON.stringify(result,null," "));
       var relationships = [];
