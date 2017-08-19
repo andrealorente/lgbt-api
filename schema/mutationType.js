@@ -352,6 +352,35 @@ const mutationType = new GraphQLObjectType({
         });//Fin Promise
       }
     },
+    /** Modificar privacidad de un usuario */
+    privacity: {
+      type: new GraphQLObjectType({
+        name: 'privacityResult',
+        fields: {
+          data: { type: GraphQLBoolean },
+          error: { type: errorType }
+        }
+      }),
+      description: 'Modificar la privacidad de un usuario.',
+      args: {
+        userID: { type: GraphQLString }
+      },
+      resolve: function(_,{ userID }) {
+        return new Promise((resolve,reject) => {
+          User.findById(userID, function(err, user){
+            if(err) reject(err);
+            user.public = !user.public;
+            user.save(function(err, res){
+              if(err) reject(err);
+              resolve({
+                data: res.public,
+                error: null
+              });
+            });
+          });
+        });
+      }
+    },
     /** Modificar la relación entre dos usuarios **/
     relationship: {
       type: new GraphQLObjectType({
