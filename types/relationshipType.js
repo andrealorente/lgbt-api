@@ -19,7 +19,8 @@ const relationshipType = new GraphQLObjectType({
           fields: {
             username: { type: GraphQLString },
             bio: { type: GraphQLString },
-            public: { type: GraphQLBoolean }
+            public: { type: GraphQLBoolean },
+            image: { type: GraphQLString }
           }
         }),
         resolve: (rel) => {
@@ -30,7 +31,8 @@ const relationshipType = new GraphQLObjectType({
                 resolve({
                   username: user.username,
                   bio: user.bio,
-                  public: user.public
+                  public: user.public,
+                  image: user.image
                 });
               }
             });
