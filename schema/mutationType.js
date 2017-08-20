@@ -381,6 +381,49 @@ const mutationType = new GraphQLObjectType({
         });
       }
     },
+    // Modificar contraseña de usuario
+    changePswd: {
+      type: new GraphQLObjectType({
+        name: 'changePswdResult',
+        fields: {
+          data: { type: GraphQLString },
+          error: { type: errorType }
+        }
+      }),
+      description: 'Cambiar la contraseña de un usuario.',
+      args: {
+        userID: { type: GraphQLString },
+        oldPswd: { type: GraphQLString },
+        newPswd: { type: GraphQLString }
+      },
+      resolve: function(_, args) {
+        return new Promise((resolve,reject) => {
+          User.findById(args.userID, function(err, user) {
+            if(err) reject(err);
+
+            //Comprobar la vieja contraseña
+            if(user.pswd != args.oldPswd)
+              resolve({
+                data: null,
+                error: {
+                  code: 1,
+                  message: 'Tu contraseña actual no coincide.'
+                }
+              });
+
+            user.pswd = args.newPswd;
+            user.save(function(err,res){
+              if(err) reject(err);
+
+              resolve({
+                data: res.pswd,
+                error: null
+              });
+            });
+          });
+        });
+      }
+    },
     /** Modificar la relación entre dos usuarios **/
     relationship: {
       type: new GraphQLObjectType({

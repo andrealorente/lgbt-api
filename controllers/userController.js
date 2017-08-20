@@ -170,6 +170,20 @@ var userController = {
       });
     });
   },
+  changePassword: function(req,res) {
+    var mutation = 'mutation { changePswd(userID: \"'+ req.user +'\",oldPswd: \"'+ req.body.old_pswd +'\", newPswd: \"'+ req.body.new_pswd +'\" ) { data, error { code, message } } }';
+    graphql(Schema, mutation).then(function(result) {
+      if(result.data.changePswd.error)
+        res.json({
+          success: false,
+          error: result.data.changePswd.error
+        });
+      res.json({
+        success: true,
+        data: result.data.changePswd.data
+      });
+    });
+  },
   getFollows: function(req,res) {
     var query = ' query { user(userID:\"' + req.params.id + '\") { relationships { id, user_data { username, bio, public, image }, outgoing_status, incoming_status } } }';
   	graphql(Schema, query).then( function(result) {
