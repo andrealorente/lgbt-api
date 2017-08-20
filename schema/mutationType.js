@@ -402,7 +402,10 @@ const mutationType = new GraphQLObjectType({
             if(err) reject(err);
 
             //Comprobar la vieja contraseña
-            if(user.pswd != args.oldPswd)
+            console.log("Contraseña del usuario consultado: " + user.pswd);
+            console.log("Contraseña actual recibida por args: " + args.oldPswd);
+            console.log("Contraseña nueva: "+ args.newPswd);
+            if(user.pswd != args.oldPswd){
               resolve({
                 data: null,
                 error: {
@@ -410,16 +413,16 @@ const mutationType = new GraphQLObjectType({
                   message: 'Tu contraseña actual no coincide.'
                 }
               });
-
-            user.pswd = args.newPswd;
-            user.save(function(err,res){
-              if(err) reject(err);
-
-              resolve({
-                data: res.pswd,
-                error: null
+            }else{
+              user.pswd = args.newPswd;
+              user.save(function(err,res){
+                if(err) reject(err);
+                resolve({
+                  data: res.pswd,
+                  error: null
+                });
               });
-            });
+            }   
           });
         });
       }

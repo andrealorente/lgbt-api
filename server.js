@@ -126,9 +126,9 @@ app.get('/v1/activity', middleware.ensureAuthorised, userController.getActivity)
 //Confirmar correo
 app.post('/v1/users/confirm', userController.confirmAccount);
 //Cambiar privacidad de un usuario
-app.post('/v1/users/privacity', middleware.ensureAuthorised, userController.changePrivacity);
+app.post('/v1/privacity', middleware.ensureAuthorised, userController.changePrivacity);
 //Cambiar contraseña de usuario
-app.post('/v1/users/password', middleware.ensureAuthorised, userController.changePassword);
+app.post('/v1/password', middleware.ensureAuthorised, userController.changePassword);
 //Reportar usuario/comentario/canal
 app.post('/v1/report', middleware.ensureAuthorised, userController.report);
 //Solicitar rango de editor-request

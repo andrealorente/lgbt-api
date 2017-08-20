@@ -171,21 +171,25 @@ var userController = {
     });
   },
   changePassword: function(req,res) {
-    var mutation = 'mutation { changePswd(userID: \"'+ req.user +'\",oldPswd: \"'+ req.body.old_pswd +'\", newPswd: \"'+ req.body.new_pswd +'\" ) { data, error { code, message } } }';
+
+    var mutation = 'mutation { changePswd(userID: \"'+ req.user +'\",oldPswd: \"'+ req.body.user_oldpswd +'\", newPswd: \"'+ req.body.user_newpswd +'\" ) { data, error { code, message } } }';
     graphql(Schema, mutation).then(function(result) {
-      if(result.data.changePswd.error)
+      console.log(result.data.changePswd);
+      if(result.data.changePswd.error){
         res.json({
           success: false,
           error: result.data.changePswd.error
         });
-      res.json({
-        success: true,
-        data: result.data.changePswd.data
-      });
+      }else{
+        res.json({
+          success: true,
+          data: result.data.changePswd.data
+        });
+      }
     });
   },
   getFollows: function(req,res) {
-    var query = ' query { user(userID:\"' + req.params.id + '\") { relationships { id, user_data { username, bio, public, image }, outgoing_status, incoming_status } } }';
+    var query = ' query { user(userID:\"' + req.params.id + '\") { relationships { id, user_data { username, name, public, image }, outgoing_status, incoming_status } } }';
   	graphql(Schema, query).then( function(result) {
   		//console.log(JSON.stringify(result,null," "));
       var relationships = [];
@@ -201,7 +205,7 @@ var userController = {
   	});
   },
   getFollowedby: function(req,res){
-    var query = ' query { user(userID:\"' + req.params.id + '\") { relationships { id, user_data {username, bio, public, image }, outgoing_status, incoming_status } } }';
+    var query = ' query { user(userID:\"' + req.params.id + '\") { relationships { id, user_data {username, name, public, image }, outgoing_status, incoming_status } } }';
   	graphql(Schema, query).then( function(result) {
   		//console.log(JSON.stringify(result,null," "));
       var relationships = [];
