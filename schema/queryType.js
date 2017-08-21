@@ -148,6 +148,31 @@ const queryType = new GraphQLObjectType({
         });
       }
     },
+    searchUser: {
+      type: new GraphQLObjectType({
+        name: 'searchUserResult',
+        fields: {
+          data: { type: new GraphQLList(userType)},
+          error: { type: errorType }
+        }
+      }),
+      description: 'Buscar usuarios.',
+      args: {
+        searched: { type: GraphQLString }
+      },
+      resolve: function(_,{searched}) {
+        return new Promise((resolve, reject) => {
+          User.find( { $or: [ { username: { $regex: ".*"+searched+".*", $options: 'i' } }, { name: { $regex: ".*"+searched+".*", $options: 'i' }  } ] },
+            function(err, results) {
+              if(err) reject(err);
+              resolve({
+                data: results,
+                error: null
+              })
+            });
+        });
+      }
+    },
     /**POSTS**/
     allPosts: {
       type: new GraphQLObjectType({
@@ -258,16 +283,16 @@ const queryType = new GraphQLObjectType({
 					error: { type: errorType }
 				}
 			}),
-            description: 'Buscar un post ya existente',
-            args: {
-                searchparams: {type: GraphQLString},
-                type: {type: GraphQLString}
-            },
-            resolve: function(_, {searchparams}){
-                console.log(searchparams);
-                return new Promise((resolve, reject) => {
-                    Post.find( { $or: [ { title: { $regex: ".*"+searchparams+".*", $options: 'i' } }, { content: { $regex: ".*"+searchparams+".*", $options: 'i' }  } ] }
-                    ,function(err, post){
+        description: 'Buscar un post ya existente',
+        args: {
+            searchparams: {type: GraphQLString},
+            type: {type: GraphQLString}
+        },
+        resolve: function(_, {searchparams}){
+            console.log(searchparams);
+            return new Promise((resolve, reject) => {
+                Post.find( { $or: [ { title: { $regex: ".*"+searchparams+".*", $options: 'i' } }, { content: { $regex: ".*"+searchparams+".*", $options: 'i' }  } ] }
+                ,function(err, post){
                         if(err) reject(err);
 						else if(post!=null){
                             //if(post.author == args.password){

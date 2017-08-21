@@ -131,6 +131,8 @@ app.post('/v1/privacity', middleware.ensureAuthorised, userController.changePriv
 app.post('/v1/password', middleware.ensureAuthorised, userController.changePassword);
 //Reportar usuario/comentario/canal
 app.post('/v1/report', middleware.ensureAuthorised, userController.report);
+//Buscar usuario
+app.post('/v1/search/users', middleware.ensureAuthorised, userController.searchUser);
 //Solicitar rango de editor-request
 app.post('/v1/editor', middleware.ensureAuthorised, function(req,res){
   var mutation = ` mutation { editRequest(userID, email, reason){ data { username }, error { code, message }} }`;

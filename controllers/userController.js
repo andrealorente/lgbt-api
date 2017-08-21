@@ -302,6 +302,22 @@ var userController = {
       });
     });
   },
+  searchUser: function(req, res) {
+    var query = 'query { searchUser(searched: \"'+ req.body.text_searched +'\") { data {id, username, name }, error {code, message}} }';
+    graphql(Schema, query).then(function(result) {
+      if(result.data.searchUser.error){
+        res.json({
+          success: false,
+          error: result.data.searchUser.error
+        });
+      }else{
+        res.json({
+          success: true,
+          data: result.data.searchUser.data
+        })
+      }
+    });
+  },
   saveFirebase: function(req,res) {
     console.log(req.user);
       var mutation = ` mutation {
