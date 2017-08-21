@@ -253,7 +253,7 @@ var eventController = {
   },
 
   searchEvent: function(req, res) {
-    var query = 'query { searchEvent(searched: \"'+ req.query.text +'\"){ data { id, title, description, image}, error { code, message}}';
+    var query = 'query { searchEvent(searched: \"'+ req.query.text +'\"){ data { id, title, description, image}, error { code, message}}}';
     graphql(Schema, query).then(function(result) {
       if(result.data.searchEvent.error)
         res.json({
