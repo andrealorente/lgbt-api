@@ -14,6 +14,7 @@ const channelType = new GraphQLObjectType({
         id: { type: GraphQLString },
         title: { type: GraphQLString },
         description: { type: GraphQLString },
+        image: { type: GraphQLString },
         author: { type: GraphQLString },
         messages: { type: new GraphQLList(messageType)},
         susc: { type: new GraphQLList(GraphQLString)},

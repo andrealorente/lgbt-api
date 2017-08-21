@@ -468,8 +468,10 @@ const queryType = new GraphQLObjectType({
       args: {
         searched: { type: GraphQLString }
       },
-      resolve: function(_,{searched}) {
+      resolve: function(_,{ searched }) {
+        
         return new Promise((resolve, reject) => {
+          console.log("args: "+searched); //undefined
           Channel.find( { $or: [ { title: { $regex: ".*"+searched+".*", $options: 'i' } }, { description: { $regex: ".*"+searched+".*", $options: 'i' }  } ] },
             function(err, results) {
               if(err) reject(err);
