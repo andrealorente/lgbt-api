@@ -455,8 +455,32 @@ const queryType = new GraphQLObjectType({
         });
         });
       }
-     },           
-        //searchChannel: {},
+     }, 
+     searchChannel: {
+      type: new GraphQLObjectType({
+        name: 'searchChannelResult',
+        fields: {
+          data: { type: new GraphQLList(channelType)},
+          error: { type: errorType }
+        }
+      }),
+      description: 'Buscar canales.',
+      args: {
+        searched: { type: GraphQLString }
+      },
+      resolve: function(_,{searched}) {
+        return new Promise((resolve, reject) => {
+          Channel.find( { $or: [ { title: { $regex: ".*"+searched+".*", $options: 'i' } }, { description: { $regex: ".*"+searched+".*", $options: 'i' }  } ] },
+            function(err, results) {
+              if(err) reject(err);
+              resolve({
+                data: results,
+                error: null
+              })
+            });
+        });
+      }
+    },          
         /**EVENTOS**/
 		allEvents: {
 			type: new GraphQLObjectType({
@@ -557,6 +581,32 @@ const queryType = new GraphQLObjectType({
         });
       }
     },
+
+    searchEvent: {
+      type: new GraphQLObjectType({
+        name: 'searchEventResult',
+        fields: {
+          data: { type: new GraphQLList(eventType)},
+          error: { type: errorType }
+        }
+      }),
+      description: 'Buscar eventos.',
+      args: {
+        searched: { type: GraphQLString }
+      },
+      resolve: function(_,{searched}) {
+        return new Promise((resolve, reject) => {
+          Channel.find( { $or: [ { title: { $regex: ".*"+searched+".*", $options: 'i' } }, { description: { $regex: ".*"+searched+".*", $options: 'i' }  } ] },
+            function(err, results) {
+              if(err) reject(err);
+              resolve({
+                data: results,
+                error: null
+              })
+            });
+        });
+      }
+    },          
         /**ADMINISTRACION**/
         usersReported: {
             type: new GraphQLObjectType({

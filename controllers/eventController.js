@@ -250,6 +250,22 @@ var eventController = {
        data: result.data.commentEvent.data
       });
     });
+  },
+
+  searchEvent: function(req, res) {
+    var query = 'query { searchEvent(searched: \"'+ req.query.text +'\"){ data { id, title, description, image}, error { code, message}}';
+    graphql(Schema, query).then(function(result) {
+      if(result.data.searchEvent.error)
+        res.json({
+          success: false,
+          error: result.data.searchEvent.error
+        });
+
+      res.json({
+        success: true,
+        data: result.data.searchEvent.data
+      })
+    });
   }
 };
 

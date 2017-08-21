@@ -178,6 +178,21 @@ var channelController = {
         data: result.data.getSuscribers.data
       });
     });
+  },
+  searchChannel: function(req,res) {
+    var query = 'query { searchChannel(searched: \"'+ req.query.text +'\"){ data { id, title, description, image}, error { code, message}}';
+    graphql(Schema, query).then(function(result) {
+      if(result.data.searchChannel.error)
+        res.json({
+          success: false,
+          error: result.data.searchChannel.error
+        });
+
+      res.json({
+        success: true,
+        data: result.data.searchChannel.data
+      })
+    });
   }
 };
 

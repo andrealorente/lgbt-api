@@ -79,6 +79,8 @@ app.post('/v1/channels/:id/suscribe', middleware.ensureAuthorised, channelContro
 app.post('/v1/channels/:id/notifications', middleware.ensureAuthorised, channelController.notifChannel);
 //Obtener los suscriptores de un canal
 app.get('/v1/channels/:id/suscribers', middleware.ensureAuthorised, channelController.getSuscribers);
+//Buscar canales por nombre o descripción
+app.get('/v1/search/channels', middleware.ensureAuthorised, channelController.searchChannel);
 
 /******* RUTAS DE EVENTOS ********/
 
@@ -98,6 +100,8 @@ app.post('/v1/events/:id/assist', middleware.ensureAuthorised, eventController.a
 app.post('/v1/events/:id/interested', middleware.ensureAuthorised, eventController.interestEvent);
 //Comentar un evento
 app.post('/v1/events/:id/comments', middleware.ensureAuthorised, eventController.commentEvent);
+//Buscar evento
+app.get('/v1/search/events', middleware.ensureAuthorised, eventController.searchEvent);
 
 /******* RUTAS DE USUARIO ********/
 
