@@ -598,7 +598,7 @@ const queryType = new GraphQLObjectType({
       },
       resolve: function(_,{searched}) {
         return new Promise((resolve, reject) => {
-          Channel.find( { $or: [ { title: { $regex: ".*"+searched+".*", $options: 'i' } }, { description: { $regex: ".*"+searched+".*", $options: 'i' }  } ] },
+          Event.find( { $or: [ { title: { $regex: ".*"+searched+".*", $options: 'i' } }, { description: { $regex: ".*"+searched+".*", $options: 'i' }  } ] },
             function(err, results) {
               if(err) reject(err);
               resolve({
