@@ -303,7 +303,7 @@ var userController = {
     });
   },
   searchUser: function(req, res) {
-    var query = 'query { searchUser(searched: \"'+ req.body.text_searched +'\") { data {id, username, name }, error {code, message}} }';
+    var query = 'query { searchUser(searched: \"'+ req.query.text +'\") { data {id, username, name }, error {code, message}} }';
     graphql(Schema, query).then(function(result) {
       if(result.data.searchUser.error){
         res.json({
