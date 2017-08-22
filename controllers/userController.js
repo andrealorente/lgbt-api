@@ -189,8 +189,10 @@ var userController = {
     });
   },
   getFollows: function(req,res) {
+
     var query = ' query { user(userID:\"' + req.params.id + '\") { relationships { id, user_data { username, name, public, image }, outgoing_status, incoming_status } } }';
-  	graphql(Schema, query).then( function(result) {
+
+    graphql(Schema, query).then( function(result) {
   		//console.log(JSON.stringify(result,null," "));
       var relationships = [];
 

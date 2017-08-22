@@ -45,15 +45,14 @@ const queryType = new GraphQLObjectType({
       args: {
           userID: { type: GraphQLString }
       },
-      resolve: function( _, {userID} ) {
-
-          return new Promise((resolve,reject) => {
-              //Aquí se recuperan los datos de la bd
-              User.findOne({ _id: userID}, function(err, res) {
-                  if (err) reject(err);
-                  else resolve(res);
-              });
-          }); //Fin Promise
+      resolve: function( _, {userID} ) {  
+        return new Promise((resolve,reject) => {
+            //Aquí se recuperan los datos de la bd
+            User.findOne({ _id: userID}, function(err, res) {
+                if (err) reject(err);
+                else resolve(res);
+            });
+        }); //Fin Promise
 
       } //Fin resolve
     }, //Fin consultar user
