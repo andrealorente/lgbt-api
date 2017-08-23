@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var MessageSchema = require('./messageModel');
+var ReportSchema = require('./reportModel');
 
 var ChannelSchema = new Schema({
   title: String,
@@ -8,7 +9,7 @@ var ChannelSchema = new Schema({
   author: String,
   messages: [MessageSchema],
   susc: [String],
-  reports: [String]
+  reports: [ReportSchema]
 });
 
 var Channel = mongoose.model('channels', ChannelSchema); //nombre de la colección en la bd

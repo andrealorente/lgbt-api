@@ -9,6 +9,7 @@ import {
 import relationshipType from './relationshipType';
 import activityType from './activityType';
 import Activity from './../models/activityModel';
+import reportType from './reportType';
 
 //Definir User type
 const userType = new GraphQLObjectType({
@@ -71,7 +72,7 @@ const userType = new GraphQLObjectType({
       }
     })
     )},
-    reports: { type: new GraphQLList(GraphQLString) },
+    reports: { type: new GraphQLList(reportType) },
     role: { type: GraphQLString },
     confirm: { type: GraphQLBoolean },
     firebase_token: { type: GraphQLString }

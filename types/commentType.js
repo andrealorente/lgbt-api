@@ -5,6 +5,7 @@ import {
   GraphQLList,
 } from 'graphql';
 import userType from './userType';
+import reportType from './reportType';
 var User = require('./../models/userModel');
 
 const commentType = new GraphQLObjectType({
@@ -26,7 +27,7 @@ const commentType = new GraphQLObjectType({
 		},
 		content: { type: GraphQLString },
 		created_time: { type: GraphQLString },
-		reports: { type: new GraphQLList(GraphQLString) },
+		reports: { type: new GraphQLList(reportType) },
 		state: { type: GraphQLString }
 	}
 });

@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
+var ReportSchema = require('./reportModel');
 
 var CommentSchema = new Schema({
   target_id: String,
@@ -7,7 +8,7 @@ var CommentSchema = new Schema({
   content: String,
   created_time: Date,
   state: String,
-  reports: [String]
+  reports: [ReportSchema]
 });
 
 var Comment = mongoose.model('comments', CommentSchema); //nombre de la colecci�n en la bd

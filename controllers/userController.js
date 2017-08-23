@@ -294,9 +294,10 @@ var userController = {
     });
   },
   report: function(req,res) {
+
     var mutation = ` mutation {
       report(originID:\"`+req.user+`\", targetID: \"`+req.body.target_id+`\",
-      targetType: `+req.body.target_type+` , reason: \"`+ req.body.reason+`\") {
+      targetType: \"`+req.body.target_type+`\" , reason: \"`+ req.body.reason+`\") {
       data, error { code, message } } }`;
     graphql(Schema, mutation).then( function(result) {
       res.json({

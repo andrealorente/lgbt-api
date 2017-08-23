@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var RelationshipSchema = require('./relationshipModel');
+var ReportSchema = require('./reportModel');
 
 var MinChannel = new Schema({ //Pasar esto a otro archivo
   channel_id: String,
@@ -19,7 +20,7 @@ var UserSchema = new Schema({
   public: Boolean,
   relationships: [RelationshipSchema],
   channels: [MinChannel],
-  reports: [String],
+  reports: [ReportSchema],
   role: String,
   confirm: Boolean,
   firebase_token: String

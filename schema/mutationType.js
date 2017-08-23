@@ -1528,8 +1528,13 @@ const mutationType = new GraphQLObjectType({
                     }
                   });
                 }else{
-                  //Guardar el reporte con qué datos?? el motivo y el usuario que ha hecho el reporte?
-                  user.reports.push(args.reason);
+                  
+                  user.reports.push({
+                    origin_id: args.originID,
+                    target_id: args.targetID,
+                    target_type: args.targetType,
+                    reason: args.reason
+                  });
 
                   user.save(function(err){
                     if(err) reject(err);
@@ -1556,7 +1561,12 @@ const mutationType = new GraphQLObjectType({
                   }
                 });
               }else{
-                comm.reports.push(args.reason);
+                comm.reports.push({
+                  origin_id: args.originID,
+                  target_id: args.targetID,
+                  target_type: args.targetType,
+                  reason: args.reason
+                });
                 comm.save(function(err){
                   if(err) reject(err);
                   else{
@@ -1581,7 +1591,12 @@ const mutationType = new GraphQLObjectType({
                   }
                 });
               }else{
-                chan.reports.push(args.reason);
+                chan.reports.push({
+                  origin_id: args.originID,
+                  target_id: args.targetID,
+                  target_type: args.targetType,
+                  reason: args.reason
+                });
                 chan.save(function(err){
                   if(err) reject(err);
                   else{
