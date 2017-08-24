@@ -168,6 +168,10 @@ io.on('connection', function(socket){
   socket.on('join', function(roomId){
     socket.join(roomId);
   });
+
+  socket.on('leave', function(roomId){
+    socket.leave(roomId);
+  });
 });
 
 /*var server = app.listen(process.env.PORT || 8080, function () {
