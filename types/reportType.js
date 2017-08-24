@@ -13,8 +13,8 @@ var reportType = new GraphQLObjectType({
     id: { type: GraphQLString },
     origin_id: { type: GraphQLString },
     target_id: { type: GraphQLString },
-    target_type: { type: GraphQLInt },
-    reason: { type: GraphQLString }
+    reason: { type: GraphQLString },
+    created_time: { type: GraphQLDateTime }
   }
 });
 

@@ -1532,8 +1532,8 @@ const mutationType = new GraphQLObjectType({
                   user.reports.push({
                     origin_id: args.originID,
                     target_id: args.targetID,
-                    target_type: args.targetType,
-                    reason: args.reason
+                    reason: args.reason,
+                    created_time: new Date().toISOString()
                   });
 
                   user.save(function(err){
@@ -1564,8 +1564,8 @@ const mutationType = new GraphQLObjectType({
                 comm.reports.push({
                   origin_id: args.originID,
                   target_id: args.targetID,
-                  target_type: args.targetType,
-                  reason: args.reason
+                  reason: args.reason,
+                  created_time: new Date().toISOString()
                 });
                 comm.save(function(err){
                   if(err) reject(err);
@@ -1594,8 +1594,8 @@ const mutationType = new GraphQLObjectType({
                 chan.reports.push({
                   origin_id: args.originID,
                   target_id: args.targetID,
-                  target_type: args.targetType,
-                  reason: args.reason
+                  reason: args.reason,
+                  created_time: new Date().toISOString()
                 });
                 chan.save(function(err){
                   if(err) reject(err);

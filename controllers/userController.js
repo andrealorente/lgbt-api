@@ -300,6 +300,12 @@ var userController = {
       targetType: \"`+req.body.target_type+`\" , reason: \"`+ req.body.reason+`\") {
       data, error { code, message } } }`;
     graphql(Schema, mutation).then( function(result) {
+      if(result.data.report.error) {
+        res.json({
+          success: false,
+          error: result.data.report.error
+        });
+      }
       res.json({
         success: result.data.report.data
       });
