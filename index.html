@@ -28,6 +28,7 @@
       nickname = 'Usuario' + Math.random(2000);
     } else {
       socket.emit('chat message', nickname + ' se ha conectado al chat.');
+      socket.emit('join', 'canal');
       users.push(nickname);
     }
 
@@ -41,7 +42,7 @@
       $('#messages').append($('<li>').text(msg));
     });
 
-    
+
   });
 
   </script>
