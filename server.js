@@ -160,11 +160,14 @@ io.on('connection', function(socket){
     console.log('message: ' + msg.msg);
     io.to(msg.room).emit('chat message', msg.msg);
   });
+
   socket.on('disconnect', function(){
     console.log('user disconnected');
     io.emit('chat message', 'A user disconnected');
   });
+
   var rooms = [];
+  
   socket.on('join', function(roomId){
     socket.join(roomId);
   });
