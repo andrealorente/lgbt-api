@@ -4,7 +4,7 @@ import {
   GraphQLNonNull,
   GraphQLList,
   GraphQLBoolean,
-  GraphQLInt,
+  GraphQLInt
 } from 'graphql';
 import messageType from './messageType';
 

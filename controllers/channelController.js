@@ -121,19 +121,18 @@ var channelController = {
   },
   //Enviar mensaje al canal
   sendMessage: function(req,res) {
-    console.log(req.body);
-    var mutation = "mutation { sendMessage(content:\""+ req.body.content +"\", channelID:\""+ req.body.channelID +"\") { message{ content, created_time, channel}, error{code,message} } }";
+    var mutation = "mutation { sendMessage(content:\""+ req.body.content +"\", channelID:\""+ req.body.channelID +"\") { data{ content, created_time, channel}, error{code,message} } }";
     graphql(Schema, mutation).then( function(result) {
-      if(result.data == null){
         console.log(result);
+      if(result.data == null){
         res.json({
           success: false,
-          error: "No se ha podido enviar ningún mensaje."
+          error: result.data.sendMessage.error
         });
       }else{
           res.json({
             success: true,
-            data: result.data.sendMessage
+            data: result.data.sendMessage.data
           });
 
       }
