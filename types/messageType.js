@@ -1,7 +1,7 @@
 import {
   GraphQLObjectType,
   GraphQLString,
-  GraphQLNonNull,
+  GraphQLNonNull
 } from 'graphql';
 
 var messageType = new GraphQLObjectType({

@@ -1110,12 +1110,13 @@ const mutationType = new GraphQLObjectType({
         }
       },
       resolve: function(root, args) {
-        console.log(args.state);
+        console.log(args);
         return new Promise((resolve, reject) => {
           //Buscar canal
           Channel.findById(args.channelID, function(err,channel){
             if(err) reject(err);
             else if(channel!=null){
+                console.log(channel);
               channel.messages.push({
                 content: args.content,
                 created_time: new Date().toISOString(),
