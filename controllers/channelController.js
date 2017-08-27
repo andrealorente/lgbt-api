@@ -84,9 +84,9 @@ var channelController = {
   //Obtener todos los canales
   allChannels: function(req, res) {
 
-      var query = 'query { allChannels(userSusc:"") { data{id, title, description, author, susc},error{code,message} } }';
+      var query = 'query { allChannels(userSusc:"",after: \"'+ req.query.after +'\") { data{id, title, description, author, susc},error{code,message} } }';
       graphql(Schema, query).then( function(result) {
-          if(result.data.allChannels == null){
+          if(result.data.allChannels == null || result.data.allPosts.data.length == 0){
   			res.json({
   				success: false,
   				error: "No se ha encontrado ningún canal con esa ID"
