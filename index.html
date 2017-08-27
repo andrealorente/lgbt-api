@@ -27,7 +27,7 @@
     if (nickname == null || nickname == "") {
       nickname = 'Usuario' + Math.random(2000);
     } else {
-      socket.emit('chat message', nickname + ' se ha conectado al chat.');
+      socket.emit('chat message', {room: 'canal', msg: nickname + ' se ha conectado al chat.'});
       socket.emit('join', 'canal');
       users.push(nickname);
     }
@@ -39,7 +39,8 @@
     });
 
     socket.on('chat message', function(msg){ //Añadir los mensajes que te llegan
-      $('#messages').append($('<li>').text(msg.msg));
+      console.log(msg);
+      $('#messages').append($('<li>').text(msg));
     });
 
 
