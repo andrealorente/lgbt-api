@@ -33,7 +33,7 @@
     }
 
     $('form').submit(function(){
-      socket.emit('chat message', {room: 'canal', msg: nickname + ': ' + $('#m').val()});
+      socket.emit('chat message', {room: '58d2498f734d1d60d985d383', msg: nickname + ': ' + $('#m').val()});
       $('#m').val('');
       return false;
     });
