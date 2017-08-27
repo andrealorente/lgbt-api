@@ -91,10 +91,17 @@ var postController = {
                   error: "No se ha encontrado ningún post en la base de datos."
               });
           }else{
-              res.json({
-                  success: true,
-                  data: result.data.allPosts.data
-              });
+              if(result.data.allPosts.data.length == 0){
+                  res.json({
+                      success: false,
+                      error: "No se ha encontrado ningún post en la base de datos."
+                  });
+              }else{
+                  res.json({
+                      success: true,
+                      data: result.data.allPosts.data
+                  });
+              }
           }
       });
   },

@@ -92,10 +92,17 @@ var eventController = {
                   error: "No se ha encontrado ningún evento en la base de datos."
               });
           }else{
-              res.json({
-                  success: true,
-                  data: result.data.allEvents.data
-              });
+              if(result.data.allEvents.data.length == 0){
+                  res.json({
+                      success: false,
+                      error: "No se ha encontrado ningún evento en la base de datos."
+                  });
+              }else{
+                  res.json({
+                      success: true,
+                      data: result.data.allEvents.data
+                  });
+              }
           }
       });
   },
