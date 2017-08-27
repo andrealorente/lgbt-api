@@ -483,41 +483,42 @@ const queryType = new GraphQLObjectType({
         });
       }
     },          
-        /**EVENTOS**/
-		allEvents: {
+      /**EVENTOS**/
+      allEvents: {
 			type: new GraphQLObjectType({
-        name: 'allEventsResult',
-        fields: {
-            data: { type: new GraphQLList(eventType) },
-            error: { type: errorType }
-        }
-      }),
-      args: {
-          month: { type: GraphQLInt },
-          year: { type: GraphQLInt }
-      },
+                name: 'allEventsResult',
+                fields: {
+                    data: { type: new GraphQLList(eventType) },
+                    error: { type: errorType }
+                }
+            }),
+            args: {
+                month: { type: GraphQLInt },
+                year: { type: GraphQLInt },
+                after: { type: GraphQLDateTime }
+            },
 			resolve: function(_, args) {
 				return new Promise((resolve, reject) => {
-					Event.find(function(err, res) {
+					Event.find({ created_time: { $lt: args.after }},function(err, res) {console.log(res);
 						if(err) reject(err);
 						else{
-                var events = [];
-                //Guardar solo los eventos que sean del mes y año que se pasarle
-                console.log(res);
-                for(var i in res) {
-                    var date = new Date(res[i].start_time);
-                    console.log(date);
-                    if(date.getMonth() == args.month && date.getFullYear() == args.year){
-                        events.push(res[i]);
-                    }
-                }
-                //Faltaría ordenar por días
-                resolve({
-                    data: events,
-                    error: null
-                });
-            }
-					});
+                            var events = [];
+                            //Guardar solo los eventos que sean del mes y año que se pasarle
+                            console.log(res);
+                            for(var i in res) {
+                                var date = new Date(res[i].start_time);
+                                console.log(date);
+                                if(date.getMonth() == args.month && date.getFullYear() == args.year){
+                                    events.push(res[i]);
+                                }
+                            }
+                            //Faltaría ordenar por días
+                            resolve({
+                                data: events,
+                                error: null
+                            });
+                        }
+					}).sort('-created_time').limit( 5 );
 				});
 			}
 		},
