@@ -86,7 +86,7 @@ var channelController = {
 
       var query = 'query { allChannels(userSusc:"",after: \"'+ req.query.after +'\") { data{id, title, description, author, susc},error{code,message} } }';
       graphql(Schema, query).then( function(result) {
-          if(result.data.allChannels == null || result.data.allPosts.data.length == 0){
+          if(result.data.allChannels == null){
   			res.json({
   				success: false,
   				error: "No se ha encontrado ningún canal con esa ID"

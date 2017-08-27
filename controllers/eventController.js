@@ -86,7 +86,7 @@ var eventController = {
       var query = 'query { allEvents (month:'+ req.query.month + ', year:'+ req.query.year +',after: \"'+ req.query.after +'\") { data{ id, title, description, place, start_time, assistants, interested }, error { code, message } } }';
       graphql(Schema, query).then( function(result) {
           console.log(result);
-          if(result.data.allEvents == null || result.data.allEvents.data.length == 0){
+          if(result.data.allEvents == null){
               res.json({
                   success: false,
                   error: "No se ha encontrado ningún evento en la base de datos."
