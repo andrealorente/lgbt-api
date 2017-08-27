@@ -174,39 +174,39 @@ const queryType = new GraphQLObjectType({
     },
     /**POSTS**/
     allPosts: {
-      type: new GraphQLObjectType({
+        type: new GraphQLObjectType({
 			name: 'allPostsResult',
 			fields: {
-				data: { type: new GraphQLList(postType) },
+                data: { type: new GraphQLList(postType) },
 				error: { type: errorType }
-			 }
-		  }),
-      args: {
-        after: { type: GraphQLDateTime }
-      },
-      resolve: function(_, {after}){
-          return new Promise((resolve,reject) => {
-            console.log(after);
+            }
+        }),
+        args: {
+            after: { type: GraphQLDateTime }
+        },
+        resolve: function(_, {after}){
+            return new Promise((resolve,reject) => {
+                console.log(after);
 
-            Post.find({ created_time: { $lt: after }}, function(err, post){
-              if(err) reject(err);
-    					else if(post!=null){
-                resolve({
-                  data: post,
-                  error: null
-                });
-    					}else{
-    						resolve({
-    							data: null,
-    							error: {
-    								code: 1,
-    								message: "No hay ningún post creado."
-    							}
-    						});
-    					}
-            }).sort('-created_time').limit( 5 );
-          });
-      }
+                Post.find({ created_time: { $lt: after }}, function(err, post){
+                    if(err) reject(err);
+    				else if(post!=null){
+                        resolve({
+                            data: post,
+                            error: null
+                        });
+    				}else{
+    				    resolve({
+    				        data: null,
+    				        error: {
+    				            code: 1,
+    				            message: "No hay ningún post creado."
+    				        }
+    				    });
+    				}
+                }).sort('-created_time').limit( 5 );
+            });
+        }
     },
 		onePost: {
 			type: new GraphQLObjectType({
@@ -324,59 +324,60 @@ const queryType = new GraphQLObjectType({
                 });
             }
         },
-        /**CANALES**/
-		allChannels: { //Esto sería más bien para la página de Explorar canales (que muestra todos)
-      type: new GraphQLObjectType({
-        name: 'allChannelsResult',
-        fields: {
-          data: { type: new GraphQLList(channelType) },
-          error: { type: errorType }
-        }
-      }),
-        args: {
-          userSusc: { type: GraphQLString }
-        },
-			resolve: function(_,args) {
-				return new Promise((resolve, reject) => {
-          if(args.userSusc == ""){ //Se piden todos los canales de la app
-            Channel.find(function(err, channel){
-              if(err) reject(err);
-              else if(channel!=null){
-                resolve({
-                    data: channel,
-                    error: null
-                });
-              }else{
-                resolve({
-                  data: null,
-                  error: {
-                    code: 1,
-                    message: "No hay ningún canal creado."
-                  }
-                });
+      /**CANALES**/
+      allChannels: { //Esto sería más bien para la página de Explorar canales (que muestra todos)
+        type: new GraphQLObjectType({
+            name: 'allChannelsResult',
+            fields: {
+                data: { type: new GraphQLList(channelType) },
+                error: { type: errorType }
             }
-  					});
-          }else{
-            User.findById(args.userSusc, function(err, user){
-              var arrayIDs = [];
-              for(var i in user.channels){
-                arrayIDs.push(user.channels[i].channel_id);
-              }
-              Channel.find({
-                '_id': { $in: arrayIDs }
-              },function(err,channels){
-                if(err)reject(err);
-                else{
-                  resolve({
-                    data: channels,
-                    error: null
-                  });
+        }),
+        args: {
+            userSusc: { type: GraphQLString },
+            after: { type: GraphQLDateTime }
+        },
+          resolve: function(_,args) { 
+              return new Promise((resolve, reject) => {
+                if(args.userSusc == ""){ //Se piden todos los canales de la app  
+                    Channel.find({ created_time: { $lt: args.after }},
+                    function(err, channel){
+                        if(err) reject(err);
+                        else if(channel!=null){
+                            resolve({
+                                data: channel,
+                                error: null
+                            });
+                        }else{
+                            resolve({
+                                data: null,
+                                error: {
+                                    code: 1,
+                                    message: "No hay ningún canal creado."
+                                }
+                            });
+                        }
+  		            }).sort('-created_time').limit( 5 );
+                }else{
+                    User.findById(args.userSusc, function(err, user){
+                        var arrayIDs = [];
+                        for(var i in user.channels){
+                            arrayIDs.push(user.channels[i].channel_id);
+                        }
+                        Channel.find({
+                            '_id': { $in: arrayIDs }
+                        },function(err,channels){
+                            if(err)reject(err);
+                            else{
+                                resolve({
+                                    data: channels,
+                                    error: null
+                                });
+                            }
+                        });
+                    });
                 }
               });
-            });
-          }
-
-				});
 			}
 		},
 		oneChannel: {

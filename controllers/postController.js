@@ -82,10 +82,10 @@ var postController = {
       });
   },
   //Obtener todos los posts
-  allPosts: function(req, res) {
+  allPosts: function(req, res) {console.log(req);
       var query = 'query { allPosts(after: \"'+ req.query.after +'\") { data { id, title, content, image, author_id, author_data { username, image },tags, created_time, likes },error{code,message}} }';
       graphql(Schema, query).then( function(result) {
-          if(result.data.allPosts == null){
+          if(result.data.allPosts == null || result.data.allPosts.data.length == 0){
               res.json({
                   success: false,
                   error: "No se ha encontrado ningún post en la base de datos."
@@ -100,10 +100,9 @@ var postController = {
   },
   //Obtener un post
   onePost: function(req,res) {
-
   	var query = 'query { onePost(postID:\"' + req.params.id + '\") {data{ title, author_id, author_data { username, name, image }, content, created_time, tags, image, likes, comments( targetID: \"' + req.params.id +'\") { id, content, author_id, author_data { username, image }, created_time } },error{code,message}} }';
   	graphql(Schema, query).then( function(result) {
-      console.log(result);
+      //console.log(result);
   		if(result.data.onePost == null){
   			res.json({
   				success: false,
@@ -118,6 +117,7 @@ var postController = {
 
       });
   },
+  //Actualizar un post
   updatePost: function(req,res){
 
       var form = new formidable.IncomingForm();
