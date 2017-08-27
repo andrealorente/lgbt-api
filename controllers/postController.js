@@ -85,7 +85,7 @@ var postController = {
   allPosts: function(req, res) {console.log(req);
       var query = 'query { allPosts(after: \"'+ req.query.after +'\") { data { id, title, content, image, author_id, author_data { username, image },tags, created_time, likes },error{code,message}} }';
       graphql(Schema, query).then( function(result) {
-          if(result.data.allPosts == null || result.data.allPosts.data.length == 0){
+          if(result.data.allPosts == null){
               res.json({
                   success: false,
                   error: "No se ha encontrado ningún post en la base de datos."
