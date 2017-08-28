@@ -329,6 +329,24 @@ var userController = {
       }
     });
   },
+  becomeEditor: function(req, res) {
+    var mutation = `mutation { editRequest(userID: \"`+req.user+`\", email: \"`+req.body.email+`\", 
+    name: \"`+req.body.name+`\", org: \"`+req.body.org +`\",reason: \"`+req.body.reason+`\" ) 
+    { data, error { code, message }}}`;
+    graphql(Schema, mutation).then(function(result) {
+      if(result.data.editRequest.error){
+        res.json({
+          success: false,
+          error: result.data.editRequest.error
+        });
+      }else{
+        res.json({
+          success: true,
+          data: result.data.editRequest.data
+        });
+      }
+    });
+  },
   saveFirebase: function(req,res) {
     console.log(req.user);
       var mutation = ` mutation {

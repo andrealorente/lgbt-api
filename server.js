@@ -138,10 +138,8 @@ app.post('/v1/report', middleware.ensureAuthorised, userController.report);
 //Buscar usuario
 app.get('/v1/search/users', middleware.ensureAuthorised, userController.searchUser);
 //Solicitar rango de editor-request
-app.post('/v1/editor', middleware.ensureAuthorised, function(req,res){
-  var mutation = ` mutation { editRequest(userID, email, reason){ data { username }, error { code, message }} }`;
+app.post('/v1/editor', middleware.ensureAuthorised, userController.becomeEditor);
 
-});
 app.post('/v1/firebase', middleware.ensureAuthorised, userController.saveFirebase);
 
 /******* RUTAS DE ADMINISTRACION ********/

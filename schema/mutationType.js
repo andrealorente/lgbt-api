@@ -26,6 +26,7 @@ import postType from './../types/postType';
 import errorType from './../types/errorType';
 import activityType from './../types/activityType';
 import messageType from './../types/messageType';
+import requestType from './../types/requestType';
 
 var FCM = require('fcm-push');
 
@@ -636,6 +637,8 @@ const mutationType = new GraphQLObjectType({
       args: {
         userID: { type: GraphQLString },
         email: { type: GraphQLString },
+        name: { type: GraphQLString },
+        org: { type: GraphQLString },
         reason: { type: GraphQLString }
       },
       resolve: function(_,args) {
@@ -646,8 +649,11 @@ const mutationType = new GraphQLObjectType({
               if(user.role != 'editor'){
                 Request.create({
                   userID: args.userID,
+                  name: args.name,
+                  org: args.org,
                   email: args.email,
-                  reason: reason
+                  reason: args.reason,
+                  state: 'pending'
                 }, function(err,res){
                   if(err) reject(err);
                   else{
