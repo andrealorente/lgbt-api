@@ -643,10 +643,11 @@ const mutationType = new GraphQLObjectType({
       },
       resolve: function(_,args) {
         return new Promise((resolve,reject) => {
+          console.log("ENTRO EN EDITREQUEST");
           User.findById(args.userID, function(err,user){
             if(err) reject(err);
             else{
-              if(user.role != 'editor'){
+              
                 Request.create({
                   userID: args.userID,
                   name: args.name,
@@ -657,13 +658,14 @@ const mutationType = new GraphQLObjectType({
                 }, function(err,res){
                   if(err) reject(err);
                   else{
+                    console.log(res);
                     resolve({
                       data: user,
                       error: null
                     });
                   }
                 });
-              }
+              
             }
           });
         });
