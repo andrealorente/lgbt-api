@@ -103,15 +103,15 @@ const mutationType = new GraphQLObjectType({
       }
     },
 
-    loginFB: {
+    loginFBGg: {
       type: new GraphQLObjectType({
-        name: 'loginFBResult',
+        name: 'loginFBGgResult',
         fields: {
           user: { type: userType },
           error: { type: errorType }
         }
       }),
-      description: 'Iniciar sesión o registrar usuario con Facebook.',
+      description: 'Iniciar sesión o registrar usuario con Facebook o Google.',
       args: {
           email: { type: GraphQLString },
           name: { type: GraphQLString }
@@ -131,6 +131,7 @@ const mutationType = new GraphQLObjectType({
                   name: args.name,
                   email: args.email,
                   pswd: password,
+                  image: 'http://res.cloudinary.com/tfg-lgbt-cloud/image/upload/v1502812240/users/default-user_fss0lr.png',
                   public: true,
                   role: "user",
                   confirm: false
@@ -643,7 +644,7 @@ const mutationType = new GraphQLObjectType({
       },
       resolve: function(_,args) {
         return new Promise((resolve,reject) => {
-          console.log("ENTRO EN EDITREQUEST");
+
           User.findById(args.userID, function(err,user){
             if(err) reject(err);
             else{

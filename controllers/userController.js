@@ -33,7 +33,7 @@ var userController = {
       console.log(req);
     console.log(user);
     console.log(pswd);
-  	var mutation = 'mutation { loginUser(username: \"' + user + '\", password: \"'+pswd +'\"){ user { id, username, name, public, image }, error { code, message } } }';
+  	var mutation = 'mutation { loginUser(username: \"' + user + '\", password: \"'+pswd +'\"){ user { id, username, name, public, image, role }, error { code, message } } }';
 
   	graphql(Schema, mutation).then( function(result) {
   		//console.log(JSON.stringify(result));
@@ -53,25 +53,25 @@ var userController = {
   	});
   },
 
-  loginFB: function(req,res) {
+  loginFBGg: function(req,res) {
     var email = req.body.email;
     var name = req.body.name;
 
-    var mutation = 'mutation { loginFB(email: \"' + email + '\", name: \"'+name +'\"){ user { id, username, name, public, image }, error { code, message } } }';
+    var mutation = 'mutation { loginFBGg(email: \"' + email + '\", name: \"'+name +'\"){ user { id, username, name, public, image, role }, error { code, message } } }';
 
   	graphql(Schema, mutation).then( function(result) {
   		//console.log(JSON.stringify(result));
   		console.log(result);
-  		if(result.data.loginFB.user==null){
+  		if(result.data.loginFBGg.user==null){
   			res.json({
   				success: false,
-  				error: result.data.loginFB.error
+  				error: result.data.loginFBGg.error
   			});
   		}else{
   			res.json({
   				success: true,
-  				data: result.data.loginFB.user,
-  				token: createToken(result.data.loginFB.user)
+  				data: result.data.loginFBGg.user,
+  				token: createToken(result.data.loginFBGg.user)
   			});
   		}
   	});
