@@ -1131,7 +1131,9 @@ const mutationType = new GraphQLObjectType({
                   'to': '/topics/'+channel.id,
                   'notification': {
                     'title': channel.title,
-                    'body': args.content }
+                    'body': args.content,
+                    "sound":"default", //If you want notification sound
+                    "click_action":"FCM_PLUGIN_ACTIVITY" }
                 };
 
                 fcm.send(message, function(err, response){
@@ -1592,6 +1594,7 @@ const mutationType = new GraphQLObjectType({
                   }
                 });
               }else{
+                console.log(chan);
                 chan.reports.push({
                   origin_id: args.originID,
                   target_id: args.targetID,
