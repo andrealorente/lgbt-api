@@ -83,7 +83,7 @@ var eventController = {
   //Obtener los eventos de un mes
   allEvents: function(req, res) {
       //Se le pasan los parámetros en la url -> /events?month=4&year=2017 en RESTClient
-      var query = 'query { allEvents (month:'+ req.query.month + ', year:'+ req.query.year +',after: \"'+ req.query.after +'\") { data{ id, title, description, place, start_time, assistants, interested }, error { code, message } } }';
+      var query = 'query { allEvents (month:'+ req.query.month + ', year:'+ req.query.year +',after: \"'+ req.query.after +'\") { data{ id, title, description, place, start_time, assistants, interested, image }, error { code, message } } }';
       graphql(Schema, query).then( function(result) {
           console.log(result);
           if(result.data.allEvents == null){
@@ -108,7 +108,7 @@ var eventController = {
   },
   //Obtener un evento concreto
   oneEvent: function(req,res) {
-    var query = 'query { oneEvent(eventID:\"' + req.params.id + '\") { data {title, description, place, created_time, start_time, end_time, author_id, author_data { username, image }, comments(targetID:\"' + req.params.id +'\") { author_data { id, username, image }, content, created_time }, assistants, interested }} }';
+    var query = 'query { oneEvent(eventID:\"' + req.params.id + '\") { data {title, description, place, created_time, start_time, end_time, author_id, author_data { username, image }, comments(targetID:\"' + req.params.id +'\") { author_data { id, username, image }, content, created_time }, assistants, interested, image }} }';
     graphql(Schema, query).then( function(result) {
 		console.log(result); // { data: oneEvent: null }
 		if(result.data.oneEvent == null){ //No sé si esto está bien así o habría que mandar el error desde graphql
