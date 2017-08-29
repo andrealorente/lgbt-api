@@ -8,7 +8,8 @@ import {
   graphql,
   GraphQLObjectType,
   GraphQLList,
-  GraphQLString
+  GraphQLString,
+  GraphQLInt
 } from 'graphql';
 
 import { GraphQLDateTime } from 'graphql-iso-date';
@@ -49,6 +50,17 @@ var postType = new GraphQLObjectType({
   },
   state: { type: GraphQLString },
   likes: { type: new GraphQLList(GraphQLString) },
+  comments_count: {
+    type: GraphQLInt,
+    resolve: function(root) {
+      return new Promise((resolve,reject) => {
+        Comment.find({ 'target_id': root.id }, function(err, res) {
+          if(err) reject(err);
+          else resolve(res.length);
+        });
+      });
+    }
+  },
   created_time: { type: GraphQLDateTime }
 }
 });
