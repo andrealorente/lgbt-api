@@ -19,8 +19,6 @@ var eventController = {
       //console.log(form);
 
       form.parse(req, function(err, fields, files){
-          var tagspost=[];
-          if(fields.tags!="undefined" && fields.tags.split(", ")!=""){tagspost = fields.tags.split(', ');}
 
           var temp_path;
           if (files.images) {
@@ -31,17 +29,17 @@ var eventController = {
                           temp_path,
                           function (result) {
                               console.log("Actualizado con 1 foto");
-                              var mutation = "mutation{createPost(title:\""+ fields.title +"\",content:\""+ fields.content +"\",tags:"+ JSON.stringify(tagspost) +",image:\""+ result.version+"/"+result.public_id +"\",state:\""+ fields.state +"\",author_id:\""+ fields.author +"\"){data{title,content,tags,image,state,author_id},error{code,message}}}";
+                              var mutation = "mutation{createEvent(title:\""+ fields.title +"\",description:\""+ fields.description +"\",place:\""+ fields.place +"\",image:\""+ result.version+"/"+result.public_id +"\",state:\""+ fields.state +"\",author_id:\""+ fields.author +"\",start_time:\""+ fields.start_time +"\",end_time:\""+ fields.end_time +"\"){data{title,content,place,image,state,author_id,start_time,end_time},error{code,message}}}";
   	                       graphql(Schema, mutation).then( function(result) {
-  		                      if(result.data.createPost == null){
+  		                      if(result.data.createEvent == null){
   			                     res.json({
   				                    success: false,
-  				                    error: "No se ha creado el post"
+  				                    error: "No se ha creado el evento"
   			                     });
   		                      }else{
   			                     res.json({
   				                    success: true,
-  				                    data: result.data.createPost.data
+  				                    data: result.data.createEvent.data
   			                     });
   		                      }
 
@@ -52,8 +50,8 @@ var eventController = {
                               width: 300,
                               height: 300,
                               format: "png",
-                              folder: "posts",
-                              tags: ['posts', fields.id, fields.title/*, fields.author*/]
+                              folder: "events",
+                              tags: ['events', fields.id, fields.title/*, fields.author*/]
                           }
                       );
                   } else {
@@ -63,17 +61,17 @@ var eventController = {
           }
           else{
               console.log("Actualizado sin 1 foto");
-              var mutation = "mutation{createPost(title:\""+ fields.title +"\",content:\""+ fields.content +"\",tags:"+ JSON.stringify(tagspost) +",image:\"1493935772/no-image_u8eu8r\",state:\""+ fields.state +"\",author_id:\""+ fields.author +"\"){post{id,title,content,tags,image,state,author_id},error{code,message}}}";
-              graphql(Schema, mutation).then( function(result) {
-                   if(result.data.createPost == null){
+              var mutation = "mutation{createEvent(title:\""+ fields.title +"\",description:\""+ fields.description +"\",place:\""+ fields.place +"\",image:\"1493935772/no-image_u8eu8r\",state:\""+ fields.state +"\",author_id:\""+ fields.author +"\",start_time:\""+ fields.start_time +"\",end_time:\""+ fields.end_time +"\"){data{id,title,description,place,image,state,author_id,start_time,end_time},error{code,message}}}";
+              graphql(Schema, mutation).then( function(result) { console.log(result);
+                   if(result.data.createEvent == null ){
                        res.json({
                           success: false,
-                          error: "No se ha encontrado ningún post con esa ID"
+                          error: "No se ha encontrado ningún evento con esa ID"
                        });
                     }else{
                        res.json({
                           success: true,
-                          data: result.data.createPost
+                          data: result.data.createEvent.data
                        });
                     }
               });

@@ -342,7 +342,24 @@ var userController = {
           data: result.data.saveFirebase.data
         });
       });
-  }
+  },
+  recoverPassword: function(req,res) {
+    var mutation = 'mutation { recoverPassword(username: \"'+ req.body.username +'\" ) { data {name}, error { code, message } } }';
+    graphql(Schema, mutation).then(function(result) {
+      console.log(result);
+      if(result.data.recoverPassword.error){
+        res.json({
+          success: false,
+          error: result.data.recoverPassword.error
+        });
+      }else{
+        res.json({
+          success: true,
+          data: result.data.recoverPassword.data
+        });
+      }
+    });
+  },
 
 };
 
