@@ -518,7 +518,7 @@ const queryType = new GraphQLObjectType({
                     error: null
                 });
              }
-					}).sort('start_time').limit( 3 );
+					}).sort('start_time').limit( 4 );
 				});
 			}
 		},
