@@ -7,6 +7,7 @@ import {
 import userType from './userType';
 import reportType from './reportType';
 var User = require('./../models/userModel');
+import { GraphQLDateTime } from 'graphql-iso-date';
 
 const commentType = new GraphQLObjectType({
 	name: 'commentType',
@@ -26,7 +27,7 @@ const commentType = new GraphQLObjectType({
 			}
 		},
 		content: { type: GraphQLString },
-		created_time: { type: GraphQLString },
+		created_time: { type: GraphQLDateTime },
 		reports: { type: new GraphQLList(reportType) },
 		state: { type: GraphQLString }
 	}

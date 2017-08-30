@@ -33,7 +33,7 @@ var userController = {
       console.log(req);
     console.log(user);
     console.log(pswd);
-  	var mutation = 'mutation { loginUser(username: \"' + user + '\", password: \"'+pswd +'\"){ user { id, username, name, public, image }, error { code, message } } }';
+  	var mutation = 'mutation { loginUser(username: \"' + user + '\", password: \"'+pswd +'\"){ user { id, username, name, public, image, role }, error { code, message } } }';
 
   	graphql(Schema, mutation).then( function(result) {
   		//console.log(JSON.stringify(result));
@@ -53,25 +53,25 @@ var userController = {
   	});
   },
 
-  loginFB: function(req,res) {
+  loginFBGg: function(req,res) {
     var email = req.body.email;
     var name = req.body.name;
 
-    var mutation = 'mutation { loginFB(email: \"' + email + '\", name: \"'+name +'\"){ user { id, username, name, public, image }, error { code, message } } }';
+    var mutation = 'mutation { loginFBGg(email: \"' + email + '\", name: \"'+name +'\"){ user { id, username, name, public, image, role }, error { code, message } } }';
 
   	graphql(Schema, mutation).then( function(result) {
   		//console.log(JSON.stringify(result));
   		console.log(result);
-  		if(result.data.loginFB.user==null){
+  		if(result.data.loginFBGg.user==null){
   			res.json({
   				success: false,
-  				error: result.data.loginFB.error
+  				error: result.data.loginFBGg.error
   			});
   		}else{
   			res.json({
   				success: true,
-  				data: result.data.loginFB.user,
-  				token: createToken(result.data.loginFB.user)
+  				data: result.data.loginFBGg.user,
+  				token: createToken(result.data.loginFBGg.user)
   			});
   		}
   	});
@@ -295,11 +295,12 @@ var userController = {
     });
   },
   report: function(req,res) {
-
+    console.log(req.body);
     var mutation = ` mutation {
       report(originID:\"`+req.user+`\", targetID: \"`+req.body.target_id+`\",
-      targetType: \"`+req.body.target_type+`\" , reason: \"`+ req.body.reason+`\") {
+      targetType: `+req.body.target_type+` , reason: \"`+ req.body.reason +`\") {
       data, error { code, message } } }`;
+
     graphql(Schema, mutation).then( function(result) {
       if(result.data.report.error) {
         res.json({
@@ -325,6 +326,26 @@ var userController = {
           success: true,
           data: result.data.searchUser.data
         })
+      }
+    });
+  },
+  becomeEditor: function(req, res) {
+    console.log(req.body);
+    var mutation = `mutation { editRequest(userID: \"`+req.user+`\", email: \"`+req.body.email+`\", 
+    name: \"`+req.body.name+`\", org: \"`+req.body.org +`\",reason: \"`+req.body.reason+`\" ) 
+    { data { username, name }, error { code, message }}}`;
+    console.log(mutation);
+    graphql(Schema, mutation).then(function(result) {
+      if(result.data.editRequest.error){
+        res.json({
+          success: false,
+          error: result.data.editRequest.error
+        });
+      }else{
+        res.json({
+          success: true,
+          data: result.data.editRequest.data
+        });
       }
     });
   },

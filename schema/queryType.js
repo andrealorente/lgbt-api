@@ -358,7 +358,7 @@ const queryType = new GraphQLObjectType({
                             });
                         }
   		            }).sort('-created_time').limit( 5 );
-                }else{
+                }else{ //Se piden los canales a los que estoy suscrito
                     User.findById(args.userSusc, function(err, user){
                         var arrayIDs = [];
                         for(var i in user.channels){
@@ -486,39 +486,39 @@ const queryType = new GraphQLObjectType({
       /**EVENTOS**/
       allEvents: {
 			type: new GraphQLObjectType({
-                name: 'allEventsResult',
-                fields: {
-                    data: { type: new GraphQLList(eventType) },
-                    error: { type: errorType }
-                }
-            }),
-            args: {
-                month: { type: GraphQLInt },
-                year: { type: GraphQLInt },
-                after: { type: GraphQLDateTime }
-            },
+        name: 'allEventsResult',
+        fields: {
+          data: { type: new GraphQLList(eventType) },
+          error: { type: errorType }
+        }
+        }),
+        args: {
+          month: { type: GraphQLInt },
+          year: { type: GraphQLInt },
+          after: { type: GraphQLDateTime }
+        },
 			resolve: function(_, args) {
 				return new Promise((resolve, reject) => {
-					Event.find({ created_time: { $lt: args.after }},function(err, res) {console.log(res);
+					Event.find({ start_time: { $gt: args.after }},function(err, res) {console.log(res);
 						if(err) reject(err);
 						else{
-                            var events = [];
-                            //Guardar solo los eventos que sean del mes y año que se pasarle
-                            console.log(res);
-                            for(var i in res) {
-                                var date = new Date(res[i].start_time);
-                                console.log(date);
-                                if(date.getMonth() == args.month && date.getFullYear() == args.year){
-                                    events.push(res[i]);
-                                }
-                            }
-                            //Faltaría ordenar por días
-                            resolve({
-                                data: events,
-                                error: null
-                            });
-                        }
-					}).sort('-created_time').limit( 5 );
+                var events = [];
+                //Guardar solo los eventos que sean del mes y año que se pasarle
+                console.log(res);
+                for(var i in res) {
+                    var date = new Date(res[i].start_time);
+                    console.log(date);
+                    if(date.getMonth() == args.month && date.getFullYear() == args.year){
+                        events.push(res[i]);
+                    }
+                }
+                //Faltaría ordenar por días
+                resolve({
+                    data: events,
+                    error: null
+                });
+             }
+					}).sort('start_time').limit( 4 );
 				});
 			}
 		},

@@ -108,7 +108,9 @@ app.get('/v1/search/events', middleware.ensureAuthorised, eventController.search
 //Loguear un usuario
 app.post('/v1/users/login', userController.loginUser);
 //Loguear/registrar con fb
-app.post('/v1/users/login/facebook', userController.loginFB);
+app.post('/v1/users/login/facebook', userController.loginFBGg);
+//Loguear/registrar con google
+app.post('/v1/users/login/google', userController.loginFBGg);
 //Obtiene un usuario
 app.get('/v1/users/:id', middleware.ensureAuthorised, userController.getUser);
 //Crea un usuario
@@ -138,10 +140,8 @@ app.post('/v1/report', middleware.ensureAuthorised, userController.report);
 //Buscar usuario
 app.get('/v1/search/users', middleware.ensureAuthorised, userController.searchUser);
 //Solicitar rango de editor-request
-app.post('/v1/editor', middleware.ensureAuthorised, function(req,res){
-  var mutation = ` mutation { editRequest(userID, email, reason){ data { username }, error { code, message }} }`;
+app.post('/v1/editor', middleware.ensureAuthorised, userController.becomeEditor);
 
-});
 app.post('/v1/firebase', middleware.ensureAuthorised, userController.saveFirebase);
 //Recuperar contraseña de usuario
 app.post('/v1/recover', userController.recoverPassword);

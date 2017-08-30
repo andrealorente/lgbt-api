@@ -26,6 +26,7 @@ import postType from './../types/postType';
 import errorType from './../types/errorType';
 import activityType from './../types/activityType';
 import messageType from './../types/messageType';
+import requestType from './../types/requestType';
 
 var FCM = require('fcm-push');
 
@@ -114,15 +115,15 @@ const mutationType = new GraphQLObjectType({
       }
     },
 
-    loginFB: {
+    loginFBGg: {
       type: new GraphQLObjectType({
-        name: 'loginFBResult',
+        name: 'loginFBGgResult',
         fields: {
           user: { type: userType },
           error: { type: errorType }
         }
       }),
-      description: 'Iniciar sesión o registrar usuario con Facebook.',
+      description: 'Iniciar sesión o registrar usuario con Facebook o Google.',
       args: {
           email: { type: GraphQLString },
           name: { type: GraphQLString }
@@ -142,6 +143,7 @@ const mutationType = new GraphQLObjectType({
                   name: args.name,
                   email: args.email,
                   pswd: password,
+                  image: 'http://res.cloudinary.com/tfg-lgbt-cloud/image/upload/v1502812240/users/default-user_fss0lr.png',
                   public: true,
                   role: "user",
                   confirm: false
@@ -648,28 +650,35 @@ const mutationType = new GraphQLObjectType({
       args: {
         userID: { type: GraphQLString },
         email: { type: GraphQLString },
+        name: { type: GraphQLString },
+        org: { type: GraphQLString },
         reason: { type: GraphQLString }
       },
       resolve: function(_,args) {
         return new Promise((resolve,reject) => {
+
           User.findById(args.userID, function(err,user){
             if(err) reject(err);
             else{
-              if(user.role != 'editor'){
+              
                 Request.create({
                   userID: args.userID,
+                  name: args.name,
+                  org: args.org,
                   email: args.email,
-                  reason: reason
+                  reason: args.reason,
+                  state: 'pending'
                 }, function(err,res){
                   if(err) reject(err);
                   else{
+                    console.log(res);
                     resolve({
                       data: user,
                       error: null
                     });
                   }
                 });
-              }
+              
             }
           });
         });
@@ -1236,7 +1245,9 @@ const mutationType = new GraphQLObjectType({
                   'to': '/topics/'+channel.id,
                   'notification': {
                     'title': channel.title,
-                    'body': args.content }
+                    'body': args.content,
+                    "sound":"default", //If you want notification sound
+                    "click_action":"FCM_PLUGIN_ACTIVITY" }
                 };
 
                 fcm.send(message, function(err, response){
@@ -1699,6 +1710,7 @@ const mutationType = new GraphQLObjectType({
                   }
                 });
               }else{
+                console.log(chan);
                 chan.reports.push({
                   origin_id: args.originID,
                   target_id: args.targetID,
