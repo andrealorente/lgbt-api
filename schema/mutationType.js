@@ -39,7 +39,7 @@ var nodemailer = require('nodemailer');
 var transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
-        user: 'lgbtcast-tfg@gmail.com', // Nuestro e-mail
+        user: 'lgbtcast.tfg@gmail.com', // Nuestro e-mail
         pass: 'ayc1994tfgua' // Nuestra contraseña
         // Para que funcione, iniciar sesión en google e ir a: https://www.google.com/settings/security/lesssecureapps
     }
