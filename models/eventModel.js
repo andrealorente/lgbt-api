@@ -12,7 +12,8 @@ var EventSchema = new Schema({
   end_time: Date,
   comments: [String],
   assistants: [String],
-  interested: [String]
+  interested: [String],
+  state: String
 });
 
 var Event = mongoose.model('events', EventSchema); //nombre de la colección en la bd

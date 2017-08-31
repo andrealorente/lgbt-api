@@ -33,6 +33,18 @@ var FCM = require('fcm-push');
 var serverKey = 'AIzaSyCthSLMQ7tsBAC_j2KbRK-ppy1YdIctRyg';
 var fcm = new FCM(serverKey);
 
+// create reusable transporter object using SMTP transport
+var crypto = require('crypto');
+var nodemailer = require('nodemailer');
+var transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+        user: 'lgbtcast.tfg@gmail.com', // Nuestro e-mail
+        pass: 'ayc1994tfgua' // Nuestra contraseña
+        // Para que funcione, iniciar sesión en google e ir a: https://www.google.com/settings/security/lesssecureapps
+    }
+});
+
 //Definir mutation type
 const mutationType = new GraphQLObjectType({
   name: 'Mutation',
@@ -672,6 +684,98 @@ const mutationType = new GraphQLObjectType({
         });
       }
     },
+      
+    recoverPassword: {
+        type: new GraphQLObjectType({
+            name: 'recoverPasswordResult',
+            fields: {
+                data: {
+                    type: userType
+                },
+                error: {
+                    type: errorType
+                }
+            }
+        }),
+        description: 'Recuperar contraseña',
+        args: {
+            username: {
+                type: new GraphQLNonNull(GraphQLString)
+            }
+        },
+        resolve: function(_, args) {
+            return new Promise((resolve, reject) => {
+            //Comprobar que existe el nombre de usuario o email en la bd
+            User.findOne({ 'email': args.username
+            }, function(err, user) {
+                if (err) reject(err);
+                else if (user != null) {
+                    var theuserbefore = JSON.parse(JSON.stringify(user));
+                    var newPassword;
+                    var sendedPassword;
+                    crypto.randomBytes(4, function(err, buffer) {
+                    if (err) res.send(err);
+                        sendedPassword = buffer.toString('hex');
+                        newPassword = sendedPassword;
+                        newPassword= crypto.createHash('md5').update(newPassword).digest("hex");
+                        user.pswd = newPassword;
+
+                    // setup e-mail data with unicode symbols
+                    var mailOptions = {
+                        from: 'U-Plan <u-plan@gmail.com>', // sender address
+                        to: user.email, // list of receivers
+                        subject: 'U-Plan: Recuperar password', // Subject line
+                        //text: 'Tu contraseña recuperada es: '+newPassword, // plaintext body
+                        html: '<link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet" type="text/css">' +
+                        '<div style="font-family: Ubuntu, sans-serif; background-color: rgba(83, 35, 54, 0.08);">' +
+                        '<div style="background-color: #532336; text-align: center"><img src="https://u-plan.herokuapp.com/assets/uplanlogo4.png" width="80px" style="margin-bottom: -10px"><img src="https://u-plan.herokuapp.com/assets/uplanlogo3.png" width="30px"></div>' +
+                        '<div style="padding: 8px;"><h1>Recuperaci&oacute;n de contrase&ntilde;a</h1>' +
+                        '<p><br>Hola <strong>'+user.username+'</strong>!</p>' +
+                        '<p>Has solicitado que se te facilite una nueva contrase&ntilde;a para iniciar sesi&oacute;n.<br>' +
+                        'A continuaci&oacute;n se muestran tus nuevos datos de inicio:</p>' +
+                        '<div style="border: 1px black solid; padding: 10px 18px; background-color: #e5e5ff"> <strong>Usuario:</strong> ' + user.username + '<br>' +
+                        ' <strong>Contrase&ntilde;a:</strong> <span style="color: red">'+ sendedPassword+'</span></div>' +
+                        '<p><br>Accede a tu cuenta <a href="https://u-plan.herokuapp.com/">aqu&iacute;</a> con esta informaci&oacute;n y cambia la contrase&ntilde;a por una propia.</p>' +
+                        '<h4>Un cordial saludo,</h4>' +
+                        '<h3><a href="https://u-plan.herokuapp.com/">U-Plan</a></h3>' +
+                        '</div></div>'// html body
+                    }; console.log(mailOptions);
+                    // send mail with defined transport object
+                    transporter.sendMail(mailOptions, function(error, info){
+                        if(error){ console.log(error);
+                            resolve({
+                                data: null,
+                                error: {
+                                    code: 2,
+                                    message: "La contraseña no es correcta."
+                                }
+                            });
+                        }else {
+                            //user.pswd = args.newPswd;
+                            user.save(function(err,user){
+                                if(err) reject(err);
+                                resolve({
+                                  data: user,
+                                  error: null
+                                });
+                            });
+                        }
+                    });
+                });
+
+                } else {
+                    resolve({
+                        data: null,
+                        error: {
+                            code: 1,
+                            message: "No existe un usuario con ese nombre o correo."
+                        }
+                    });
+                }
+            });
+        });
+      }
+    },
 
     /**POSTS**/
 
@@ -1297,6 +1401,7 @@ const mutationType = new GraphQLObjectType({
         author_id: { type: GraphQLString },
         start_time: { type: GraphQLDateTime },
         end_time: { type: GraphQLDateTime },
+        state: { type: GraphQLString }
       },
       resolve: function(_,args) {
         return new Promise((resolve,reject) => {
@@ -1308,7 +1413,8 @@ const mutationType = new GraphQLObjectType({
             author_id: args.author_id,
             created_time: new Date().toISOString(),
             start_time: args.start_time,
-            end_time: args.end_time
+            end_time: args.end_time,
+            state: args.state
           }, function(err, ev){
             if(err) reject(err);
             else if(ev != null){

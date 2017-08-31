@@ -143,6 +143,8 @@ app.get('/v1/search/users', middleware.ensureAuthorised, userController.searchUs
 app.post('/v1/editor', middleware.ensureAuthorised, userController.becomeEditor);
 
 app.post('/v1/firebase', middleware.ensureAuthorised, userController.saveFirebase);
+//Recuperar contraseña de usuario
+app.post('/v1/recover', userController.recoverPassword);
 
 /******* RUTAS DE ADMINISTRACION ********/
 //Obtener usuarios reportados

@@ -49,6 +49,7 @@ const eventType = new GraphQLObjectType({
     		},
         assistants: { type: new GraphQLList(GraphQLString) },
         interested: { type: new GraphQLList(GraphQLString) },
+        state: { type: GraphQLString },
 
     }
 });
