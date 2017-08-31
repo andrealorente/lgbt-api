@@ -208,7 +208,7 @@ const queryType = new GraphQLObjectType({
             });
         }
     },
-		onePost: {
+      onePost: {
 			type: new GraphQLObjectType({
 				name: 'onePostResult',
 				fields: {
@@ -584,7 +584,6 @@ const queryType = new GraphQLObjectType({
         });
       }
     },
-
     searchEvent: {
       type: new GraphQLObjectType({
         name: 'searchEventResult',
@@ -610,25 +609,48 @@ const queryType = new GraphQLObjectType({
         });
       }
     },          
-        /**ADMINISTRACION**/
-        usersReported: {
+      /**ADMINISTRACION**/
+      usersReported: {
+          type: new GraphQLObjectType({
+              name: 'usersReportedResult',
+              fields: {
+                  data: { type: new GraphQLList(userType) },
+                  error: { type: errorType }
+              }
+          }),
+          args: {},
+          resolve: function( _, {} ) {
+              return new Promise((resolve,reject) => {
+                  User.find({ reports: { $gt: [] }}, function(err, user) {
+                      if (err) reject(err);
+                      else{
+                          resolve({
+                              data: user,
+                              error: null
+                          });
+                      }
+                  });
+              }); //Fin Promise
+          } //Fin resolve
+      },
+      lastComments: {
             type: new GraphQLObjectType({
-                name: 'usersReportedResult',
+                name: 'lastCommentsResult',
                 fields: {
-                    data: { type: new GraphQLList(userType) },
+                    data: { type: new GraphQLList(commentType) },
                     error: { type: errorType }
                 }
             }),
             args: {
-                userID: { type: GraphQLString }
+                content: { type: GraphQLString }
             },
-            resolve: function( _, {userID} ) {
+            resolve: function( _, {args} ) {
                 return new Promise((resolve,reject) => {
-                    User.findOne({ _id: userID}, function(err, user) {
+                    Comment.find({}, {}, { sort: { 'created_at' : -1 }, limit: 3},function(err, comment) {
                         if (err) reject(err);
                         else{
                             resolve({
-                                data: user,
+                                data: comment,
                                 error: null
                             });
                         }
@@ -636,8 +658,77 @@ const queryType = new GraphQLObjectType({
                 }); //Fin Promise
 
             } //Fin resolve
-        }
-    }
+        },
+      commentsReported: {
+          type: new GraphQLObjectType({
+              name: 'commentsReportedResult',
+              fields: {
+                  data: { type: new GraphQLList(commentType) },
+                  error: { type: errorType }
+              }
+          }),
+          args: {},
+          resolve: function( _, {} ) {
+              return new Promise((resolve,reject) => {
+                  Comment.find({ reports: { $gt: [] }}, function(err, comment) {
+                      if (err) reject(err);
+                      else{
+                          resolve({
+                              data: comment,
+                              error: null
+                          });
+                      }
+                  });
+              }); //Fin Promise
+          } //Fin resolve
+      },
+      postsReported: {
+          type: new GraphQLObjectType({
+              name: 'postsReportedResult',
+              fields: {
+                  data: { type: new GraphQLList(postType) },
+                  error: { type: errorType }
+              }
+          }),
+          args: {},
+          resolve: function( _, {} ) {
+              return new Promise((resolve,reject) => {
+                  Post.find({ reports: { $gt: [] } }, function(err, post) {
+                      if (err) reject(err);
+                      else{
+                          resolve({
+                              data: post,
+                              error: null
+                          });
+                      }
+                  });
+              }); //Fin Promise
+          } //Fin resolve
+    },
+    channelsReported: {
+          type: new GraphQLObjectType({
+              name: 'channelsReportedResult',
+              fields: {
+                  data: { type: new GraphQLList(channelType) },
+                  error: { type: errorType }
+              }
+          }),
+          args: {},
+          resolve: function( _, {} ) {
+              return new Promise((resolve,reject) => {
+                  Channel.find({ reports: { $gt: [] } }, function(err, channel) {
+                      if (err) reject(err);
+                      else{
+                          resolve({
+                              data: channel,
+                              error: null
+                          });
+                      }
+                  });
+              }); //Fin Promise
+          } //Fin resolve
+      }
+  },
 });
 
 //module.exports = queryType;

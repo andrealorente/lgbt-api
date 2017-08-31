@@ -731,22 +731,22 @@ const mutationType = new GraphQLObjectType({
 
                     // setup e-mail data with unicode symbols
                     var mailOptions = {
-                        from: 'U-Plan <u-plan@gmail.com>', // sender address
+                        from: 'LGBTCast <lgbtcast.tfg@gmail.com>', // sender address
                         to: user.email, // list of receivers
-                        subject: 'U-Plan: Recuperar password', // Subject line
+                        subject: 'LGBTCast: Recuperar contraseña', // Subject line
                         //text: 'Tu contraseña recuperada es: '+newPassword, // plaintext body
                         html: '<link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet" type="text/css">' +
                         '<div style="font-family: Ubuntu, sans-serif; background-color: rgba(83, 35, 54, 0.08);">' +
-                        '<div style="background-color: #532336; text-align: center"><img src="https://u-plan.herokuapp.com/assets/uplanlogo4.png" width="80px" style="margin-bottom: -10px"><img src="https://u-plan.herokuapp.com/assets/uplanlogo3.png" width="30px"></div>' +
+                        '<div style="background-color: #4F2365; text-align: center"><img src="https://u-plan.herokuapp.com/assets/uplanlogo4.png" width="80px" style="margin-bottom: -10px"><img src="https://u-plan.herokuapp.com/assets/uplanlogo3.png" width="30px"></div>' +
                         '<div style="padding: 8px;"><h1>Recuperaci&oacute;n de contrase&ntilde;a</h1>' +
                         '<p><br>Hola <strong>'+user.username+'</strong>!</p>' +
-                        '<p>Has solicitado que se te facilite una nueva contrase&ntilde;a para iniciar sesi&oacute;n.<br>' +
+                        '<p>Parece ser que has olvidado la contrase&ntilde;a para iniciar sesi&oacute;n.<br>' +
                         'A continuaci&oacute;n se muestran tus nuevos datos de inicio:</p>' +
                         '<div style="border: 1px black solid; padding: 10px 18px; background-color: #e5e5ff"> <strong>Usuario:</strong> ' + user.username + '<br>' +
                         ' <strong>Contrase&ntilde;a:</strong> <span style="color: red">'+ sendedPassword+'</span></div>' +
-                        '<p><br>Accede a tu cuenta <a href="https://u-plan.herokuapp.com/">aqu&iacute;</a> con esta informaci&oacute;n y cambia la contrase&ntilde;a por una propia.</p>' +
-                        '<h4>Un cordial saludo,</h4>' +
-                        '<h3><a href="https://u-plan.herokuapp.com/">U-Plan</a></h3>' +
+                        '<p><br>Accede a tu cuenta <a href="https://tfg-cms.herokuapp.com/login">aqu&iacute;</a> con esta informaci&oacute;n y cambia la contrase&ntilde;a por una propia.</p>' +
+                        '<h4>Un saludo,</h4>' +
+                        '<h3><a href="https://tfg-cms.herokuapp.com/">LGBTCast</a></h3>' +
                         '</div></div>'// html body
                     }; console.log(mailOptions);
                     // send mail with defined transport object
@@ -756,7 +756,7 @@ const mutationType = new GraphQLObjectType({
                                 data: null,
                                 error: {
                                     code: 2,
-                                    message: "La contraseña no es correcta."
+                                    message: "Ha surgido un error inesperado, no se ha podido enviar el correo."
                                 }
                             });
                         }else {
@@ -777,7 +777,7 @@ const mutationType = new GraphQLObjectType({
                         data: null,
                         error: {
                             code: 1,
-                            message: "No existe un usuario con ese nombre o correo."
+                            message: "No existe un usuario con ese email."
                         }
                     });
                 }
@@ -1646,7 +1646,7 @@ const mutationType = new GraphQLObjectType({
             Post.findById(args.targetID, function(err, post){
               if(err) reject(err);
               else{
-                if(user == null){
+                if(post == null){
                   resolve({
                     data: false,
                     error: {
@@ -1688,21 +1688,43 @@ const mutationType = new GraphQLObjectType({
                   }
                 });
               }else{
-                comm.reports.push({
-                  origin_id: args.originID,
-                  target_id: args.targetID,
-                  reason: args.reason,
-                  created_time: new Date().toISOString()
-                });
-                comm.save(function(err){
-                  if(err) reject(err);
-                  else{
-                    resolve({
-                      data: true,
-                      error: null
-                    });
-                  }
-                });
+                  User.findById(comm.author_id, function(err, user){
+                      if(err) reject(err);
+                      else if(user == null){
+                        resolve({
+                          data: false,
+                          error: {
+                            code: 2,
+                            message: 'No existe el comentario a reportar.'
+                          }
+                        });
+                      }else{
+                          user.reports.push({
+                              origin_id: args.originID,
+                              target_id: args.targetID,
+                              reason: args.reason,
+                              comment: comm.content,
+                              created_time: new Date().toISOString()             
+                          });
+                          user.save();
+                          comm.reports.push({
+                              origin_id: args.originID,
+                              target_id: args.targetID,
+                              reason: args.reason,
+                              created_time: new Date().toISOString()
+                            });
+                            comm.save(function(err){
+                              if(err) reject(err);
+                              else{
+                                resolve({
+                                  data: true,
+                                  error: null
+                                });
+                              }
+                            });
+                      }
+                  });
+                
               }
             });
           }else if(args.targetType == 3){
@@ -1770,6 +1792,195 @@ const mutationType = new GraphQLObjectType({
           });
         });
       }//Fin resolve
+    },
+      
+    /**ADMINISTRACION**/
+        
+    deleteUser: {
+        type: new GraphQLObjectType({
+            name: 'deleteUserResult',
+            fields: {
+                data: {
+                    type: userType
+                },
+                error: {
+                    type: errorType
+                }
+            }
+        }),
+        description: 'Eliminar un usuario ya existente',
+        args: {
+            userID: { type: GraphQLString }
+        },
+        resolve: function(root, args) {
+            return new Promise((resolve, reject) => {
+                User.findOneAndUpdate({
+                    _id: args.userID
+                },
+                {
+                    $set: {
+                        state: args.state
+                    }
+                }, {
+                    new: true
+                }, function(err, user) {
+                    if (err) reject(err);
+                    else if (user != null) {
+                        resolve({
+                            data: user, //que deberia devolver si se borra el usuario
+                            error: null
+                        });
+
+                    } else {
+                        resolve({
+                            data: null,
+                            error: "No existe el usuario que deseas eliminar."
+                        });
+                    }
+                });
+            });
+        }
+    },
+    
+    convertEditor: {
+        type: new GraphQLObjectType({
+            name: 'convertEditorResult',
+            fields: {
+                data: {
+                    type: userType
+                },
+                error: {
+                    type: errorType
+                }
+            }
+        }),
+        description: 'Convertir o no un usuario en editor',
+        args: {
+            userID: { type: GraphQLString },
+            role: { type: GraphQLString }
+        },
+        resolve: function(root, args) {
+            return new Promise((resolve, reject) => {
+                User.findOneAndUpdate({
+                    _id: args.userID
+                },
+                {
+                    $set: {
+                        role: args.role
+                    }
+                }, {
+                    new: true
+                },function(err, user) {
+                    if (err) reject(err);
+                    else if (user != null) {
+                        resolve({
+                            data: user,
+                            error: null
+                        });
+
+                    } else {
+                        resolve({
+                            data: null,
+                            error: "No existe el usuario que deseas modificar."
+                        });
+                    }
+                });
+            });
+        }
+    },
+        
+    deleteComment: {
+        type: new GraphQLObjectType({
+            name: 'deleteCommentResult',
+            fields: {
+                data: {
+                    type: commentType
+                },
+                error: {
+                    type: errorType
+                }
+            }
+        }),
+        description: 'Aprobar o elimina un comentario',
+        args: {
+            commentID: { type: GraphQLString },
+            state: { type: GraphQLString }
+        },
+        resolve: function(root, args) {
+            return new Promise((resolve, reject) => {
+                Comment.findOneAndUpdate({
+                    _id: args.commentID
+                },
+                {
+                    $set: {
+                        state: args.state
+                    }
+                }, {
+                    new: true
+                },function(err, comment) {
+                    if (err) reject(err);
+                    else if (comment != null) {
+                        resolve({
+                            data: comment,
+                            error: null
+                        });
+
+                    } else {
+                        resolve({
+                            data: null,
+                            error: "No existe el comentario que deseas modificar."
+                        });
+                    }
+                });
+            });
+        }
+    },
+        
+    deletePost: {
+        type: new GraphQLObjectType({
+            name: 'deletePostResult',
+            fields: {
+                data: {
+                    type: postType
+                },
+                error: {
+                    type: errorType
+                }
+            }
+        }),
+        description: 'Aprobar o elimina un post',
+        args: {
+            postID: { type: GraphQLString },
+            state: { type: GraphQLString }
+        },
+        resolve: function(root, args) {
+            return new Promise((resolve, reject) => {
+                Post.findOneAndUpdate({
+                    _id: args.postID
+                },
+                {
+                    $set: {
+                        state: args.state
+                    }
+                }, {
+                    new: true
+                },function(err, post) {
+                    if (err) reject(err);
+                    else if (post != null) {
+                        resolve({
+                            data: post,
+                            error: null
+                        });
+
+                    } else {
+                        resolve({
+                            data: null,
+                            error: "No existe el post que deseas modificar."
+                        });
+                    }
+                });
+            });
+        }
     }
   })
 });
