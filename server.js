@@ -130,7 +130,7 @@ app.get('/v1/requests', middleware.ensureAuthorised, userController.getRequests)
 //Carga la actividad de los seguidos del usuario
 app.get('/v1/activity', middleware.ensureAuthorised, userController.getActivity);
 //Confirmar correo
-app.post('/v1/users/confirm', userController.confirmAccount);
+app.post('/v1/confirm', userController.confirmAccount);
 //Cambiar privacidad de un usuario
 app.post('/v1/privacity', middleware.ensureAuthorised, userController.changePrivacity);
 //Cambiar contraseña de usuario

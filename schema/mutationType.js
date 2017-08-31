@@ -87,10 +87,19 @@ const mutationType = new GraphQLObjectType({
             else if (user != null) {
               //Comprobar que la contraseña coincide con la que es
               if (user.pswd == args.password) {
-                    resolve({
-                      user: user,
-                      error: null
-                    });
+                if(!user.confirm){ //Si no está confirmao no puede hacer login
+                  resolve({
+                    user: null,
+                    error:  {
+                      code: 3,
+                      message: 'Debes confirmar tu correo para poder iniciar sesión'
+                    }
+                  });
+                }
+                resolve({
+                  user: user,
+                  error: null
+                });
               } else {
                 resolve({
                   user: null,
