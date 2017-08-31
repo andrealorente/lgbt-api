@@ -78,12 +78,15 @@ var userController = {
   },
 
   createUser: function(req,res) {
+    
     var username = req.body.user_name;
   	var email = req.body.user_email;
   	var pswd = req.body.user_pswd;
 
-  	var mutation = ' mutation { createUser(username:\"'+ username +'\", email: \"' + email + '\", pswd: \"'+ pswd +'\") { user{id, username, name}, error {code, message} } }';
+    console.log(req.body);
 
+  	var mutation = ' mutation { createUser(username:\"'+ username +'\", email: \"' + email + '\", pswd: \"'+ pswd +'\") { user{id, username, name}, error {code, message} } }';
+    console.log(mutation);
   	graphql(Schema, mutation).then( function(result) {
   		//console.log(JSON.stringify(result,null," "));
   		if(result.data.createUser.user==null){
@@ -95,7 +98,7 @@ var userController = {
         let url = 'https://lgbt-api.herokuapp.com/users/confirm?id='+result.data.createUser.user.id;
         // setup email data with unicode symbols
         let mailOptions = {
-            from: '"Admin" <lgbtcast.tfg@lgbtcast.com>', // sender address
+            from: '"Admin" <lgbtcast.tfg@gmail.com>', // sender address
             to: email, // list of receivers
             subject: '¡Bienvenidx a LGBTcast!', // Subject line
             text: 'Confirma tu correo electrónico para empezar a conocer las novedades del colectivo LGBT.', // plain text body
@@ -115,6 +118,7 @@ var userController = {
   			});
   		}
   	});
+    
   },
   getUser: function(req,res) {
     var user = req.params.id;
