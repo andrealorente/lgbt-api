@@ -1634,7 +1634,7 @@ const mutationType = new GraphQLObjectType({
         return new Promise((resolve, reject) => {
           if(args.targetType == 1){
             //Reportar usuario
-            User.findById(args.targetID, function(err, user){
+            Post.findById(args.targetID, function(err, post){
               if(err) reject(err);
               else{
                 if(user == null){
@@ -1642,19 +1642,19 @@ const mutationType = new GraphQLObjectType({
                     data: false,
                     error: {
                       code: 1,
-                      message: 'No existe el usuario con ese identificador.'
+                      message: 'No existe el post con ese identificador.'
                     }
                   });
                 }else{
                   
-                  user.reports.push({
+                  post.reports.push({
                     origin_id: args.originID,
                     target_id: args.targetID,
                     reason: args.reason,
                     created_time: new Date().toISOString()
                   });
 
-                  user.save(function(err){
+                  post.save(function(err){
                     if(err) reject(err);
                     else{
                       resolve({
