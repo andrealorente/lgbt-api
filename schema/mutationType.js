@@ -39,8 +39,8 @@ var nodemailer = require('nodemailer');
 var transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
-        user: 'jelly.studio.abp@gmail.com', // Nuestro e-mail
-        pass: 'U-Planmolamogollon2016' // Nuestra contraseña
+        user: 'lgbtcast-tfg@gmail.com', // Nuestro e-mail
+        pass: 'ayc1994tfgua' // Nuestra contraseña
         // Para que funcione, iniciar sesión en google e ir a: https://www.google.com/settings/security/lesssecureapps
     }
 });
@@ -714,17 +714,16 @@ const mutationType = new GraphQLObjectType({
                     var newPassword;
                     var sendedPassword;
                     crypto.randomBytes(4, function(err, buffer) {
-                    if (err)
-                        res.send(err);
+                    if (err) res.send(err);
                         sendedPassword = buffer.toString('hex');
-                    newPassword = sendedPassword;
-                    newPassword= crypto.createHash('md5').update(newPassword).digest("hex");
-                    user.pswd = newPassword;
+                        newPassword = sendedPassword;
+                        newPassword= crypto.createHash('md5').update(newPassword).digest("hex");
+                        user.pswd = newPassword;
 
                     // setup e-mail data with unicode symbols
                     var mailOptions = {
                         from: 'U-Plan <u-plan@gmail.com>', // sender address
-                        to: user.username, // list of receivers
+                        to: user.email, // list of receivers
                         subject: 'U-Plan: Recuperar password', // Subject line
                         //text: 'Tu contraseña recuperada es: '+newPassword, // plaintext body
                         html: '<link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet" type="text/css">' +
@@ -740,7 +739,7 @@ const mutationType = new GraphQLObjectType({
                         '<h4>Un cordial saludo,</h4>' +
                         '<h3><a href="https://u-plan.herokuapp.com/">U-Plan</a></h3>' +
                         '</div></div>'// html body
-                    };
+                    }; console.log(mailOptions);
                     // send mail with defined transport object
                     transporter.sendMail(mailOptions, function(error, info){
                         if(error){ console.log(error);
