@@ -26,6 +26,10 @@ var transporter = nodemailer.createTransport({
     }
 });
 
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey('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');
+
+
 var userController = {
   loginUser: function(req,res) {
     var user = req.body.user_name;
@@ -97,8 +101,8 @@ var userController = {
   		}else{
         let url = 'https://lgbt-api.herokuapp.com/users/confirm?id='+result.data.createUser.user.id;
         // setup email data with unicode symbols
-        let mailOptions = {
-            from: '"Admin" <lgbtcast.tfg@herokuapp.com>', // sender address
+        /*let mailOptions = {
+            from: '"Admin" <lgbtcast.tfg@gmail.com>', // sender address
             to: email, // list of receivers
             subject: '¡Bienvenidx a LGBTcast!', // Subject line
             text: 'Confirma tu correo electrónico para empezar a conocer las novedades del colectivo LGBT.', // plain text body
@@ -111,13 +115,26 @@ var userController = {
                 return console.log(error);
             }
             console.log('Message %s sent: %s', info.messageId, info.response);
-        });
+        });*/
+        const msg = {
+          to: email,
+          from: 'lgbtcast.tfg@gmail.com',
+          subject: '¡Bienvenido a LGBTcast!',
+          text: 'Confirma tu correo electrónico para empezar a conocer las novedades del colectivo LGBT.',
+          html: '<p>Haz click en el enlace siguiente para confirmar tu correo electrónico: </p><p><a href=\"'+url+'\">Confirmar correo</a></p><p>Si no has sido tú no sé qué hay que hacer.</p>',
+        };
+        sgMail.send(msg);
+
   			res.json({
   				success: true,
   				data: result.data.createUser.user
   			});
   		}
   	});
+    
+    
+
+    /*res.send("hola");*/
     
   },
   getUser: function(req,res) {
