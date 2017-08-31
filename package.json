@@ -2,7 +2,7 @@
   "name": "lgbt-api",
   "version": "0.0.1",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "main": "server.js",
   "scripts": {
     "start": "./node_modules/.bin/babel-node ./server.js"
