@@ -251,7 +251,7 @@ var userController = {
   	});
   },
   getRequests: function(req,res) {
-    var query = ' query { user(userID:\"' + req.user + '\") { relationships { id, user_data { username, bio, public, image }, outgoing_status, incoming_status } } }';
+    var query = ' query { user(userID:\"' + req.user + '\") { relationships { id, user_data { username, name, public, image }, outgoing_status, incoming_status } } }';
   	graphql(Schema, query).then( function(result) {
   		//console.log(JSON.stringify(result,null," "));
       var relationships = [];
