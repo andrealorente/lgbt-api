@@ -98,7 +98,7 @@ var userController = {
         let url = 'https://lgbt-api.herokuapp.com/users/confirm?id='+result.data.createUser.user.id;
         // setup email data with unicode symbols
         let mailOptions = {
-            from: '"Admin" <lgbtcast.tfg@gmail.com>', // sender address
+            from: '"Admin" <lgbtcast.tfg@herokuapp.com>', // sender address
             to: email, // list of receivers
             subject: '¡Bienvenidx a LGBTcast!', // Subject line
             text: 'Confirma tu correo electrónico para empezar a conocer las novedades del colectivo LGBT.', // plain text body
