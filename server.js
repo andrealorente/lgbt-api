@@ -149,6 +149,22 @@ app.post('/v1/recover', userController.recoverPassword);
 /******* RUTAS DE ADMINISTRACION ********/
 //Obtener usuarios reportados
 app.get('/v1/admin/users', middleware.ensureAuthorised, adminController.usersReported);
+//Obtener posts reportados
+app.get('/v1/admin/posts', middleware.ensureAuthorised, adminController.postsReported);
+//Obtener comentarios reportados
+app.get('/v1/admin/comments', middleware.ensureAuthorised, adminController.commentReported);
+//Obtener canales reportados
+app.get('/v1/admin/comments', middleware.ensureAuthorised, adminController.channelsReported);
+//Aprobar/Eliminar usuario reportado
+app.post('/v1/admin/delete/user', middleware.ensureAuthorised, adminController.deleteUser);
+//Aprobar/Eliminar posts reportado
+app.post('/v1/admin/delete/post', middleware.ensureAuthorised, adminController.deletePost);
+//Aprobar/Eliminar comentario reportado
+app.post('/v1/admin/delete/comment', middleware.ensureAuthorised, adminController.deleteComment);
+//Aprobar/Eliminar canal reportado
+app.post('/v1/admin/delete/comment', middleware.ensureAuthorised, adminController.deleteChannel);
+//Ultimos comentarios
+app.get('/v1/admin/lastcomments', middleware.ensureAuthorised, adminController.lastComments);
 
 
 app.get('/', function(req, res){
