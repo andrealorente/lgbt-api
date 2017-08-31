@@ -728,7 +728,7 @@ const queryType = new GraphQLObjectType({
               }); //Fin Promise
           } //Fin resolve
       }
-    
+  },
 });
 
 //module.exports = queryType;
