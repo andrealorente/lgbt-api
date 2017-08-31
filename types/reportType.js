@@ -14,6 +14,7 @@ var reportType = new GraphQLObjectType({
     origin_id: { type: GraphQLString },
     target_id: { type: GraphQLString },
     reason: { type: GraphQLString },
+    comment: { type: GraphQLString },
     created_time: { type: GraphQLDateTime }
   }
 });

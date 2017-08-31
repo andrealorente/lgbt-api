@@ -1646,7 +1646,7 @@ const mutationType = new GraphQLObjectType({
             Post.findById(args.targetID, function(err, post){
               if(err) reject(err);
               else{
-                if(user == null){
+                if(post == null){
                   resolve({
                     data: false,
                     error: {
@@ -1688,21 +1688,43 @@ const mutationType = new GraphQLObjectType({
                   }
                 });
               }else{
-                comm.reports.push({
-                  origin_id: args.originID,
-                  target_id: args.targetID,
-                  reason: args.reason,
-                  created_time: new Date().toISOString()
-                });
-                comm.save(function(err){
-                  if(err) reject(err);
-                  else{
-                    resolve({
-                      data: true,
-                      error: null
-                    });
-                  }
-                });
+                  User.findById(comm.author_id, function(err, user){
+                      if(err) reject(err);
+                      else if(user == null){
+                        resolve({
+                          data: false,
+                          error: {
+                            code: 2,
+                            message: 'No existe el comentario a reportar.'
+                          }
+                        });
+                      }else{
+                          user.reports.push({
+                              origin_id: args.originID,
+                              target_id: args.targetID,
+                              reason: args.reason,
+                              comment: comm.content,
+                              created_time: new Date().toISOString()             
+                          });
+                          user.save();
+                          comm.reports.push({
+                              origin_id: args.originID,
+                              target_id: args.targetID,
+                              reason: args.reason,
+                              created_time: new Date().toISOString()
+                            });
+                            comm.save(function(err){
+                              if(err) reject(err);
+                              else{
+                                resolve({
+                                  data: true,
+                                  error: null
+                                });
+                              }
+                            });
+                      }
+                  });
+                
               }
             });
           }else if(args.targetType == 3){
