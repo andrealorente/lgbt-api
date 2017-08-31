@@ -1,7 +1,8 @@
 {
   "name": "lgbt-api",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
+  "license": "MIT",
   "main": "server.js",
   "scripts": {
     "start": "./node_modules/.bin/babel-node ./server.js"
@@ -25,6 +26,7 @@
     "mongoose": "^4.8.3",
     "morgan": "~1.6.1",
     "nodemailer": "^4.1.0",
+    "@sendgrid/mail": "latest",
     "serve-favicon": "~2.3.0",
     "socket.io": "^2.0.3"
   },

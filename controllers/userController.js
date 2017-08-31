@@ -4,7 +4,6 @@ import moment from 'moment';
 import jwt from 'jwt-simple';
 import config from './../config';
 import middleware from './../middleware';
-import nodemailer from 'nodemailer';
 
 var createToken = function(user) {
   console.log(user);
@@ -17,14 +16,9 @@ var createToken = function(user) {
   return jwt.encode(payload, config.TOKEN_SECRET);
 };
 
-// create reusable transporter object using the default SMTP transport
-var transporter = nodemailer.createTransport({
-    service: 'Gmail',
-    auth: {
-      user: 'lgbtcast.tfg@gmail.com',
-      pass: 'ayc1994tfgua'
-    }
-});
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey('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');
+
 
 var userController = {
   loginUser: function(req,res) {
@@ -78,12 +72,15 @@ var userController = {
   },
 
   createUser: function(req,res) {
+    
     var username = req.body.user_name;
   	var email = req.body.user_email;
   	var pswd = req.body.user_pswd;
 
-  	var mutation = ' mutation { createUser(username:\"'+ username +'\", email: \"' + email + '\", pswd: \"'+ pswd +'\") { user{id, username, name}, error {code, message} } }';
+    console.log(req.body);
 
+  	var mutation = ' mutation { createUser(username:\"'+ username +'\", email: \"' + email + '\", pswd: \"'+ pswd +'\") { user{id, username, name}, error {code, message} } }';
+    console.log(mutation);
   	graphql(Schema, mutation).then( function(result) {
   		//console.log(JSON.stringify(result,null," "));
   		if(result.data.createUser.user==null){
@@ -92,29 +89,28 @@ var userController = {
   				error: result.data.createUser.error
   			});
   		}else{
-        let url = 'https://lgbt-api.herokuapp.com/users/confirm?id='+result.data.createUser.user.id;
-        // setup email data with unicode symbols
-        let mailOptions = {
-            from: '"Admin" <lgbtcast.tfg@lgbtcast.com>', // sender address
-            to: email, // list of receivers
-            subject: '¡Bienvenidx a LGBTcast!', // Subject line
-            text: 'Confirma tu correo electrónico para empezar a conocer las novedades del colectivo LGBT.', // plain text body
-            html: '<p>Haz click en el enlace siguiente para confirmar tu correo electrónico: </p><p><a href=\"'+url+'\">Confirmar correo</a></p><p>Si no has sido tú no sé qué hay que hacer.</p>' // html body
+        let url = 'https://lgbt-api.herokuapp.com/v1/confirm?id='+result.data.createUser.user.id;
+        
+        const msg = {
+          to: email,
+          from: 'lgbtcast.tfg@gmail.com',
+          subject: '¡Bienvenido a LGBTcast!',
+          text: 'Confirma tu correo electrónico para empezar a conocer las novedades del colectivo LGBT.',
+          html: '<p>Haz click en el enlace siguiente para confirmar tu correo electrónico: </p><p><a href=\"'+url+'\">Confirmar correo</a></p><p>Si no has sido tú ignora este correo.</p>',
         };
+        sgMail.send(msg);
 
-        // send mail with defined transport object
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                return console.log(error);
-            }
-            console.log('Message %s sent: %s', info.messageId, info.response);
-        });
   			res.json({
   				success: true,
   				data: result.data.createUser.user
   			});
   		}
   	});
+    
+    
+
+    /*res.send("hola");*/
+    
   },
   getUser: function(req,res) {
     var user = req.params.id;
@@ -251,7 +247,7 @@ var userController = {
   	});
   },
   getRequests: function(req,res) {
-    var query = ' query { user(userID:\"' + req.user + '\") { relationships { id, user_data { username, bio, public, image }, outgoing_status, incoming_status } } }';
+    var query = ' query { user(userID:\"' + req.user + '\") { relationships { id, user_data { username, name, public, image }, outgoing_status, incoming_status } } }';
   	graphql(Schema, query).then( function(result) {
   		//console.log(JSON.stringify(result,null," "));
       var relationships = [];
