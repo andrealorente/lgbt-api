@@ -12,8 +12,8 @@ import Activity from './../models/activityModel';
 import reportType from './reportType';
 
 //Definir User type
-const userType = new GraphQLObjectType({
-  name: 'User',
+const requestType = new GraphQLObjectType({
+  name: 'Request',
   fields: {
     id: { type: GraphQLString }, //Cada campo puede tener un resolve
     name: { type: GraphQLString },
@@ -24,4 +24,4 @@ const userType = new GraphQLObjectType({
   }
 });
 
-export default userType;
+export default requestType;

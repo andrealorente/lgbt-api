@@ -16,7 +16,7 @@ var adminController = {
   		}else{
   			res.json({
   				success: true,
-  				data: result.data.usresReported.data
+  				data: result.data.usersReported.data
   			});
   		}
 
@@ -57,6 +57,26 @@ var adminController = {
                   data: result.data.searchUser.data
               });
         }
+
+      });
+  },
+  //Obtener solicitudes de editor
+  requestEditor: function(req,res) {
+      var query = 'query { requestEditor{ data { id, name, email, org, reason, state },error{code,message}} }';
+      graphql(Schema, query).then( function(result) {
+
+  		console.log(result); // { data: oneEvent: null }
+  		if(result.data.requestEditor == null){ //No sé si esto está bien así o habría que mandar el error desde graphql
+  			res.json({
+  				success: false,
+  				error: "No se ha encontrado ningún usuario reportado"
+  			});
+  		}else{
+  			res.json({
+  				success: true,
+  				data: result.data.requestEditor.data
+  			});
+  		}
 
       });
   },
