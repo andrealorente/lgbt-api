@@ -4,6 +4,7 @@ import moment from 'moment';
 import jwt from 'jwt-simple';
 import config from './../config';
 import middleware from './../middleware';
+var path = require('path');
 
 var createToken = function(user) {
   console.log(user);
@@ -276,17 +277,14 @@ var userController = {
   },
   confirmAccount: function(req,res) {
     var mutation = ' mutation { confirmAccount(userID: \"'+ req.query.id +'\") { data{ id, confirm }, error { code, message } } }';
+    console.log(mutation);
+    console.log(req.query.id);
+    
     graphql(Schema, mutation).then( function(result) {
       if(result.data.confirmAccount.error == null){
-        res.json({
-          success: true,
-          data: result.data.confirmAccount.data
-        });
+        res.sendFile(path.join(__dirname, '../html', 'confirmed.html'));
       }else{
-        res.json({
-          success: false,
-          error: result.data.confirmAccount.error
-        });
+        res.send("Ha habido un error");
       }
     });
   },
