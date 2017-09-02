@@ -359,7 +359,7 @@ var userController = {
       });
   },
   recoverPassword: function(req,res) {
-    var mutation = 'mutation { recoverPassword(username: \"'+ req.body.username +'\" ) { data {name}, error { code, message } } }';
+    var mutation = 'mutation { recoverPassword(username: \"'+ req.body.username +'\" ) { data {email,username}, error { code, message } } }';
     graphql(Schema, mutation).then(function(result) {
       console.log(result);
       if(result.data.recoverPassword.error){

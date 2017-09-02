@@ -15,7 +15,8 @@ import reportType from './reportType';
 const requestType = new GraphQLObjectType({
   name: 'Request',
   fields: {
-    id: { type: GraphQLString }, //Cada campo puede tener un resolve
+    id: { type: GraphQLString },
+    userID: { type: GraphQLString },//Cada campo puede tener un resolve
     name: { type: GraphQLString },
     email: { type: GraphQLString },
     org: { type: GraphQLString },

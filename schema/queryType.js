@@ -707,7 +707,7 @@ const queryType = new GraphQLObjectType({
               }); //Fin Promise
           } //Fin resolve
     },
-    channelsReported: {
+      channelsReported: {
           type: new GraphQLObjectType({
               name: 'channelsReportedResult',
               fields: {

@@ -4,7 +4,7 @@ import Schema from './../schema/schema';
 var adminController = {
   //Obtener usuarios reportados
   usersReported: function(req,res) {
-      var query = 'query { usersReported{ data { id, username, name },error{code,message}} }';
+      var query = 'query { usersReported{ data { id, username, name, reports{comment, reason} },error{code,message}} }';
       graphql(Schema, query).then( function(result) {
 
   		console.log(result); // { data: oneEvent: null }
@@ -24,7 +24,7 @@ var adminController = {
   },
   //Eliminar/No Eliminar Usuario
   deleteUser: function(req,res) {
-      var mutation = 'mutation { deleteUser{ data { id },error{code,message}} }';
+      var mutation = 'mutation { deleteUser(userID:\"' + req.query.userID + '\", type:\"' + req.query.type + '\"){ data { id },error{code,message}} }';
       graphql(Schema, mutation).then( function(result) {
           console.log(result); 
         if(result.data.deleteUser == null){ 
@@ -62,11 +62,9 @@ var adminController = {
   },
   //Obtener solicitudes de editor
   requestEditor: function(req,res) {
-      var query = 'query { requestEditor{ data { id, name, email, org, reason, state },error{code,message}} }';
+      var query = 'query { requestEditor{ data { id, userID, name, email, org, reason, state },error{code,message}} }';
       graphql(Schema, query).then( function(result) {
-
-  		console.log(result); // { data: oneEvent: null }
-  		if(result.data.requestEditor == null){ //No sé si esto está bien así o habría que mandar el error desde graphql
+  		if(result.data.requestEditor == null){
   			res.json({
   				success: false,
   				error: "No se ha encontrado ningún usuario reportado"
@@ -82,9 +80,8 @@ var adminController = {
   },
   //Admitir/Rechazar editor
   convertEditor: function(req,res) {
-      var mutation = 'mutation { convertEditor{ data { id },error{code,message}} }';
+      var mutation = 'mutation { convertEditor(id:\"' + req.query.id + '\", userID:\"' + req.query.userID + '\", type:\"' + req.query.type + '\"){ data { id },error{code,message}} }';
       graphql(Schema, mutation).then( function(result) {
-          console.log(result);
         if(result.data.convertEditor == null){ 
               res.json({
                   success: false,
