@@ -927,12 +927,8 @@ const mutationType = new GraphQLObjectType({
       type: new GraphQLObjectType({
         name: 'updatePostResult',
         fields: {
-          data: {
-            type: postType
-          },
-          error: {
-            type: errorType
-          }
+          data: { type: postType },
+          error: { type: errorType }
         }
       }),
       description: 'Editar un post ya existente',
@@ -956,8 +952,7 @@ const mutationType = new GraphQLObjectType({
           type: GraphQLString
         }
       },
-      resolve: function(root, args) {
-        console.log(args.state);
+      resolve: function(_, args) {
         return new Promise((resolve, reject) => {
           Post.findOneAndUpdate({
               _id: args.postID
@@ -1162,9 +1157,12 @@ const mutationType = new GraphQLObjectType({
         image: {
           type: GraphQLString
         },
-        author_id: {
+        author: {
             type: GraphQLString
         },
+        state: {
+            type: GraphQLString
+        }
       },
       resolve: function(root, args) {
         return new Promise((resolve, reject) => {
@@ -1173,7 +1171,8 @@ const mutationType = new GraphQLObjectType({
               description: args.description,
               created_time: new Date().toISOString(),
               image: args.image,
-              author_id: args.author_id
+              author: args.author,
+              state: args.state
           }, function(err, channel) {
               if (err) reject(err);
               else if (channel != null) {

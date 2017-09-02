@@ -21,7 +21,8 @@ const channelType = new GraphQLObjectType({
         messages: { type: new GraphQLList(messageType)},
         susc: { type: new GraphQLList(GraphQLString)},
         reports: { type: new GraphQLList(GraphQLString) },
-        created_time: { type: GraphQLDateTime }
+        created_time: { type: GraphQLDateTime },
+        state: { type: GraphQLString }
     }
 });
 
