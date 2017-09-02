@@ -696,6 +696,86 @@ const mutationType = new GraphQLObjectType({
         });
       }
     },
+    
+    editRequestCMS: {
+      type: new GraphQLObjectType({
+        name: 'editRequestCMSResult',
+        fields: {
+          data: {
+            type: userType
+          },
+          error: {
+            type: errorType
+          }
+        }
+      }),
+      description: 'Enviar solicitud para ser editor.',
+      args: {
+        email: { type: GraphQLString },
+        username: { type: GraphQLString },
+        pswd: { type: GraphQLString },
+        org: { type: GraphQLString },
+        reason: { type: GraphQLString }
+      },
+      resolve: function(_,args) {
+        return new Promise((resolve,reject) => {
+
+          User.findOne({username: args.username}, function(err,user){
+            if(err) reject(err);
+            else if(user != null){
+                if(user.pswd == args.pswd){
+                    if(user.confirm == true){
+                        Request.create({
+                          userID: user.id,
+                          name: args.name,
+                          org: args.org,
+                          email: args.email,
+                          reason: args.reason,
+                          state: 'pending'
+                        }, function(err,res){
+                          if(err) reject(err);
+                          else{
+                            console.log(res);
+                            resolve({
+                              data: user,
+                              error: null
+                            });
+                          }
+                        });
+                    }
+                    else{
+                        resolve({
+                            data: null,
+                            error: {
+                                code: 3,
+                                message: "Aún no has validado tu cuenta."
+                            }
+                        });
+                    }
+                }
+                else{
+                    resolve({
+                        data: null,
+                        error: {
+                            code: 2,
+                            message: "Contraseña incorrecta."
+                        }
+                    });
+                }
+              
+            }else{
+                resolve({
+                    data: null,
+                    error: {
+                        code: 1,
+                        message: "No existe un usuario con ese nombre. Regístrate desde la App"
+                    }
+                });
+            }
+          });
+        });
+      }
+    },  
       
     recoverPassword: {
         type: new GraphQLObjectType({

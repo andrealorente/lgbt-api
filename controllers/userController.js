@@ -290,10 +290,7 @@ var userController = {
   },
   report: function(req,res) {
     console.log(req.body);
-    var mutation = ` mutation {
-      report(originID:\"`+req.user+`\", targetID: \"`+req.body.target_id+`\",
-      targetType: `+req.body.target_type+` , reason: \"`+ req.body.reason +`\") {
-      data, error { code, message } } }`;
+    var mutation = 'mutation {report(originID:\"'+req.user+'\", targetID: \"'+req.body.target_id+'\",targetType: '+req.body.target_type+' , reason: \"'+ req.body.reason +'\") {data, error { code, message } } }';
 
     graphql(Schema, mutation).then( function(result) {
       if(result.data.report.error) {
@@ -325,9 +322,7 @@ var userController = {
   },
   becomeEditor: function(req, res) {
     console.log(req.body);
-    var mutation = `mutation { editRequest(userID: \"`+req.user+`\", email: \"`+req.body.email+`\", 
-    name: \"`+req.body.name+`\", org: \"`+req.body.org +`\",reason: \"`+req.body.reason+`\" ) 
-    { data { username, name }, error { code, message }}}`;
+    var mutation = 'mutation { editRequest(userID: \"'+req.user+'\", email: \"'+req.body.email+'\", name: \"'+req.body.name+'\", org: \"'+req.body.org +'\",reason: \"'+req.body.reason+'\" ) { data { username, name }, error { code, message }}}';
     console.log(mutation);
     graphql(Schema, mutation).then(function(result) {
       if(result.data.editRequest.error){
@@ -339,6 +334,24 @@ var userController = {
         res.json({
           success: true,
           data: result.data.editRequest.data
+        });
+      }
+    });
+  },
+  becomeEditorCMS: function(req, res) {
+    console.log(req);
+    var mutation = 'mutation { editRequestCMS(email: \"'+req.body.email+'\", username: \"'+req.body.username+'\", pswd: \"'+req.body.pswd+'\", org: \"'+req.body.org +'\",reason: \"'+req.body.reason+'\" ) { data { username, name }, error { code, message }}}';
+    console.log(mutation);
+    graphql(Schema, mutation).then(function(result) {
+      if(result.data.editRequestCMS.error){
+        res.json({
+          success: false,
+          error: result.data.editRequestCMS.error
+        });
+      }else{
+        res.json({
+          success: true,
+          data: result.data.editRequestCMS.data
         });
       }
     });
