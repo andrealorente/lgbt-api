@@ -7,6 +7,8 @@ import {
   GraphQLInt
 } from 'graphql';
 import messageType from './messageType';
+import userType from './userType';
+var User = require('./../models/userModel');
 
 import { GraphQLDateTime } from 'graphql-iso-date';
 
@@ -33,7 +35,7 @@ const channelType = new GraphQLObjectType({
               });
             });
           }
-        },
+        }
     }
 });
 
