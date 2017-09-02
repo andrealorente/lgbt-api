@@ -22,7 +22,18 @@ const channelType = new GraphQLObjectType({
         susc: { type: new GraphQLList(GraphQLString)},
         reports: { type: new GraphQLList(GraphQLString) },
         created_time: { type: GraphQLDateTime },
-        state: { type: GraphQLString }
+        state: { type: GraphQLString },
+        author_data: {
+          type: userType,
+          resolve: function(root){
+            return new Promise((resolve,reject) => {
+              User.findById(root.author, function(err, user){
+                if(err) reject(err);
+                else resolve(user);
+              });
+            });
+          }
+        },
     }
 });
 
