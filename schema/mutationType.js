@@ -45,6 +45,9 @@ var transporter = nodemailer.createTransport({
     }
 });
 
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey('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');
+
 //Definir mutation type
 const mutationType = new GraphQLObjectType({
   name: 'Mutation',
@@ -693,6 +696,86 @@ const mutationType = new GraphQLObjectType({
         });
       }
     },
+    
+    editRequestCMS: {
+      type: new GraphQLObjectType({
+        name: 'editRequestCMSResult',
+        fields: {
+          data: {
+            type: userType
+          },
+          error: {
+            type: errorType
+          }
+        }
+      }),
+      description: 'Enviar solicitud para ser editor.',
+      args: {
+        email: { type: GraphQLString },
+        username: { type: GraphQLString },
+        pswd: { type: GraphQLString },
+        org: { type: GraphQLString },
+        reason: { type: GraphQLString }
+      },
+      resolve: function(_,args) {
+        return new Promise((resolve,reject) => {
+
+          User.findOne({username: args.username}, function(err,user){
+            if(err) reject(err);
+            else if(user != null){
+                if(user.pswd == args.pswd){
+                    if(user.confirm == true){
+                        Request.create({
+                          userID: user.id,
+                          name: args.name,
+                          org: args.org,
+                          email: args.email,
+                          reason: args.reason,
+                          state: 'pending'
+                        }, function(err,res){
+                          if(err) reject(err);
+                          else{
+                            console.log(res);
+                            resolve({
+                              data: user,
+                              error: null
+                            });
+                          }
+                        });
+                    }
+                    else{
+                        resolve({
+                            data: null,
+                            error: {
+                                code: 3,
+                                message: "Aún no has validado tu cuenta."
+                            }
+                        });
+                    }
+                }
+                else{
+                    resolve({
+                        data: null,
+                        error: {
+                            code: 2,
+                            message: "Contraseña incorrecta."
+                        }
+                    });
+                }
+              
+            }else{
+                resolve({
+                    data: null,
+                    error: {
+                        code: 1,
+                        message: "No existe un usuario con ese nombre. Regístrate desde la App"
+                    }
+                });
+            }
+          });
+        });
+      }
+    },  
       
     recoverPassword: {
         type: new GraphQLObjectType({
@@ -737,7 +820,7 @@ const mutationType = new GraphQLObjectType({
                         //text: 'Tu contraseña recuperada es: '+newPassword, // plaintext body
                         html: '<link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet" type="text/css">' +
                         '<div style="font-family: Ubuntu, sans-serif; background-color: rgba(83, 35, 54, 0.08);">' +
-                        '<div style="background-color: #4F2365; text-align: center"><img src="https://u-plan.herokuapp.com/assets/uplanlogo4.png" width="80px" style="margin-bottom: -10px"><img src="https://u-plan.herokuapp.com/assets/uplanlogo3.png" width="30px"></div>' +
+                        '<div style="background-color: #4F2365; text-align: center"><img src="https://tfg-cms.herokuapp.com/app/assets/images/logocms.png" width="80px" style="margin-bottom: -10px"></div>' +
                         '<div style="padding: 8px;"><h1>Recuperaci&oacute;n de contrase&ntilde;a</h1>' +
                         '<p><br>Hola <strong>'+user.username+'</strong>!</p>' +
                         '<p>Parece ser que has olvidado la contrase&ntilde;a para iniciar sesi&oacute;n.<br>' +
@@ -750,26 +833,14 @@ const mutationType = new GraphQLObjectType({
                         '</div></div>'// html body
                     }; console.log(mailOptions);
                     // send mail with defined transport object
-                    transporter.sendMail(mailOptions, function(error, info){
-                        if(error){ console.log(error);
+                        sgMail.send(mailOptions);
+                        user.save(function(err,user){
+                            if(err) reject(err);
                             resolve({
-                                data: null,
-                                error: {
-                                    code: 2,
-                                    message: "Ha surgido un error inesperado, no se ha podido enviar el correo."
-                                }
+                              data: user,
+                              error: null
                             });
-                        }else {
-                            //user.pswd = args.newPswd;
-                            user.save(function(err,user){
-                                if(err) reject(err);
-                                resolve({
-                                  data: user,
-                                  error: null
-                                });
-                            });
-                        }
-                    });
+                        });
                 });
 
                 } else {
@@ -856,12 +927,8 @@ const mutationType = new GraphQLObjectType({
       type: new GraphQLObjectType({
         name: 'updatePostResult',
         fields: {
-          data: {
-            type: postType
-          },
-          error: {
-            type: errorType
-          }
+          data: { type: postType },
+          error: { type: errorType }
         }
       }),
       description: 'Editar un post ya existente',
@@ -885,8 +952,7 @@ const mutationType = new GraphQLObjectType({
           type: GraphQLString
         }
       },
-      resolve: function(root, args) {
-        console.log(args.state);
+      resolve: function(_, args) {
         return new Promise((resolve, reject) => {
           Post.findOneAndUpdate({
               _id: args.postID
@@ -1091,9 +1157,12 @@ const mutationType = new GraphQLObjectType({
         image: {
           type: GraphQLString
         },
-        author_id: {
+        author: {
             type: GraphQLString
         },
+        state: {
+            type: GraphQLString
+        }
       },
       resolve: function(root, args) {
         return new Promise((resolve, reject) => {
@@ -1102,7 +1171,8 @@ const mutationType = new GraphQLObjectType({
               description: args.description,
               created_time: new Date().toISOString(),
               image: args.image,
-              author_id: args.author_id
+              author: args.author,
+              state: args.state
           }, function(err, channel) {
               if (err) reject(err);
               else if (channel != null) {
@@ -1814,7 +1884,8 @@ const mutationType = new GraphQLObjectType({
         }),
         description: 'Eliminar un usuario ya existente',
         args: {
-            userID: { type: GraphQLString }
+            userID: { type: GraphQLString },
+            type: { type: GraphQLString }
         },
         resolve: function(root, args) {
             return new Promise((resolve, reject) => {
@@ -1823,7 +1894,7 @@ const mutationType = new GraphQLObjectType({
                 },
                 {
                     $set: {
-                        state: args.state
+                        state: args.type
                     }
                 }, {
                     new: true
@@ -1831,7 +1902,7 @@ const mutationType = new GraphQLObjectType({
                     if (err) reject(err);
                     else if (user != null) {
                         resolve({
-                            data: user, //que deberia devolver si se borra el usuario
+                            data: user,
                             error: null
                         });
 
@@ -1860,35 +1931,47 @@ const mutationType = new GraphQLObjectType({
         }),
         description: 'Convertir o no un usuario en editor',
         args: {
+            id: { type: GraphQLString },
             userID: { type: GraphQLString },
-            role: { type: GraphQLString }
+            type: { type: GraphQLString }
         },
         resolve: function(root, args) {
             return new Promise((resolve, reject) => {
-                User.findOneAndUpdate({
-                    _id: args.userID
-                },
-                {
-                    $set: {
-                        role: args.role
-                    }
-                }, {
-                    new: true
-                },function(err, user) {
-                    if (err) reject(err);
-                    else if (user != null) {
-                        resolve({
-                            data: user,
-                            error: null
-                        });
-
-                    } else {
+                Request.remove({ _id: args.id }, function (err,req){
+                    if(err){
                         resolve({
                             data: null,
-                            error: "No existe el usuario que deseas modificar."
+                            error: "Ha ocurrido un error."
+                        });
+                    }
+                    else{
+                        User.findOneAndUpdate({
+                            _id: args.userID
+                        },
+                        {
+                            $set: {
+                                role: args.type
+                            }
+                        }, {
+                            new: true
+                        },function(err, user) {
+                            if (err) reject(err);
+                            else if (user != null) {
+                                resolve({
+                                    data: user,
+                                    error: null
+                                });
+
+                            } else {
+                                resolve({
+                                    data: null,
+                                    error: "No existe el usuario que deseas modificar."
+                                });
+                            }
                         });
                     }
                 });
+                
             });
         }
     },

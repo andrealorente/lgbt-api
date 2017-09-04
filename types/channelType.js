@@ -7,6 +7,8 @@ import {
   GraphQLInt
 } from 'graphql';
 import messageType from './messageType';
+import userType from './userType';
+var User = require('./../models/userModel');
 
 import { GraphQLDateTime } from 'graphql-iso-date';
 
@@ -21,7 +23,19 @@ const channelType = new GraphQLObjectType({
         messages: { type: new GraphQLList(messageType)},
         susc: { type: new GraphQLList(GraphQLString)},
         reports: { type: new GraphQLList(GraphQLString) },
-        created_time: { type: GraphQLDateTime }
+        created_time: { type: GraphQLDateTime },
+        state: { type: GraphQLString },
+        author_data: {
+          type: userType,
+          resolve: function(root){
+            return new Promise((resolve,reject) => {
+              User.findById(root.author, function(err, user){
+                if(err) reject(err);
+                else resolve(user);
+              });
+            });
+          }
+        }
     }
 });
 

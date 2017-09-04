@@ -141,7 +141,8 @@ app.post('/v1/report', middleware.ensureAuthorised, userController.report);
 app.get('/v1/search/users', middleware.ensureAuthorised, userController.searchUser);
 //Solicitar rango de editor-request
 app.post('/v1/editor', middleware.ensureAuthorised, userController.becomeEditor);
-
+//Solicitar rango de editor-request desde CMS
+app.post('/v1/editor/cms', userController.becomeEditorCMS);
 app.post('/v1/firebase', middleware.ensureAuthorised, userController.saveFirebase);
 //Recuperar contraseña de usuario
 app.post('/v1/recover', userController.recoverPassword);
@@ -158,14 +159,17 @@ app.get('/v1/admin/comments', middleware.ensureAuthorised, adminController.chann
 //Aprobar/Eliminar usuario reportado
 app.post('/v1/admin/delete/user', middleware.ensureAuthorised, adminController.deleteUser);
 //Aprobar/Eliminar posts reportado
-app.post('/v1/admin/delete/post', middleware.ensureAuthorised, adminController.deletePost);
+app.post('/v1/admin/update/post', middleware.ensureAuthorised, adminController.deletePost);
 //Aprobar/Eliminar comentario reportado
-app.post('/v1/admin/delete/comment', middleware.ensureAuthorised, adminController.deleteComment);
+app.post('/v1/admin/update/comment', middleware.ensureAuthorised, adminController.deleteComment);
 //Aprobar/Eliminar canal reportado
-app.post('/v1/admin/delete/comment', middleware.ensureAuthorised, adminController.deleteChannel);
+app.post('/v1/admin/update/comment', middleware.ensureAuthorised, adminController.deleteChannel);
 //Ultimos comentarios
 app.get('/v1/admin/lastcomments', middleware.ensureAuthorised, adminController.lastComments);
-
+//Obtener solicitudes de editor
+app.get('/v1/admin/editor', middleware.ensureAuthorised, adminController.requestEditor);
+//Aprobar/Eliminar solicitud editor
+app.post('/v1/admin/update/editor', middleware.ensureAuthorised, adminController.convertEditor);
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');

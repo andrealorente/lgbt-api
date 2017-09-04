@@ -14,6 +14,7 @@ var Channel = require('./../models/channelModel');
 var Event = require('./../models/eventModel');
 var Comment = require('./../models/commentModel');
 var Activity = require('./../models/activityModel');
+var Request = require('./../models/requestModel');
 
 //Custom types
 import userType from './../types/userType';
@@ -23,6 +24,7 @@ import eventType from './../types/eventType';
 import postType from './../types/postType';
 import errorType from './../types/errorType';
 import activityType from './../types/activityType';
+import requestType from './../types/requestType';
 
 const statusType = new GraphQLObjectType({
 	name: 'statusType',
@@ -705,7 +707,7 @@ const queryType = new GraphQLObjectType({
               }); //Fin Promise
           } //Fin resolve
     },
-    channelsReported: {
+      channelsReported: {
           type: new GraphQLObjectType({
               name: 'channelsReportedResult',
               fields: {
@@ -721,6 +723,29 @@ const queryType = new GraphQLObjectType({
                       else{
                           resolve({
                               data: channel,
+                              error: null
+                          });
+                      }
+                  });
+              }); //Fin Promise
+          } //Fin resolve
+      },
+      requestEditor: {
+          type: new GraphQLObjectType({
+              name: 'requestEditorResult',
+              fields: {
+                  data: { type: new GraphQLList(requestType) },
+                  error: { type: errorType }
+              }
+          }),
+          args: {},
+          resolve: function( _, {} ) {
+              return new Promise((resolve,reject) => {
+                  Request.find({ state: 'pending' }, function(err, req) {
+                      if (err) reject(err);
+                      else{
+                          resolve({
+                              data: req,
                               error: null
                           });
                       }

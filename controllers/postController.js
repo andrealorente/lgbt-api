@@ -130,7 +130,6 @@ var postController = {
       var form = new formidable.IncomingForm();
       form.keepExtensions = true;
       form.multiples = true;
-      //console.log(form);
 
       form.parse(req, function(err, fields, files){
           var tagspost=[];
@@ -143,11 +142,11 @@ var postController = {
                       temp_path = files.images.path;
                       cloudinary.uploader.upload(
                           temp_path,
-                          function (result) {
+                          function (result) { console.log(result);
                               console.log("Actualizado con 1 foto");
                               var mutation = "mutation{updatePost(postID:\""+ fields.id +"\",title:\""+ fields.title +"\",content:\""+ fields.content +"\",tags:"+ JSON.stringify(tagspost) +",image:\""+ result.version+"/"+result.public_id +"\",state:\""+ fields.state +"\"){data{id,title,content,tags,image,state},error{code,message}}}";
-  	                       graphql(Schema, mutation).then( function(result) {
-  		                      if(result.data.updatePost == null){
+  	                       graphql(Schema, mutation).then( function(result2) { console.log(result2);
+  		                      if(result2.data.updatePost == null){
   			                     res.json({
   				                    success: false,
   				                    error: "No se ha encontrado ningún post con esa ID"
@@ -155,7 +154,7 @@ var postController = {
   		                      }else{
   			                     res.json({
   				                    success: true,
-  				                    data: result.data.updatePost.data
+  				                    data: result2.data.updatePost.data
   			                     });
   		                      }
 
@@ -177,9 +176,9 @@ var postController = {
           }
           else{
               console.log("Actualizado sin 1 foto");
-              var mutation = "mutation{updatePost(postID:\""+ fields.id +"\",title:\""+ fields.title +"\",content:\""+ fields.content +"\",tags:"+ JSON.stringify(tagspost) +",image:\"1493935772/no-image_u8eu8r\",state:\""+ fields.state +"\"){post{id,title,content,tags,image,state},error{code,message}}}";
-              graphql(Schema, mutation).then( function(result) {
-                   if(result.data.updatePost == null){
+              var mutation = "mutation{updatePost(postID:\""+ fields.id +"\",title:\""+ fields.title +"\",content:\""+ fields.content +"\",tags:"+ JSON.stringify(tagspost) +",image:\"1493935772/no-image_u8eu8r\",state:\""+ fields.state +"\"){data{id,title,content,tags,image,state},error{code,message}}}";
+              graphql(Schema, mutation).then( function(result2) { 
+                   if(result2.data.updatePost == null){
                        res.json({
                           success: false,
                           error: "No se ha encontrado ningún post con esa ID"
@@ -187,7 +186,7 @@ var postController = {
                     }else{
                        res.json({
                           success: true,
-                          data: result.data.updatePost
+                          data: result2.data.updatePost.data
                        });
                     }
               });

@@ -20,9 +20,7 @@ var channelController = {
       //console.log(form);
 
       form.parse(req, function(err, fields, files){
-          var tagspost=[];
-          if(fields.tags!="undefined" && fields.tags.split(", ")!=""){tagspost = fields.tags.split(', ');}
-
+          
           var temp_path;
           if (files.images) {
               if (!files.images.length) {
@@ -32,7 +30,7 @@ var channelController = {
                           temp_path,
                           function (result) {
                               console.log("Actualizado con 1 foto");
-                              var mutation = "mutation{createChannel(title:\""+ fields.title +"\",content:\""+ fields.content +"\",tags:"+ JSON.stringify(tagspost) +",image:\""+ result.version+"/"+result.public_id +"\",state:\""+ fields.state +"\",author_id:\""+ fields.author +"\"){channel{title,content,tags,image,state,author_id},error{code,message}}}";
+                              var mutation = "mutation{createChannel(title:\""+ fields.title +"\",description:\""+ fields.content +"\",image:\""+ result.version+"/"+result.public_id +"\",state:\""+ fields.state +"\",author:\""+ fields.author +"\"){data{title,description,image,state,author},error{code,message}}}";
   	                       graphql(Schema, mutation).then( function(result) {
   		                      if(result.data.createChannel == null){
   			                     res.json({
@@ -53,8 +51,8 @@ var channelController = {
                               width: 300,
                               height: 300,
                               format: "png",
-                              folder: "posts",
-                              tags: ['posts', fields.id, fields.title/*, fields.author*/]
+                              folder: "channels",
+                              tags: ['channels', fields.id, fields.title/*, fields.author*/]
                           }
                       );
                   } else {
@@ -64,8 +62,9 @@ var channelController = {
           }
           else{
               console.log("Actualizado sin 1 foto");
-              var mutation = "mutation{createPost(title:\""+ fields.title +"\",content:\""+ fields.content +"\",tags:"+ JSON.stringify(tagspost) +",image:\"1493935772/no-image_u8eu8r\",state:\""+ fields.state +"\",author_id:\""+ fields.author +"\"){channel{id,title,content,tags,image,state,author_id},error{code,message}}}";
+              var mutation = "mutation{createChannel(title:\""+ fields.title +"\",description:\""+ fields.content +"\",image:\"1493935772/no-image_u8eu8r\",state:\""+ fields.state +"\",author:\""+ fields.author +"\"){data{id,title,description,image,state,author},error{code,message}}}";
               graphql(Schema, mutation).then( function(result) {
+                  console.log(result);
                    if(result.data.createChannel == null){
                        res.json({
                           success: false,
@@ -84,7 +83,7 @@ var channelController = {
   //Obtener todos los canales
   allChannels: function(req, res) {
 
-      var query = 'query { allChannels(userSusc:"",after: \"'+ req.query.after +'\") { data{id, title, description, author, susc},error{code,message} } }';
+      var query = 'query { allChannels(userSusc:"",after: \"'+ req.query.after +'\") { data{id, title, description, author, susc, author_data { username, image }},error{code,message} } }';
       graphql(Schema, query).then( function(result) {
           if(result.data.allChannels == null){
   			res.json({
