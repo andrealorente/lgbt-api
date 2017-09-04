@@ -3,6 +3,7 @@ import commentType from './commentType';
 var Comment = require('./../models/commentModel');
 import userType from './userType';
 var User = require('./../models/userModel');
+import reportType from './reportType';
 
 import {
   graphql,
@@ -61,6 +62,7 @@ var postType = new GraphQLObjectType({
       });
     }
   },
+  reports: { type: new GraphQLList(reportType) },
   created_time: { type: GraphQLDateTime }
 }
 });

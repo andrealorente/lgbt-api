@@ -9,6 +9,7 @@ import {
 import messageType from './messageType';
 import userType from './userType';
 var User = require('./../models/userModel');
+import reportType from './reportType';
 
 import { GraphQLDateTime } from 'graphql-iso-date';
 
@@ -22,7 +23,7 @@ const channelType = new GraphQLObjectType({
         author: { type: GraphQLString },
         messages: { type: new GraphQLList(messageType)},
         susc: { type: new GraphQLList(GraphQLString)},
-        reports: { type: new GraphQLList(GraphQLString) },
+        reports: { type: new GraphQLList(reportType) },
         created_time: { type: GraphQLDateTime },
         state: { type: GraphQLString },
         author_data: {

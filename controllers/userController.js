@@ -169,8 +169,14 @@ var userController = {
     });
   },
   changePassword: function(req,res) {
-
-    var mutation = 'mutation { changePswd(userID: \"'+ req.user +'\",oldPswd: \"'+ req.body.user_oldpswd +'\", newPswd: \"'+ req.body.user_newpswd +'\" ) { data, error { code, message } } }';
+      
+      var jsonbody = JSON.stringify(req.body);
+    if(jsonbody == "{}"){
+        var mutation = 'mutation { changePswd(userID: \"'+ req.user +'\",oldPswd: \"'+ req.query.user_oldpswd +'\", newPswd: \"'+ req.query.user_newpswd +'\" ) { data, error { code, message } } }';
+    }
+    else{
+        var mutation = 'mutation { changePswd(userID: \"'+ req.user +'\",oldPswd: \"'+ req.body.user_oldpswd +'\", newPswd: \"'+ req.body.user_newpswd +'\" ) { data, error { code, message } } }';
+    }
     graphql(Schema, mutation).then(function(result) {
       console.log(result.data.changePswd);
       if(result.data.changePswd.error){

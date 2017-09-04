@@ -35,7 +35,7 @@ var channelController = {
   		                      if(result.data.createChannel == null){
   			                     res.json({
   				                    success: false,
-  				                    error: "No se ha creado el post"
+  				                    error: "No se ha creado el canal"
   			                     });
   		                      }else{
   			                     res.json({
@@ -68,7 +68,7 @@ var channelController = {
                    if(result.data.createChannel == null){
                        res.json({
                           success: false,
-                          error: "No se ha encontrado ningún post con esa ID"
+                          error: "No se ha encontrado ningún canal con esa ID"
                        });
                     }else{
                        res.json({
@@ -80,10 +80,79 @@ var channelController = {
           }
       });
   },
+  //Modificar un canal
+  updateChannel: function(req,res){
+
+      var form = new formidable.IncomingForm();
+      form.keepExtensions = true;
+      form.multiples = true;
+      //console.log(form);
+
+      form.parse(req, function(err, fields, files){
+          
+          var temp_path;
+          if (files.images) {
+              if (!files.images.length) {
+                  if (files.images.name != "") {
+                      temp_path = files.images.path;
+                      cloudinary.uploader.upload(
+                          temp_path,
+                          function (result) {
+                              console.log("Actualizado con 1 foto");
+                              var mutation = "mutation{updateChannel(channelID:\""+ fields.id +"\",title:\""+ fields.title +"\",description:\""+ fields.content +"\",image:\""+ result.version+"/"+result.public_id +"\",state:\""+ fields.state +"\"){data{title,description,image,state,author},error{code,message}}}";
+  	                       graphql(Schema, mutation).then( function(result) {
+  		                      if(result.data.updateChannel == null){
+  			                     res.json({
+  				                    success: false,
+  				                    error: "No se ha creado el canal"
+  			                     });
+  		                      }else{
+  			                     res.json({
+  				                    success: true,
+  				                    data: result.data.updateChannel.data
+  			                     });
+  		                      }
+
+                              });
+                          },
+                          {
+                              crop: 'limit',
+                              width: 300,
+                              height: 300,
+                              format: "png",
+                              folder: "channels",
+                              tags: ['channels', fields.id, fields.title/*, fields.author*/]
+                          }
+                      );
+                  } else {
+                      console.log("Actualizado sin 1 foto");
+                  }
+              }
+          }
+          else{
+              console.log("Actualizado sin 1 foto");
+              var mutation = "mutation{updateChannel(channelID:\""+ fields.id +"\",title:\""+ fields.title +"\",description:\""+ fields.content +"\",image:\"1493935772/no-image_u8eu8r\",state:\""+ fields.state +"\"){data{id,title,description,image,state,author},error{code,message}}}";
+              graphql(Schema, mutation).then( function(result) {
+                  console.log(result);
+                   if(result.data.updateChannel == null){
+                       res.json({
+                          success: false,
+                          error: "No se ha podido modificar"
+                       });
+                    }else{
+                       res.json({
+                          success: true,
+                          data: result.data.updateChannel.data
+                       });
+                    }
+              });
+          }
+      });
+  },
   //Obtener todos los canales
   allChannels: function(req, res) {
 
-      var query = 'query { allChannels(userSusc:"",after: \"'+ req.query.after +'\") { data{id, title, description, author, susc, author_data { username, image }},error{code,message} } }';
+      var query = 'query { allChannels(userSusc:"",after: \"'+ req.query.after +'\") { data{id, title, description, author, created_time, susc, author_data { username, image }},error{code,message} } }';
       graphql(Schema, query).then( function(result) {
           if(result.data.allChannels == null){
   			res.json({

@@ -727,7 +727,9 @@ const mutationType = new GraphQLObjectType({
                     if(user.confirm == true){
                         Request.create({
                           userID: user.id,
-                          name: args.name,
+                          username: args.username,
+                          name: user.name,
+                          image: user.image,
                           org: args.org,
                           email: args.email,
                           reason: args.reason,
@@ -1219,19 +1221,23 @@ const mutationType = new GraphQLObjectType({
         },
         image: {
           type: GraphQLString
+        },
+        state: {
+          type: GraphQLString
         }
       },
       resolve: function(root, args) {
         //console.log(args.state);
         return new Promise((resolve, reject) => {
-          Post.findOneAndUpdate({
+          Channel.findOneAndUpdate({
               _id: args.channelID
             }, //"58e7ca08a364171f3c3fe58d"},
             {
               $set: {
                 title: args.title,
                 description: args.description,
-                image: args.image
+                image: args.image,
+                state: args.state
               }
             }, {
               new: true

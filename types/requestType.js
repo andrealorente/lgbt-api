@@ -16,7 +16,9 @@ const requestType = new GraphQLObjectType({
   name: 'Request',
   fields: {
     id: { type: GraphQLString },
-    userID: { type: GraphQLString },//Cada campo puede tener un resolve
+    userID: { type: GraphQLString },
+    username: { type: GraphQLString },
+    image: { type: GraphQLString },
     name: { type: GraphQLString },
     email: { type: GraphQLString },
     org: { type: GraphQLString },
