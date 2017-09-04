@@ -142,7 +142,7 @@ const queryType = new GraphQLObjectType({
               },function(err,activities){
                 console.log(activities);
                 resolve(activities);
-              }).sort('-created_time').limit(5);
+              }).sort('-created_time').limit(10);
 
             }
           });
