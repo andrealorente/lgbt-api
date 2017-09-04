@@ -25,9 +25,7 @@ var userController = {
   loginUser: function(req,res) {
     var user = req.body.user_name;
   	var pswd = req.body.user_pswd;
-      console.log(req);
-    console.log(user);
-    console.log(pswd);
+   
   	var mutation = 'mutation { loginUser(username: \"' + user + '\", password: \"'+pswd +'\"){ user { id, username, name, public, image, role }, error { code, message } } }';
 
   	graphql(Schema, mutation).then( function(result) {

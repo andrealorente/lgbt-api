@@ -6,6 +6,7 @@ var ReportSchema = require('./reportModel');
 var ChannelSchema = new Schema({
   title: String,
   description: String,
+  image: String,
   author: String,
   messages: [MessageSchema],
   susc: [String],
