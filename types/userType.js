@@ -28,14 +28,10 @@ const userType = new GraphQLObjectType({
     relationships: { type: new GraphQLList(relationshipType) },
     activity: {
       type: new GraphQLList(activityType),
-      args: {
-        after: { type: GraphQLDateTime }
-      },
       resolve: (user, args) => {
         return new Promise((resolve,reject) => {
           Activity.find({ 
-            origin_id: user.id,
-            created_time: { $lt: args.after } }, function(err, act){
+            origin_id: user.id }, function(err, act){
             if(err) reject(err);
             else{
               resolve(act);
