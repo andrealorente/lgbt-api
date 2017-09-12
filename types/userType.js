@@ -6,7 +6,7 @@ import {
   GraphQLBoolean,
   GraphQLInt,
 } from 'graphql';
-import { GraphQLDateTime } from 'graphql-iso-date';
+
 import relationshipType from './relationshipType';
 import activityType from './activityType';
 import Activity from './../models/activityModel';
@@ -40,7 +40,7 @@ const userType = new GraphQLObjectType({
             else{
               resolve(act);
             }
-          }).sort('-created_time').limit(5);
+          }).sort('-created_time');
         });
       }
     },
