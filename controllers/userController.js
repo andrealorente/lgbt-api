@@ -116,7 +116,8 @@ var userController = {
     if(req.params.id == "me"){
       user = req.user; //En req.user está la id que coge del token de la cabecera
     }
-  	var query = ' query { user(userID:\"' + user + '\") { id, username, name, bio, image, place, counts { followedby, following }, public, activity { action, target_id, created_time, type } } }';
+    var date = new Date().toISOString();
+  	var query = ' query { user(userID:\"' + user + '\") { id, username, name, bio, image, place, counts { followedby, following }, public, activity (after: \"'+date+'\"") { action, target_id, created_time, type } } }';
   	graphql(Schema, query).then( function(result) {
   		//console.log(JSON.stringify(result,null," "));
   		res.json({
