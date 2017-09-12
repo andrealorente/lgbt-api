@@ -81,7 +81,7 @@ var eventController = {
   //Obtener los eventos de un mes
   allEvents: function(req, res) {
       //Se le pasan los parámetros en la url -> /events?month=4&year=2017 en RESTClient
-      var query = 'query { allEvents (month:'+ req.query.month + ', year:'+ req.query.year +',after: \"'+ req.query.after +'\") { data{ id, title, description, place, start_time, assistants, interested, image }, error { code, message } } }';
+      var query = 'query { allEvents (month:'+ req.query.month + ', year:'+ req.query.year +',after: \"'+ req.query.after +'\") { data{ id, title, description, place, start_time, assistants, interested, image, author_data { username, image } }, error { code, message } } }';
       graphql(Schema, query).then( function(result) {
           console.log(result);
           if(result.data.allEvents == null){

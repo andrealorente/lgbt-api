@@ -81,6 +81,8 @@ app.post('/v1/channels/:id/notifications', middleware.ensureAuthorised, channelC
 app.get('/v1/channels/:id/suscribers', middleware.ensureAuthorised, channelController.getSuscribers);
 //Buscar canales por nombre o descripción
 app.get('/v1/search/channels', middleware.ensureAuthorised, channelController.searchChannel);
+//Modificar un canal concreto
+app.post('/v1/channels/:id/update',middleware.ensureAuthorised, channelController.updateChannel);
 
 /******* RUTAS DE EVENTOS ********/
 
@@ -153,11 +155,11 @@ app.get('/v1/admin/users', middleware.ensureAuthorised, adminController.usersRep
 //Obtener posts reportados
 app.get('/v1/admin/posts', middleware.ensureAuthorised, adminController.postsReported);
 //Obtener comentarios reportados
-app.get('/v1/admin/comments', middleware.ensureAuthorised, adminController.commentReported);
+app.get('/v1/admin/comments', middleware.ensureAuthorised, adminController.commentsReported);
 //Obtener canales reportados
-app.get('/v1/admin/comments', middleware.ensureAuthorised, adminController.channelsReported);
+app.get('/v1/admin/channels', middleware.ensureAuthorised, adminController.channelsReported);
 //Aprobar/Eliminar usuario reportado
-app.post('/v1/admin/delete/user', middleware.ensureAuthorised, adminController.deleteUser);
+app.post('/v1/admin/update/user', middleware.ensureAuthorised, adminController.deleteUser);
 //Aprobar/Eliminar posts reportado
 app.post('/v1/admin/update/post', middleware.ensureAuthorised, adminController.deletePost);
 //Aprobar/Eliminar comentario reportado

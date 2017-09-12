@@ -62,7 +62,7 @@ var adminController = {
   },
   //Obtener solicitudes de editor
   requestEditor: function(req,res) {
-      var query = 'query { requestEditor{ data { id, userID, name, email, org, reason, state },error{code,message}} }';
+      var query = 'query { requestEditor{ data { id, userID, username, name, image, email, org, reason, state },error{code,message}} }';
       graphql(Schema, query).then( function(result) {
   		if(result.data.requestEditor == null){
   			res.json({
@@ -97,11 +97,11 @@ var adminController = {
       });
   },
   //Obtener comentarios reportados
-  commentReported: function(req,res) {
-      var query = 'query { commentReported{ data { id, username, name },error{code,message}} }';
+  commentsReported: function(req,res) {
+      var query = 'query { commentsReported{ data { id, author_data{username, name}, content, reports{comment, reason}},error{code,message}} }';
       graphql(Schema, query).then( function(result) {
           console.log(result); 
-        if(result.data.commentReported == null){ 
+        if(result.data.commentsReported == null){ 
               res.json({
                   success: false,
                   error: "No se ha encontrado ningún comentario reportado"
@@ -109,7 +109,7 @@ var adminController = {
         }else{
               res.json({
                   success: true,
-                  data: result.data.commentReported.data
+                  data: result.data.commentsReported.data
               });
         }
 
@@ -136,7 +136,7 @@ var adminController = {
   },
   //Obtener posts reportados
   postsReported: function(req,res) {
-      var query = 'query { postsReported{ data { id },error{code,message}} }';
+      var query = 'query { postsReported{ data { id, author_data{username, name}, title, reports{comment, reason} },error{code,message}} }';
       graphql(Schema, query).then( function(result) {
           console.log(result); 
         if(result.data.postsReported == null){ 
@@ -174,7 +174,7 @@ var adminController = {
   },
   //Obtener canales reportados
   channelsReported: function(req,res) {
-      var query = 'query { channelsReported{ data { id },error{code,message}} }';
+      var query = 'query { channelsReported{ data { id, author_data{username, name}, title, reports{comment, reason} },error{code,message}} }';
       graphql(Schema, query).then( function(result) {
           console.log(result); 
         if(result.data.channelsReported == null){ 
