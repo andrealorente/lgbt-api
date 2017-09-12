@@ -359,7 +359,7 @@ const queryType = new GraphQLObjectType({
                                 }
                             });
                         }
-  		            }).sort('-created_time').limit( 5 );
+  		            }).sort('-created_time').limit( 8 );
                 }else{ //Se piden los canales a los que estoy suscrito
                     User.findById(args.userSusc, function(err, user){
                         var arrayIDs = [];
