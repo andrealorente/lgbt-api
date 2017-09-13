@@ -64,7 +64,7 @@ var postController = {
           }
           else{
               console.log("Actualizado sin 1 foto");
-              var mutation = "mutation{createPost(title:\""+ fields.title +"\",content:\""+ fields.content +"\",tags:"+ JSON.stringify(tagspost) +",image:\"1493935772/no-image_u8eu8r\",state:\""+ fields.state +"\",author_id:\""+ fields.author +"\"){post{id,title,content,tags,image,state,author_id},error{code,message}}}";
+              var mutation = "mutation{createPost(title:\""+ fields.title +"\",content:\""+ fields.content +"\",tags:"+ JSON.stringify(tagspost) +",image:\"1493935772/no-image_u8eu8r\",state:\""+ fields.state +"\",author_id:\""+ fields.author +"\"){data{id,title,content,tags,image,state,author_id},error{code,message}}}";
               graphql(Schema, mutation).then( function(result) {
                    if(result.data.createPost == null){
                        res.json({
@@ -74,7 +74,7 @@ var postController = {
                     }else{
                        res.json({
                           success: true,
-                          data: result.data.createPost
+                          data: result.data.createPost.data
                        });
                     }
               });
