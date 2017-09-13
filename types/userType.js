@@ -6,6 +6,7 @@ import {
   GraphQLBoolean,
   GraphQLInt,
 } from 'graphql';
+
 import relationshipType from './relationshipType';
 import activityType from './activityType';
 import Activity from './../models/activityModel';
@@ -27,14 +28,15 @@ const userType = new GraphQLObjectType({
     relationships: { type: new GraphQLList(relationshipType) },
     activity: {
       type: new GraphQLList(activityType),
-      resolve: (user) => {
+      resolve: (user, args) => {
         return new Promise((resolve,reject) => {
-          Activity.find({ origin_id: user.id}, function(err, act){
+          Activity.find({ 
+            origin_id: user.id }, function(err, act){
             if(err) reject(err);
             else{
               resolve(act);
             }
-          });
+          }).sort('-created_time');
         });
       }
     },
