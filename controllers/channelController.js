@@ -171,7 +171,7 @@ var channelController = {
   //Obtener un canal concreto
   oneChannel: function(req,res) {
 
-  	var query = 'query { oneChannel(channelID:\"' + req.params.id + '\"){ data{title, description, author, susc, messages {content, created_time}},error{code,message} } }';
+  	var query = 'query { oneChannel(channelID:\"' + req.params.id + '\"){ data{title, image, description, author, susc, messages {content, created_time}},error{code,message} } }';
   	graphql(Schema, query).then( function(result) {
   		if(result.data.oneChannel.error != null){
   			res.json({
