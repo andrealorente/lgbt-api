@@ -1265,23 +1265,48 @@ const mutationType = new GraphQLObjectType({
     },
 
     deleteChannel: {
-      type: channelType,
+      type: new GraphQLObjectType({
+            name: 'deleteChannelResult',
+            fields: {
+                data: {
+                    type: channelType
+                },
+                error: {
+                    type: errorType
+                }
+            }
+        }),
       description: 'Eliminar un canal ya existente',
       args: {
-        channelID: {
-          type: GraphQLString
-        }
+        channelID: { type: GraphQLString },
+        state: { type: GraphQLString }
       },
       resolve: function(root, args) {
         return new Promise((resolve, reject) => {
-          Channel.findOneAndDelete({
-            _id: args.channelID
-          }, function(err, res) {
-            if (err) reject(err);
-            else {
-              resolve(res);
-            }
-          });
+          Channel.findOneAndUpdate({
+                    _id: args.channelID
+                },
+                {
+                    $set: {
+                        state: args.state
+                    }
+                }, {
+                    new: true
+                }, function(err, channel) {
+                    if (err) reject(err);
+                    else if (channel != null) {
+                        resolve({
+                            data: channel,
+                            error: null
+                        });
+
+                    } else {
+                        resolve({
+                            data: null,
+                            error: "No existe el canal que deseas eliminar."
+                        });
+                    }
+                });
         });
       }
     },
@@ -2028,7 +2053,7 @@ const mutationType = new GraphQLObjectType({
             });
         }
     },
-        
+     /*   
     deletePost: {
         type: new GraphQLObjectType({
             name: 'deletePostResult',
@@ -2074,7 +2099,7 @@ const mutationType = new GraphQLObjectType({
                 });
             });
         }
-    }
+    }*/
   })
 });
 

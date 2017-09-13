@@ -117,7 +117,7 @@ var adminController = {
   },
   //Aprobar/Eliminar comentario
   deleteComment: function(req,res) {
-      var mutation = 'mutation { deleteComment{ data { id, username, name },error{code,message}} }';
+      var mutation = 'mutation { deleteComment(commentID:\"' + req.query.commentID + '\", state:\"' + req.query.state + '\"){ data { id, username, name },error{code,message}} }';
       graphql(Schema, mutation).then( function(result) {
           console.log(result); 
         if(result.data.deleteComment == null){ 
@@ -155,7 +155,7 @@ var adminController = {
   }, 
   //Aprobar/Elimina posts
   deletePost: function(req,res) {
-      var mutation = 'mutation { deletePost{ data { id },error{code,message}} }';
+      var mutation = 'mutation { deletePost (postID:\"' + req.query.postID + '\"){ data { id },error{code,message}} }';
       graphql(Schema, mutation).then( function(result) {
           console.log(result); 
         if(result.data.deletePost == null){ 
@@ -193,7 +193,7 @@ var adminController = {
   }, 
   //Aprobar/Elimina canal
   deleteChannel: function(req,res) {
-      var mutation = 'mutation { deleteChannel{ data { id },error{code,message}} }';
+      var mutation = 'mutation { deleteChannel(channelID:\"' + req.query.channelID + '\", state:\"' + req.query.state + '\"){ data { id },error{code,message}} }';
       graphql(Schema, mutation).then( function(result) {
           console.log(result); 
         if(result.data.deleteChannel == null){ 

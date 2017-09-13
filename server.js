@@ -165,7 +165,7 @@ app.post('/v1/admin/update/post', middleware.ensureAuthorised, adminController.d
 //Aprobar/Eliminar comentario reportado
 app.post('/v1/admin/update/comment', middleware.ensureAuthorised, adminController.deleteComment);
 //Aprobar/Eliminar canal reportado
-app.post('/v1/admin/update/comment', middleware.ensureAuthorised, adminController.deleteChannel);
+app.post('/v1/admin/update/channel', middleware.ensureAuthorised, adminController.deleteChannel);
 //Ultimos comentarios
 app.get('/v1/admin/lastcomments', middleware.ensureAuthorised, adminController.lastComments);
 //Obtener solicitudes de editor
