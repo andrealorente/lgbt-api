@@ -222,7 +222,7 @@ var postController = {
   //Buscar post
   searchPost: function(req,res){
       console.log(req);
-      var query = 'query { searchPost(searchparams:\"' + req.query.searchparams + '\",type:\"' + req.query.type + '\") {data{title,content,author_id},error{code,message}}}';
+      var query = 'query { searchPost(searchparams:\"' + req.query.searchparams + '\",type:\"' + req.query.type + '\") {data{title,content, image, author_id, author_data { username, image },tags, created_time, likes, comments_count},error{code,message}}}';
       graphql(Schema, query).then( function(result) {
           console.log(result.data.searchPost.post);
   		if(result.data.searchPost == null){
